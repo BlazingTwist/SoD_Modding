@@ -7,8 +7,9 @@ using System.Text;
 using System.Globalization;
 using System.Xml.Serialization;
 using HarmonyLib;
+using SoD_BlazingTwist_Core;
 
-namespace SoD_BepInEx_Runtime.AsmFirstpass
+namespace SoD_Enable_Logging.AsmFirstpass
 {
 	class ServiceCallPatcher : RuntimePatcher
 	{
@@ -32,15 +33,15 @@ namespace SoD_BepInEx_Runtime.AsmFirstpass
 		}
 
 		public static void PostprocessCall(string inData, object __instance, ServiceRequest ___mServiceRequest, object ___mProcessCallback) {
-			if(!BlazingTwistSodMod.IsServiceCallLoggingEnabled()) {
+			if(!SodEnableLogging.IsServiceCallLoggingEnabled()) {
 				return;
 			}
 
-			if(___mServiceRequest == null || BlazingTwistSodMod.GetFilteredServiceCalls().Contains(___mServiceRequest._Type)) {
+			if(___mServiceRequest == null || SodEnableLogging.GetFilteredServiceCalls().Contains(___mServiceRequest._Type)) {
 				return;
 			}
 
-			using(StreamWriter writer = new StreamWriter(BlazingTwistSodMod.basePath.Replace('/', Path.DirectorySeparatorChar) + "serviceCallLogger.txt", true)) {
+			using(StreamWriter writer = new StreamWriter(SodEnableLogging.basePath.Replace('/', Path.DirectorySeparatorChar) + "serviceCallLogger.txt", true)) {
 				Type dataType = __instance.GetType().DeclaringType.GetGenericArguments()[0];
 				object inObject;
 

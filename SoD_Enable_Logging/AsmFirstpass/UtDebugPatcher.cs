@@ -1,7 +1,8 @@
-﻿using System;
+﻿using SoD_BlazingTwist_Core;
+using System;
 using UnityEngine;
 
-namespace SoD_BepInEx_Runtime.AsmFirstpass
+namespace SoD_Enable_Logging.AsmFirstpass
 {
 	public class UtDebugPatcher : RuntimePatcher
 	{

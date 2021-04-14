@@ -4,16 +4,16 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
+using SoD_BlazingTwist_Core;
 using UnityEngine;
-using BepInEx.Configuration;
 
-namespace SoD_BepInEx_Runtime
+namespace SoD_Enable_Logging
 {
 	[BepInPlugin(pluginGuid, pluginName, pluginVersion)]
-	class BlazingTwistSodMod : BaseUnityPlugin
+	class SodEnableLogging : BaseUnityPlugin
 	{
-		public const string pluginGuid = "blazingtwist.sodmod";
-		public const string pluginName = "BlazingTwist SoD Modifications";
+		public const string pluginGuid = "blazingtwist.enablelogging";
+		public const string pluginName = "BlazingTwist SoD EnableLogging";
 		public const string pluginVersion = "1.0.0";
 
 		public static string basePath = Application.dataPath + "/BlazingTwist/";
@@ -58,23 +58,8 @@ namespace SoD_BepInEx_Runtime
 			}
 
 			Harmony harmony = new Harmony(pluginGuid);
-			RunPatchers(GetTypesInNamespace("SoD_BepInEx_Runtime.AsmFirstpass"), harmony);
-			RunPatchers(GetTypesInNamespace("SoD_BepInEx_Runtime.Asm"), harmony);
-		}
-
-		private void RunPatchers(Type[] types, Harmony harmony) {
-			foreach(Type type in types) {
-				Logger.LogInfo("Starting Patcher: " + type.FullName);
-				RuntimePatcher patcher = Activator.CreateInstance(type) as RuntimePatcher;
-				patcher.Initialize(Logger, harmony);
-				patcher.ApplyPatches();
-			}
-		}
-
-		private Type[] GetTypesInNamespace(string nameSpace) {
-			return Assembly.GetExecutingAssembly().GetTypes()
-				.Where(type => String.Equals(type.Namespace, nameSpace, StringComparison.OrdinalIgnoreCase))
-				.ToArray();
+			RuntimePatcherUtils.RunPatchers(Logger, harmony, RuntimePatcherUtils.GetTypesInNamespace("SoD_Enable_Logging.AsmFirstpass"));
+			RuntimePatcherUtils.RunPatchers(Logger, harmony, RuntimePatcherUtils.GetTypesInNamespace("SoD_Enable_Logging.Asm"));
 		}
 	}
 }

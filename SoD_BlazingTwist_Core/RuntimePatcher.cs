@@ -3,7 +3,7 @@ using HarmonyLib;
 using System;
 using System.Reflection;
 
-namespace SoD_BepInEx_Runtime
+namespace SoD_BlazingTwist_Core
 {
 	public abstract class RuntimePatcher
 	{
@@ -23,7 +23,7 @@ namespace SoD_BepInEx_Runtime
 			harmony.Patch(original, new HarmonyMethod(patch));
 		}
 
-		public void PatchPostfixMethod(Type originalType, Type patcherType, String methodName, Type[] argumentTypes = null, Type[] genericTypes = null){
+		public void PatchPostfixMethod(Type originalType, Type patcherType, String methodName, Type[] argumentTypes = null, Type[] genericTypes = null) {
 			MethodInfo original = AccessTools.Method(originalType, methodName, argumentTypes, genericTypes);
 			MethodInfo patch = AccessTools.Method(patcherType, methodName, argumentTypes, genericTypes);
 			harmony.Patch(original, null, new HarmonyMethod(patch));

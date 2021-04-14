@@ -46,6 +46,10 @@
     <Reference Include="BepInEx.Harmony">
       <HintPath>Libs\BepInEx.Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="SoD_BlazingTwist_Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SoD_BlazingTwist_Core\bin\Deploy\SoD_BlazingTwist_Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -63,9 +67,7 @@
   <ItemGroup>
     <Compile Include="AsmFirstpass\ServiceCallPatcher.cs" />
     <Compile Include="AsmFirstpass\UtDebugPatcher.cs" />
-    <Compile Include="BlazingTwistSodMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RuntimePatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Asm\" />
