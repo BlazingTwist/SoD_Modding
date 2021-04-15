@@ -106,6 +106,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="asm\CameraMovementPatcher.cs" />
+    <Compile Include="asm\CharacterPatcher.cs" />
+    <Compile Include="asm\GameManagerPatcher.cs" />
+    <Compile Include="asm\UIChestPatcher.cs" />
     <Compile Include="asm\WeaponManagerPatcher.cs" />
     <Compile Include="basemod\BTAnimationPlayerManager.cs" />
     <Compile Include="basemod\BTCommands.cs" />

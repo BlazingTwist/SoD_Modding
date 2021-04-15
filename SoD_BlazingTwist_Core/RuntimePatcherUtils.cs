@@ -10,11 +10,15 @@ namespace SoD_BlazingTwist_Core
 	{
 		public static void RunPatchers(ManualLogSource logger, Harmony harmony, Type[] types) {
 			foreach(Type type in types) {
-				logger.LogInfo("Patcher started: " + type.FullName);
 				RuntimePatcher patcher = Activator.CreateInstance(type) as RuntimePatcher;
-				patcher.Initialize(logger, harmony);
-				patcher.ApplyPatches();
-				logger.LogInfo("Patcher finished: " + type.FullName);
+				if(patcher != null) {
+					logger.LogInfo("Patcher started: " + type.FullName);
+					patcher.Initialize(logger, harmony);
+					patcher.ApplyPatches();
+					logger.LogInfo("Patcher finished: " + type.FullName);
+				} else {
+					logger.LogWarning("Potential namespace-conflict! Found non-pather class: " + type.FullName);
+				}
 			}
 		}
 

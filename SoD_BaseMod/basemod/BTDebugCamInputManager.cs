@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
+using SquadTactics;
 
 namespace SoD_BaseMod.basemod
 {
@@ -66,7 +66,7 @@ namespace SoD_BaseMod.basemod
 
 			AssetBundle uiBundle = null;
 			try {
-				string bundlePath = (BTConfigHolder.basePath + "btuiBundle").Replace('/', Path.DirectorySeparatorChar);
+				string bundlePath = (BTConfigHolder.basePath + "btuiBundle").Replace('/', System.IO.Path.DirectorySeparatorChar);
 				uiBundle = AssetBundle.LoadFromFile(bundlePath);
 				if(uiBundle == null) {
 					configHolder.LogMessage(LogType.Error, "failed to load bundleFile at path: " + bundlePath);
@@ -152,6 +152,10 @@ namespace SoD_BaseMod.basemod
 				PauseAllAnimations(false);
 			}
 
+			if(IsKeyJustDown("SquadTacticsKillSwitch")) {
+				HandleSquadTacticsKillSwitch();
+			}
+
 			DoLoadLevelCheck();
 			BTDebugCam.Update();
 			BTAnimationPlayerManager.Update();
@@ -190,6 +194,24 @@ namespace SoD_BaseMod.basemod
 			}
 
 			Time.timeScale = doPause ? 0f : 1f;
+		}
+
+		private static void HandleSquadTacticsKillSwitch() {
+			GameManager gameManager = GameManager.pInstance;
+			if(gameManager == null) {
+				return;
+			}
+			List<Character> enemies = gameManager.GetTeamCharacters(Character.Team.ENEMY);
+			if(enemies == null || enemies.Count == 0) {
+				return;
+			}
+
+			for(int i = enemies.Count - 1; i >= 0; i--) {
+				Character enemy = enemies[i];
+				if(enemy != null) {
+					enemy.TakeStatChange(SquadTactics.Stat.HEALTH, -10_000f, null, false, false);
+				}
+			}
 		}
 
 		private static void DoLoadLevelCheck() {
@@ -239,7 +261,7 @@ namespace SoD_BaseMod.basemod
 				}
 
 				configHolder.LogMessage(LogType.Log, "bundle loaded, available scenes: " + string.Join(", ", scenePaths));
-				RsResourceManager.LoadLevel(Path.GetFileNameWithoutExtension(scenePaths[0]));
+				RsResourceManager.LoadLevel(System.IO.Path.GetFileNameWithoutExtension(scenePaths[0]));
 				//SceneManager.LoadScene(Path.GetFileNameWithoutExtension(scenePaths[0]));
 			} catch(Exception e) {
 				configHolder.LogMessage(LogType.Error, "caught exception while loading bundleFile-Level: " + e.ToString());

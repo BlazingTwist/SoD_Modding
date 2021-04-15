@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SoD_BaseMod.basemod
@@ -95,17 +92,19 @@ namespace SoD_BaseMod.basemod
 
 				//set terrain values
 				Terrain terrain = (Terrain)UnityEngine.Object.FindObjectOfType(typeof(Terrain));
-				initialDetailObjectDistance = terrain.detailObjectDistance;
-				initialTreeDistance = terrain.treeDistance;
-				initialTreeBillboardDistance = terrain.treeBillboardDistance;
-				terrain.detailObjectDistance = ConfigHolder.config.cameraRenderDistance;
-				terrain.treeDistance = ConfigHolder.config.cameraRenderDistance;
-				terrain.treeBillboardDistance = ConfigHolder.config.cameraRenderDistance;
-				float[] newheighterror = new float[terrain.terrainData.GetMaximumHeightError().Length];
-				for(int i = 0; i < newheighterror.Length; i++) {
-					newheighterror[i] = 1f;
+				if(terrain != null) {
+					initialDetailObjectDistance = terrain.detailObjectDistance;
+					initialTreeDistance = terrain.treeDistance;
+					initialTreeBillboardDistance = terrain.treeBillboardDistance;
+					terrain.detailObjectDistance = ConfigHolder.config.cameraRenderDistance;
+					terrain.treeDistance = ConfigHolder.config.cameraRenderDistance;
+					terrain.treeBillboardDistance = ConfigHolder.config.cameraRenderDistance;
+					float[] newheighterror = new float[terrain.terrainData.GetMaximumHeightError().Length];
+					for(int i = 0; i < newheighterror.Length; i++) {
+						newheighterror[i] = 1f;
+					}
+					terrain.terrainData.OverrideMaximumHeightError(newheighterror);
 				}
-				terrain.terrainData.OverrideMaximumHeightError(newheighterror);
 			} else {
 				//restore old values
 				camera.transform.position = initialPosition;
@@ -116,10 +115,12 @@ namespace SoD_BaseMod.basemod
 
 				//restore terrain
 				Terrain terrain = (Terrain)UnityEngine.Object.FindObjectOfType(typeof(Terrain));
-				terrain.detailObjectDistance = initialDetailObjectDistance;
-				terrain.treeDistance = initialTreeDistance;
-				terrain.treeBillboardDistance = initialTreeBillboardDistance;
-				terrain.terrainData.OverrideMaximumHeightError(terrain.terrainData.GetMaximumHeightError());
+				if(terrain != null) {
+					terrain.detailObjectDistance = initialDetailObjectDistance;
+					terrain.treeDistance = initialTreeDistance;
+					terrain.treeBillboardDistance = initialTreeBillboardDistance;
+					terrain.terrainData.OverrideMaximumHeightError(terrain.terrainData.GetMaximumHeightError());
+				}
 			}
 		}
 
