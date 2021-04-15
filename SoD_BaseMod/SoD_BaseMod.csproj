@@ -111,6 +111,8 @@
     <Compile Include="asm\CameraMovementPatcher.cs" />
     <Compile Include="asm\CharacterPatcher.cs" />
     <Compile Include="asm\CoAnimControllerPatcher.cs" />
+    <Compile Include="asm\EelRoastManagerPatcher.cs" />
+    <Compile Include="asm\EREelPatcher.cs" />
     <Compile Include="asm\GameManagerPatcher.cs" />
     <Compile Include="asm\GauntletControllerPatcher.cs" />
     <Compile Include="asm\KAConsolePatcher.cs" />
