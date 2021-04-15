@@ -10,11 +10,7 @@ namespace SoD_BaseMod.asm
 	[HarmonyPatch]
 	public class UIChestPatcher : RuntimePatcher
 	{
-		private static UIChestPatcher instance;
-
 		public override void ApplyPatches() {
-			instance = this;
-
 			Type originalType = typeof(UiChest);
 			Type patcherType = typeof(UIChestPatcher);
 

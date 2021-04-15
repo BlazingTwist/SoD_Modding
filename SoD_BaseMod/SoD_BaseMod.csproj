@@ -113,7 +113,10 @@
     <Compile Include="asm\GameManagerPatcher.cs" />
     <Compile Include="asm\GauntletControllerPatcher.cs" />
     <Compile Include="asm\KAConsolePatcher.cs" />
+    <Compile Include="asm\KAUiGauntletShooterHUDPatcher.cs" />
+    <Compile Include="asm\ObstacleCourseGamePatcher.cs" />
     <Compile Include="asm\UIChestPatcher.cs" />
+    <Compile Include="asm\UiEndDBPatcher.cs" />
     <Compile Include="asm\WeaponManagerPatcher.cs" />
     <Compile Include="basemod\BTAnimationPlayerManager.cs" />
     <Compile Include="basemod\BTCommands.cs" />
