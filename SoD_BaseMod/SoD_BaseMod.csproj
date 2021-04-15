@@ -116,6 +116,7 @@
     <Compile Include="asm\KAConsolePatcher.cs" />
     <Compile Include="asm\KAUiGauntletShooterHUDPatcher.cs" />
     <Compile Include="asm\ObstacleCourseGamePatcher.cs" />
+    <Compile Include="asm\SanctuaryPetPatcher.cs" />
     <Compile Include="asm\UIChestPatcher.cs" />
     <Compile Include="asm\UiEndDBPatcher.cs" />
     <Compile Include="asm\WeaponManagerPatcher.cs" />
