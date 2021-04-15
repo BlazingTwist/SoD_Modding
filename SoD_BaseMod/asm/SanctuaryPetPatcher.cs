@@ -20,16 +20,19 @@ namespace SoD_BaseMod.asm
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update", null, null);
 			MethodInfo updateShadersOriginal = AccessTools.Method(originalType, "UpdateShaders", null, null);
 			MethodInfo setSleepParticleOriginal = AccessTools.Method(originalType, "SetSleepParticle", new Type[] { typeof(bool), typeof(Transform) }, null);
+			MethodInfo setPWeaponShotsAvailableOriginal = AccessTools.PropertySetter(originalType, "pWeaponShotsAvailable");
 
 			HarmonyMethod setMeterPrefix = new HarmonyMethod(AccessTools.Method(patcherType, "SetMeterPrefix", new Type[] { typeof(SanctuaryPetMeterInstance), typeof(float).MakeByRefType(), typeof(bool).MakeByRefType(), typeof(SanctuaryPet) }, null));
 			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix", null, null));
 			HarmonyMethod updateShadersPostfix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdateShadersPostfix", new Type[] { typeof(SanctuaryPet), typeof(Dictionary<string, SkinnedMeshRenderer>) }, null));
 			HarmonyMethod setSleepParticlePostfix = new HarmonyMethod(AccessTools.Method(patcherType, "SetSleepParticlePostfix", new Type[] { typeof(SanctuaryPet) }, null));
+			HarmonyMethod setPWeaponShotsAvailablePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "SetPWeaponShotsAvailablePrefix", null, null));
 
 			harmony.Patch(setMeterOriginal, setMeterPrefix);
 			harmony.Patch(updateOriginal, updatePrefix);
 			harmony.Patch(updateShadersOriginal, null, updateShadersPostfix);
 			harmony.Patch(setSleepParticleOriginal, null, setSleepParticlePostfix);
+			harmony.Patch(setPWeaponShotsAvailableOriginal, setPWeaponShotsAvailablePrefix);
 		}
 
 		private static void SetMeterPrefix(SanctuaryPetMeterInstance ins, ref float val, ref bool forceUpdate, SanctuaryPet __instance) {
@@ -84,6 +87,11 @@ namespace SoD_BaseMod.asm
 			if(config != null && config.disableZZZParticles) {
 				__instance._SleepingParticleSystem.Stop();
 			}
+		}
+
+		private static bool SetPWeaponShotsAvailablePrefix() {
+			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
+			return hackConfig == null || !hackConfig.fireball_infiniteShots;
 		}
 	}
 }
