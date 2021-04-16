@@ -968,8 +968,8 @@ namespace SoD_BaseMod.basemod
 			}
 
 			public static void OnExecute(BTConsoleCommand.BTCommandInput input) {
-				if(UnityEngine.Object.FindObjectOfType(typeof(MemoryProfilerInGame)) == null) {
-					new GameObject("Memory Profiler", new Type[] { typeof(MemoryProfilerInGame) });
+				if(UnityEngine.Object.FindObjectOfType(typeof(BTMemoryProfilerContainer)) == null) {
+					new GameObject("Memory Profiler", new Type[] { typeof(BTMemoryProfilerContainer) });
 					BTConsole.WriteLine("Attached MemProfiler.");
 				} else {
 					BTConsole.WriteLine("MemProfiler is already attached.");

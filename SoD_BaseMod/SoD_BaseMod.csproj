@@ -139,6 +139,8 @@
     <Compile Include="basemod\BTInfoHUDManager.cs" />
     <Compile Include="basemod\BTLevelConfigEntry.cs" />
     <Compile Include="basemod\BTLoggerConfigEntry.cs" />
+    <Compile Include="basemod\BTMemoryProfiler.cs" />
+    <Compile Include="basemod\BTMemoryProfilerContainer.cs" />
     <Compile Include="basemod\BTModMenuManager.cs" />
     <Compile Include="basemod\BTUIDragHandler.cs" />
     <Compile Include="basemod\BTUIUtils.cs" />
