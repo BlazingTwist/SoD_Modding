@@ -1,39 +1,44 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Reflection;
+using HarmonyLib;
+using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
 using SoD_BlazingTwist_Core;
-using System;
-using System.Reflection;
 
-namespace SoD_BaseMod.asm
-{
-	public class ObstacleCourseGamePatcher : RuntimePatcher
-	{
-		private static int obstacleCourseGameID = 0;
-		private static bool timeStopped = false;
+namespace SoD_BaseMod.asm {
+	[UsedImplicitly]
+	public class ObstacleCourseGamePatcher : RuntimePatcher {
+		private static int obstacleCourseGameID;
+		private static bool timeStopped;
 
 		public override void ApplyPatches() {
 			Type originalType = typeof(ObstacleCourseGame);
 			Type patcherType = typeof(ObstacleCourseGamePatcher);
 
-			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update", null, null);
+			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix", new Type[] { typeof(ObstacleCourseGame), typeof(UiFlightSchoolHUD), typeof(float) }, null));
+			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix",
+					new[] { typeof(ObstacleCourseGame), typeof(UiFlightSchoolHUD), typeof(float) }));
 
 			harmony.Patch(updateOriginal, updatePrefix);
 		}
 
+		[UsedImplicitly]
 		private static void UpdatePrefix(ObstacleCourseGame __instance, UiFlightSchoolHUD ___mKAUIHud, float ___mTimeLeft) {
 			int instanceID = __instance.GetInstanceID();
-			if(obstacleCourseGameID != instanceID) {
+			if (obstacleCourseGameID != instanceID) {
 				obstacleCourseGameID = instanceID;
 				timeStopped = false;
 			}
-			if(BTDebugCam.useDebugCam) {
-				if(!timeStopped) {
-					timeStopped = true;
-					__instance.StopTimer();
+
+			if (BTDebugCam.useDebugCam) {
+				if (timeStopped) {
+					return;
 				}
-			} else if(timeStopped) {
+
+				timeStopped = true;
+				__instance.StopTimer();
+			} else if (timeStopped) {
 				timeStopped = false;
 				___mKAUIHud.StartTimer(___mTimeLeft);
 			}

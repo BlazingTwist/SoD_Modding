@@ -1,42 +1,43 @@
-﻿using HarmonyLib;
-using SoD_BlazingTwist_Core;
-using System;
+﻿using System;
 using System.Reflection;
+using HarmonyLib;
+using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
+using SoD_BlazingTwist_Core;
 using SquadTactics;
 
-namespace SoD_BaseMod.asm
-{
-	public class CharacterPatcher : RuntimePatcher
-	{
+namespace SoD_BaseMod.asm {
+	[UsedImplicitly]
+	public class CharacterPatcher : RuntimePatcher {
 		public override void ApplyPatches() {
 			Type originalType = typeof(Character);
 			Type patcherType = typeof(CharacterPatcher);
 
-			MethodInfo doMovementOriginal = AccessTools.Method(originalType, "DoMovement", new Type[] { typeof(Node) }, null);
-			MethodInfo useAbilityOriginal = AccessTools.Method(originalType, "UseAbility", new Type[] { typeof(Character) }, null);
+			MethodInfo doMovementOriginal = AccessTools.Method(originalType, "DoMovement", new[] {typeof(Node)});
+			MethodInfo useAbilityOriginal = AccessTools.Method(originalType, "UseAbility", new[] {typeof(Character)});
 
-			HarmonyMethod doMovementPostfix = new HarmonyMethod(AccessTools.Method(patcherType, "DoMovementPostfix", new Type[] { typeof(Character) }, null));
-			HarmonyMethod useAbilityPostfix = new HarmonyMethod(AccessTools.Method(patcherType, "UseAbilityPostfix", new Type[] { typeof(Character) }, null));
+			HarmonyMethod doMovementPostfix = new HarmonyMethod(AccessTools.Method(patcherType, "DoMovementPostfix", new[] {typeof(Character)}));
+			HarmonyMethod useAbilityPostfix = new HarmonyMethod(AccessTools.Method(patcherType, "UseAbilityPostfix", new[] {typeof(Character)}));
 
 			harmony.Patch(doMovementOriginal, null, doMovementPostfix);
 			harmony.Patch(useAbilityOriginal, null, useAbilityPostfix);
-
 		}
 
+		[UsedImplicitly]
 		private static void DoMovementPostfix(Character __instance) {
-			if(!__instance._HasMoveAction) {
+			if (!__instance._HasMoveAction) {
 				BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-				if(hackConfig != null && hackConfig.squadTactics_infiniteMoves) {
+				if (hackConfig != null && hackConfig.squadTactics_infiniteMoves) {
 					__instance._HasMoveAction = true;
 				}
 			}
 		}
 
+		[UsedImplicitly]
 		private static void UseAbilityPostfix(Character __instance) {
-			if(!__instance._HasAbilityAction) {
+			if (!__instance._HasAbilityAction) {
 				BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-				if(hackConfig != null && hackConfig.squadTactics_infiniteActions) {
+				if (hackConfig != null && hackConfig.squadTactics_infiniteActions) {
 					__instance._HasAbilityAction = true;
 				}
 			}

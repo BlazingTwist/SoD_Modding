@@ -119,7 +119,9 @@
     <Compile Include="asm\KAUiGauntletShooterHUDPatcher.cs" />
     <Compile Include="asm\ObstacleCourseGamePatcher.cs" />
     <Compile Include="asm\SanctuaryPetPatcher.cs" />
+    <Compile Include="asm\TimedMissionManagerPatcher.cs" />
     <Compile Include="asm\UiAvatarControlsPatcher.cs" />
+    <Compile Include="asm\UiBackpackPatcher.cs" />
     <Compile Include="asm\UIChestPatcher.cs" />
     <Compile Include="asm\UiEndDBPatcher.cs" />
     <Compile Include="asm\UiSelectProfilePatcher.cs" />
