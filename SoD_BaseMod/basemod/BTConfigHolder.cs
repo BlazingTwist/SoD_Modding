@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,21 +11,21 @@ using Debug = UnityEngine.Debug;
 
 namespace SoD_BaseMod.basemod {
 	public class BTConfigHolder {
-		public static string basePath = Application.dataPath + "/BlazingTwist/";
+		public static readonly string basePath = Application.dataPath + "/BlazingTwist/";
 
-		private static readonly string configFileName = "config.cs";
-		private static readonly string hackConfigFileName = "hackConfig.cs";
-		private static readonly string hackEnableFileName = "enableHacks.7bTRGia50U";
-		private static readonly string flightStatsFileName = "flightStatsOverride.cs";
+		private const string configFileName = "config.cs";
+		private const string hackConfigFileName = "hackConfig.cs";
+		private const string hackEnableFileName = "enableHacks.7bTRGia50U";
+		private const string flightStatsFileName = "flightStatsOverride.cs";
 
-		private static readonly string logFileName = "log.txt";
+		private const string logFileName = "log.txt";
 
 		private static readonly ILogger logger = Debug.unityLogger;
 		public BTConfig config;
 		public BTHackConfig hackConfig;
 		public AvAvatarFlyingData flightStats;
 
-		public void LogMessage(LogType logType, object message) {
+		public static void LogMessage(LogType logType, object message) {
 			logger.Log(logType, message);
 		}
 
@@ -88,7 +89,7 @@ namespace SoD_BaseMod.basemod {
 			}
 		}
 
-		private bool AreHacksEnabled() {
+		private static bool AreHacksEnabled() {
 			return File.Exists((basePath + hackEnableFileName).Replace('/', Path.DirectorySeparatorChar));
 		}
 
@@ -108,7 +109,7 @@ namespace SoD_BaseMod.basemod {
 			}
 		}
 
-		private T LoadConfigFile<T>(string fileName, T instance) {
+		private static T LoadConfigFile<T>(string fileName, T instance) {
 			String filePath = (basePath + fileName).Replace('/', Path.DirectorySeparatorChar);
 			if (!File.Exists(filePath)) {
 				return default;

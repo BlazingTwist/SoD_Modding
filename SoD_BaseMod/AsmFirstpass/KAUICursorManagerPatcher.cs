@@ -9,7 +9,7 @@ using SoD_BaseMod.basemod.config;
 using SoD_BlazingTwist_Core;
 using UnityEngine;
 
-namespace SoD_Enable_Cursor.AsmFirstpass {
+namespace SoD_BaseMod.AsmFirstpass {
 	[UsedImplicitly]
 	public class KAUICursorManagerPatcher : RuntimePatcher {
 		private static KAUICursorManagerPatcher instance;
