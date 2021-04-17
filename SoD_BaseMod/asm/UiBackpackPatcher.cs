@@ -1,11 +1,8 @@
-﻿using HarmonyLib;
-using SoD_BlazingTwist_Core;
-using System;
+﻿using System;
 using System.Reflection;
-using SoD_BaseMod.basemod;
-using UnityEngine;
-using System.Collections.Generic;
+using HarmonyLib;
 using JetBrains.Annotations;
+using SoD_BlazingTwist_Core;
 
 namespace SoD_BaseMod.asm {
 	[HarmonyPatch]
@@ -18,21 +15,20 @@ namespace SoD_BaseMod.asm {
 		}
 	}
 
+	[UsedImplicitly]
 	public class UiBackpackPatcher : RuntimePatcher {
 		public override void ApplyPatches() {
 			Type originalType = typeof(UiBackpack);
 			Type patcherType = typeof(UiBackpackPatcher);
 
-			MethodInfo selectItemOriginal = AccessTools.Method(originalType, "SelectItem", new Type[] {typeof(KAWidget)}, null);
+			MethodInfo selectItemOriginal = AccessTools.Method(originalType, "SelectItem", new[] { typeof(KAWidget) });
 
 			HarmonyMethod selectItemPostfix =
-				new HarmonyMethod(AccessTools.Method(patcherType, "SelectItemPostfix", new Type[] {typeof(UiBackpack), typeof(UserItemData), typeof(KAWidget)},
-				                                     null));
+					new HarmonyMethod(patcherType, nameof(SelectItemPostfix), new[] { typeof(UiBackpack), typeof(UserItemData), typeof(KAWidget) });
 
 			harmony.Patch(selectItemOriginal, null, selectItemPostfix);
 		}
 
-		[UsedImplicitly]
 		private static void SelectItemPostfix(UiBackpack __instance, UserItemData ___mSelectedUserItemData, KAWidget item) {
 			ItemData selectedItem = ___mSelectedUserItemData.Item;
 			KAUISelectItemData kAUISelectItemData = (KAUISelectItemData) item.GetUserData();

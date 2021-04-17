@@ -83,4 +83,9 @@
     <Compile Include="RuntimePatcherUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="Install" AfterTargets="Build">
+    <Message Text="Installing..." Importance="normal" />
+    <Exec Command="copy .\bin\Deploy\SoD_BlazingTwist_Core.dll ..\Releases\Current" ConsoleToMSBuild="true" />
+  </Target>
 </Project>

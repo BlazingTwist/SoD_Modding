@@ -4,6 +4,7 @@ using SoD_BlazingTwist_Core;
 using System;
 using System.Reflection;
 using JetBrains.Annotations;
+using SoD_BaseMod.basemod.config;
 using UnityEngine;
 
 namespace SoD_BaseMod.asm {
@@ -15,12 +16,11 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo onEelHitOriginal = AccessTools.Method(originalType, "OnEelHit");
 
-			HarmonyMethod onEelHitPrefix = new HarmonyMethod(AccessTools.Method(patcherType, "OnEelHitPrefix", new[] { typeof(EREel) }));
+			HarmonyMethod onEelHitPrefix = new HarmonyMethod(patcherType, nameof(OnEelHitPrefix), new[] { typeof(EREel) });
 
 			harmony.Patch(onEelHitOriginal, onEelHitPrefix);
 		}
 
-		[UsedImplicitly]
 		private static bool OnEelHitPrefix(EREel __instance) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.eelRoast_infiniteEels) {

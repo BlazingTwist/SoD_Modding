@@ -3,7 +3,6 @@ using SoD_BaseMod.basemod;
 using SoD_BlazingTwist_Core;
 using System;
 using System.Reflection;
-using JetBrains.Annotations;
 
 namespace SoD_BaseMod.asm {
 	[HarmonyPatch]
@@ -15,21 +14,18 @@ namespace SoD_BaseMod.asm {
 			MethodInfo getUnlockedOriginal = AccessTools.PropertyGetter(originalType, "pUnlocked");
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod getUnlockedPrefix =
-				new HarmonyMethod(AccessTools.Method(patcherType, "GetUnlockedPrefix", new[] { typeof(bool).MakeByRefType() }));
-			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix", new[] { typeof(KAConsole) }));
+			HarmonyMethod getUnlockedPrefix = new HarmonyMethod(patcherType, nameof(GetUnlockedPrefix), new[] { typeof(bool).MakeByRefType() });
+			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix), new[] { typeof(KAConsole) });
 
 			harmony.Patch(getUnlockedOriginal, getUnlockedPrefix);
 			harmony.Patch(updateOriginal, updatePrefix);
 		}
 
-		[UsedImplicitly]
 		private static bool GetUnlockedPrefix(out bool __result) {
 			__result = true;
 			return false;
 		}
 
-		[UsedImplicitly]
 		private static bool UpdatePrefix(KAConsole __instance) {
 			if (!BTDebugCamInputManager.IsKeyJustDown("ToggleOfficialConsole")) {
 				return true;

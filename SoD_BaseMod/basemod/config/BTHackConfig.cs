@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
-namespace SoD_BaseMod.basemod
+namespace SoD_BaseMod.basemod.config
 {
+	[PublicAPI]
 	public class BTHackConfig
 	{
 		public bool unlockStartButtons = false;

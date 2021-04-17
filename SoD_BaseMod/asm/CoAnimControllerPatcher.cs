@@ -14,12 +14,11 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix"));
+			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix));
 
 			harmony.Patch(updateOriginal, updatePrefix);
 		}
 
-		[UsedImplicitly]
 		private static bool UpdatePrefix() {
 			return !BTDebugCam.useDebugCam;
 		}

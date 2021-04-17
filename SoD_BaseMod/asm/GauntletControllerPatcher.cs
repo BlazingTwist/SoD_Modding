@@ -14,12 +14,11 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix", new[] {typeof(GauntletController)}));
+			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix), new[] {typeof(GauntletController)});
 
 			harmony.Patch(updateOriginal, updatePrefix);
 		}
 
-		[UsedImplicitly]
 		private static void UpdatePrefix(GauntletController __instance) {
 			__instance._Pause = BTDebugCam.useDebugCam;
 		}

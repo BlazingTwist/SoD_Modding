@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SoD_BaseMod.basemod.config;
 using UnityEngine;
 using SquadTactics;
 

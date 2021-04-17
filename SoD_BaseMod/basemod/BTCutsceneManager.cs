@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Reflection;
+using SoD_BaseMod.basemod.config;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;

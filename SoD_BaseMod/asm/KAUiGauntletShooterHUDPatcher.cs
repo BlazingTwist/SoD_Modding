@@ -15,12 +15,11 @@ namespace SoD_BaseMod.asm {
 			MethodInfo continueFireBallFrenzyOriginal = AccessTools.Method(originalType, "ContinueFireBallFrenzy");
 
 			HarmonyMethod continueFireBallFrenzyPostfix =
-				new HarmonyMethod(AccessTools.Method(patcherType, "ContinueFireBallFrenzyPostfix", new[] {typeof(GauntletRailShootManager)}));
+					new HarmonyMethod(patcherType, nameof(ContinueFireBallFrenzyPostfix), new[] { typeof(GauntletRailShootManager) });
 
 			harmony.Patch(continueFireBallFrenzyOriginal, continueFireBallFrenzyPostfix);
 		}
 
-		[UsedImplicitly]
 		private static void ContinueFireBallFrenzyPostfix(GauntletRailShootManager ___mGameManager) {
 			___mGameManager._GauntletController._Pause = BTDebugCam.useDebugCam;
 		}

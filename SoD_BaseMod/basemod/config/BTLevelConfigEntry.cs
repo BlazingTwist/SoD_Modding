@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SoD_BaseMod.basemod
+namespace SoD_BaseMod.basemod.config
 {
 	public class BTLevelConfigEntry
 	{

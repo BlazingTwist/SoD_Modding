@@ -106,6 +106,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsmFirstpass\KAUICursorManagerPatcher.cs" />
     <Compile Include="asm\AvAvatarControllerPatcher.cs" />
     <Compile Include="asm\CaAvatarCamPatcher.cs" />
     <Compile Include="asm\CameraMovementPatcher.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="asm\KAUiGauntletShooterHUDPatcher.cs" />
     <Compile Include="asm\ObstacleCourseGamePatcher.cs" />
     <Compile Include="asm\SanctuaryPetPatcher.cs" />
+    <Compile Include="asm\StableQuestSlotWidgetPatcher.cs" />
     <Compile Include="asm\TimedMissionManagerPatcher.cs" />
     <Compile Include="asm\UiAvatarControlsPatcher.cs" />
     <Compile Include="asm\UiBackpackPatcher.cs" />
@@ -128,27 +130,32 @@
     <Compile Include="asm\WeaponManagerPatcher.cs" />
     <Compile Include="basemod\BTAnimationPlayerManager.cs" />
     <Compile Include="basemod\BTCommands.cs" />
-    <Compile Include="basemod\BTConfig.cs" />
     <Compile Include="basemod\BTConfigHolder.cs" />
     <Compile Include="basemod\BTConfigUtils.cs" />
     <Compile Include="basemod\BTConsole.cs" />
     <Compile Include="basemod\BTConsoleCommand.cs" />
-    <Compile Include="basemod\BTCutsceneConfigEntry.cs" />
     <Compile Include="basemod\BTCutsceneManager.cs" />
     <Compile Include="basemod\BTDebugCam.cs" />
     <Compile Include="basemod\BTDebugCamInputManager.cs" />
-    <Compile Include="basemod\BTHackConfig.cs" />
     <Compile Include="basemod\BTInfoHUDManager.cs" />
-    <Compile Include="basemod\BTLevelConfigEntry.cs" />
-    <Compile Include="basemod\BTLoggerConfigEntry.cs" />
     <Compile Include="basemod\BTMemoryProfiler.cs" />
     <Compile Include="basemod\BTMemoryProfilerContainer.cs" />
     <Compile Include="basemod\BTModMenuManager.cs" />
     <Compile Include="basemod\BTUIDragHandler.cs" />
     <Compile Include="basemod\BTUIUtils.cs" />
+    <Compile Include="basemod\config\BTConfig.cs" />
+    <Compile Include="basemod\config\BTCursorVisibility.cs" />
+    <Compile Include="basemod\config\BTCutsceneConfigEntry.cs" />
+    <Compile Include="basemod\config\BTHackConfig.cs" />
+    <Compile Include="basemod\config\BTLevelConfigEntry.cs" />
+    <Compile Include="basemod\config\BTLoggerConfigEntry.cs" />
     <Compile Include="SodBaseMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  
+  <Target Name="Install" AfterTargets="Build">
+    <Message Text="Installing..." Importance="normal" />
+    <Exec Command="copy .\bin\Debug\SoD_BaseMod.dll ..\Releases\Current" ConsoleToMSBuild="true" />
+  </Target>
 </Project>

@@ -7,8 +7,8 @@
     <ProjectGuid>{773985A2-B1BD-4DD6-A3CC-91FD56EF01A8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SoD_BepInEx_Runtime</RootNamespace>
-    <AssemblyName>SoD_BepInEx_Runtime</AssemblyName>
+    <RootNamespace>SoD_Enable_Logging</RootNamespace>
+    <AssemblyName>SoD_Enable_Logging</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -49,6 +49,9 @@
     <Reference Include="BepInEx.Harmony">
       <HintPath>Libs\BepInEx.Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="SoD_BaseMod, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Releases\Current\SoD_BaseMod.dll</HintPath>
+    </Reference>
     <Reference Include="SoD_BlazingTwist_Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SoD_BlazingTwist_Core\bin\Deploy\SoD_BlazingTwist_Core.dll</HintPath>
@@ -73,8 +76,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SodEnableLogging.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Asm\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="Install" AfterTargets="Build">
+    <Message Text="Installing..." Importance="normal" />
+    <Exec Command="copy .\bin\Debug\SoD_Enable_Logging.dll ..\Releases\Current" ConsoleToMSBuild="true" />
+  </Target>
 </Project>

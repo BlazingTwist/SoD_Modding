@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
+using SoD_BaseMod.basemod.config;
 using SoD_BlazingTwist_Core;
 using UnityEngine;
 
@@ -17,20 +18,19 @@ namespace SoD_BaseMod.asm {
 			Type patcherType = typeof(SanctuaryPetPatcher);
 
 			MethodInfo setMeterOriginal = AccessTools.Method(originalType, "SetMeter",
-				new[] {typeof(SanctuaryPetMeterInstance), typeof(float), typeof(bool)});
+					new[] { typeof(SanctuaryPetMeterInstance), typeof(float), typeof(bool) });
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 			MethodInfo updateShadersOriginal = AccessTools.Method(originalType, "UpdateShaders");
-			MethodInfo setSleepParticleOriginal = AccessTools.Method(originalType, "SetSleepParticle", new[] {typeof(bool), typeof(Transform)});
+			MethodInfo setSleepParticleOriginal = AccessTools.Method(originalType, "SetSleepParticle", new[] { typeof(bool), typeof(Transform) });
 			MethodInfo setPWeaponShotsAvailableOriginal = AccessTools.PropertySetter(originalType, "pWeaponShotsAvailable");
 
-			HarmonyMethod setMeterPrefix = new HarmonyMethod(AccessTools.Method(patcherType, "SetMeterPrefix",
-				new[] {typeof(SanctuaryPetMeterInstance), typeof(float).MakeByRefType(), typeof(bool).MakeByRefType(), typeof(SanctuaryPet)}));
-			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix"));
-			HarmonyMethod updateShadersPostfix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdateShadersPostfix",
-				new[] {typeof(SanctuaryPet), typeof(Dictionary<string, SkinnedMeshRenderer>)}));
-			HarmonyMethod setSleepParticlePostfix =
-				new HarmonyMethod(AccessTools.Method(patcherType, "SetSleepParticlePostfix", new[] {typeof(SanctuaryPet)}));
-			HarmonyMethod setPWeaponShotsAvailablePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "SetPWeaponShotsAvailablePrefix"));
+			HarmonyMethod setMeterPrefix = new HarmonyMethod(patcherType, nameof(SetMeterPrefix),
+					new[] { typeof(SanctuaryPetMeterInstance), typeof(float).MakeByRefType(), typeof(bool).MakeByRefType(), typeof(SanctuaryPet) });
+			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix));
+			HarmonyMethod updateShadersPostfix = new HarmonyMethod(patcherType, nameof(UpdateShadersPostfix),
+					new[] { typeof(SanctuaryPet), typeof(Dictionary<string, SkinnedMeshRenderer>) });
+			HarmonyMethod setSleepParticlePostfix = new HarmonyMethod(patcherType, nameof(SetSleepParticlePostfix), new[] { typeof(SanctuaryPet) });
+			HarmonyMethod setPWeaponShotsAvailablePrefix = new HarmonyMethod(patcherType, nameof(SetPWeaponShotsAvailablePrefix));
 
 			harmony.Patch(setMeterOriginal, setMeterPrefix);
 			harmony.Patch(updateOriginal, updatePrefix);
@@ -39,7 +39,6 @@ namespace SoD_BaseMod.asm {
 			harmony.Patch(setPWeaponShotsAvailableOriginal, setPWeaponShotsAvailablePrefix);
 		}
 
-		[UsedImplicitly]
 		private static void SetMeterPrefix(SanctuaryPetMeterInstance ins, ref float val, ref bool forceUpdate, SanctuaryPet __instance) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.infiniteDragonMeter) {
@@ -50,12 +49,10 @@ namespace SoD_BaseMod.asm {
 			forceUpdate = true;
 		}
 
-		[UsedImplicitly]
 		private static bool UpdatePrefix() {
 			return !BTAnimationPlayerManager.IsActive();
 		}
 
-		[UsedImplicitly]
 		private static void UpdateShadersPostfix(SanctuaryPet __instance, Dictionary<string, SkinnedMeshRenderer> ___mRendererMap) {
 			if (__instance.pData?.Colors == null || __instance.pData.Colors.Length < 3) {
 				return;
@@ -68,8 +65,8 @@ namespace SoD_BaseMod.asm {
 
 			string regexString = hackConfig.disableDragonGlowRegex;
 			bool shouldDisableGlow = hackConfig.disableDragonGlow
-				.Select(name => regexString.Replace("${DragonName}", name))
-				.Any(regex => Regex.IsMatch(__instance.name, regex, RegexOptions.IgnoreCase));
+					.Select(name => regexString.Replace("${DragonName}", name))
+					.Any(regex => Regex.IsMatch(__instance.name, regex, RegexOptions.IgnoreCase));
 
 			if (!shouldDisableGlow) {
 				return;
@@ -88,7 +85,6 @@ namespace SoD_BaseMod.asm {
 			}
 		}
 
-		[UsedImplicitly]
 		private static void SetSleepParticlePostfix(SanctuaryPet __instance) {
 			BTConfig config = BTDebugCamInputManager.GetConfigHolder().config;
 			if (config != null && config.disableZZZParticles) {
@@ -96,7 +92,6 @@ namespace SoD_BaseMod.asm {
 			}
 		}
 
-		[UsedImplicitly]
 		private static bool SetPWeaponShotsAvailablePrefix() {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			return hackConfig == null || !hackConfig.fireball_infiniteShots;

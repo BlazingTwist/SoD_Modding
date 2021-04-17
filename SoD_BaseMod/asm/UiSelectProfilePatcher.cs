@@ -1,25 +1,26 @@
-﻿using HarmonyLib;
-using SoD_BaseMod.basemod;
-using SoD_BlazingTwist_Core;
-using System;
+﻿using System;
 using System.Reflection;
+using HarmonyLib;
 using JetBrains.Annotations;
+using SoD_BaseMod.basemod;
+using SoD_BaseMod.basemod.config;
+using SoD_BlazingTwist_Core;
 
 namespace SoD_BaseMod.asm {
+	[UsedImplicitly]
 	public class UiSelectProfilePatcher : RuntimePatcher {
 		public override void ApplyPatches() {
 			Type originalType = typeof(UiSelectProfile);
 			Type patcherType = typeof(UiSelectProfilePatcher);
 
-			MethodInfo initQuickLaunchButtonsOriginal = AccessTools.Method(originalType, "InitQuickLaunchButtons", null, null);
+			MethodInfo initQuickLaunchButtonsOriginal = AccessTools.Method(originalType, "InitQuickLaunchButtons");
 
 			HarmonyMethod initQuickLaunchButtonsPostfix =
-				new HarmonyMethod(AccessTools.Method(patcherType, "InitQuickLaunchButtonsPostfix", new Type[] {typeof(UiSelectProfile)}, null));
+					new HarmonyMethod(patcherType, nameof(InitQuickLaunchButtonsPostfix), new[] { typeof(UiSelectProfile) });
 
 			harmony.Patch(initQuickLaunchButtonsOriginal, null, initQuickLaunchButtonsPostfix);
 		}
 
-		[UsedImplicitly]
 		private static void InitQuickLaunchButtonsPostfix(UiSelectProfile __instance) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.unlockStartButtons) {

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
-namespace SoD_BaseMod.basemod
+namespace SoD_BaseMod.basemod.config
 {
+	[PublicAPI]
 	public class BTConfig
 	{
 		public float fileCheckInterval = 0f;
@@ -28,8 +30,12 @@ namespace SoD_BaseMod.basemod
 
 		public Dictionary<string, BTLevelConfigEntry> loadLevelBinds = null;
 
+		// Logger Config
 		public Dictionary<string, BTLoggerConfigEntry> loggerConfig = null;
 		public List<string> logMessageFilter = null;
+		public bool enableUTDebug = false;
+		public bool logServiceCalls = false;
+		public List<WsServiceType> serviceCallFilter = null;
 
 		// Console Config
 		public float consoleHeight = 0.3f;
@@ -37,5 +43,8 @@ namespace SoD_BaseMod.basemod
 		public bool consoleOpenByDefault = false;
 		public string consoleDefaultCommand = "help";
 		public Dictionary<string, List<string>> commandBinds = null;
+		
+		// Cursor
+		public BTCursorVisibility cursorVisibility = BTCursorVisibility.Default;
 	}
 }

@@ -14,12 +14,11 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo lateUpdateOriginal = AccessTools.Method(originalType, "LateUpdate");
 
-			HarmonyMethod lateUpdatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "LateUpdatePrefix"));
+			HarmonyMethod lateUpdatePrefix = new HarmonyMethod(patcherType, nameof(LateUpdatePrefix));
 
 			harmony.Patch(lateUpdateOriginal, lateUpdatePrefix);
 		}
 
-		[UsedImplicitly]
 		private static bool LateUpdatePrefix() {
 			return !BTDebugCam.useDebugCam;
 		}

@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
+using SoD_BaseMod.basemod.config;
 using SoD_BlazingTwist_Core;
 using SquadTactics;
 
@@ -21,13 +22,11 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo setRewardsOriginal = AccessTools.Method(originalType, "SetRewards");
 
-			HarmonyMethod setRewardsTranspiler =
-				new HarmonyMethod(AccessTools.Method(patcherType, "SetRewardsTranspiler", new[] {typeof(IEnumerable<CodeInstruction>)}));
+			HarmonyMethod setRewardsTranspiler = new HarmonyMethod(patcherType, nameof(SetRewardsTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(setRewardsOriginal, null, null, setRewardsTranspiler);
 		}
 
-		[UsedImplicitly]
 		public static int GetChestCount(int normalCount) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig != null && hackConfig.squadTactics_autochest > 0) {
@@ -37,9 +36,8 @@ namespace SoD_BaseMod.asm {
 			return normalCount;
 		}
 
-		[UsedImplicitly]
 		private static IEnumerable<CodeInstruction> SetRewardsTranspiler(IEnumerable<CodeInstruction> instructions) {
-			MethodInfo chestCountProvider = AccessTools.Method(typeof(UiEndDBPatcher), "GetChestCount", new[] {typeof(int)});
+			MethodInfo chestCountProvider = AccessTools.Method(typeof(UiEndDBPatcher), nameof(GetChestCount), new[] { typeof(int) });
 
 			List<CodeInstruction> instructionList = new List<CodeInstruction>(instructions);
 			List<CodeInstruction> result = new List<CodeInstruction>();
@@ -57,8 +55,8 @@ namespace SoD_BaseMod.asm {
 						FieldInfo field2 = inst2.operand as FieldInfo;
 
 						if (field1 != null && field2 != null
-						                   && field1.DeclaringType == typeof(UiEndDB) && field1.Name.Equals("mResultInfo")
-						                   && field2.DeclaringType == typeof(UiEndDB.ResultInfo) && field2.Name.Equals("_LockedChests")) {
+								&& field1.DeclaringType == typeof(UiEndDB) && field1.Name.Equals("mResultInfo")
+								&& field2.DeclaringType == typeof(UiEndDB.ResultInfo) && field2.Name.Equals("_LockedChests")) {
 							found++;
 							i += 2;
 							result.Add(inst);

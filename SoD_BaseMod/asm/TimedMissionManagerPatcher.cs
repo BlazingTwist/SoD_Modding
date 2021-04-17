@@ -6,6 +6,7 @@ using SoD_BaseMod.basemod;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using JetBrains.Annotations;
+using SoD_BaseMod.basemod.config;
 
 namespace SoD_BaseMod.asm {
 	[UsedImplicitly]
@@ -22,20 +23,21 @@ namespace SoD_BaseMod.asm {
 			MethodInfo getNextMissionOriginal = AccessTools.Method(originalType, "GetNextMission", new[] { typeof(TimedMissionSlotData) });
 			MethodInfo isMissionValidOriginal = AccessTools.Method(originalType, "IsMissionValid", new[] { typeof(TimedMission) });
 			MethodInfo getWinProbabilityOriginal = AccessTools.Method(originalType, "GetWinProbability", new[] { typeof(int) });
-			MethodInfo completeMissionOriginal = AccessTools.Method(originalType, "CompleteMission", new[] { typeof(TimedMissionSlotData), typeof(TimedMissionCompletion) });
+			MethodInfo completeMissionOriginal =
+					AccessTools.Method(originalType, "CompleteMission", new[] { typeof(TimedMissionSlotData), typeof(TimedMissionCompletion) });
 
 			HarmonyMethod updateSlotStatesPostfix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "UpdateSlotStatesPostfix", new[] { typeof(List<TimedMissionSlotData>) }));
+					new HarmonyMethod(patcherType, nameof(UpdateSlotStatesPostfix), new[] { typeof(List<TimedMissionSlotData>) });
 			HarmonyMethod getNextMissionPrefix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "GetNextMissionPrefix", new[] { typeof(int).MakeByRefType() }));
+					new HarmonyMethod(patcherType, nameof(GetNextMissionPrefix), new[] { typeof(int).MakeByRefType() });
 			HarmonyMethod getNextMissionPostfix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "GetNextMissionPostfix", new[] { typeof(TimedMission) }));
+					new HarmonyMethod(patcherType, nameof(GetNextMissionPostfix), new[] { typeof(TimedMission) });
 			HarmonyMethod isMissionValidPrefix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "IsMissionValidPrefix", new[] { typeof(TimedMission), typeof(bool).MakeByRefType() }));
+					new HarmonyMethod(patcherType, nameof(IsMissionValidPrefix), new[] { typeof(TimedMission), typeof(bool).MakeByRefType() });
 			HarmonyMethod getWinProbabilityPrefix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "GetWinProbabilityPrefix", new[] { typeof(float).MakeByRefType() }));
+					new HarmonyMethod(patcherType, nameof(GetWinProbabilityPrefix), new[] { typeof(float).MakeByRefType() });
 			HarmonyMethod completeMissionTranspiler =
-					new HarmonyMethod(AccessTools.Method(patcherType, "CompleteMissionTranspiler", new[] { typeof(IEnumerable<CodeInstruction>) }));
+					new HarmonyMethod(patcherType, nameof(CompleteMissionTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(updateSlotStatesOriginal, null, updateSlotStatesPostfix);
 			harmony.Patch(getNextMissionOriginal, getNextMissionPrefix, getNextMissionPostfix);
@@ -44,7 +46,6 @@ namespace SoD_BaseMod.asm {
 			harmony.Patch(completeMissionOriginal, null, null, completeMissionTranspiler);
 		}
 
-		[UsedImplicitly]
 		private static void UpdateSlotStatesPostfix(List<TimedMissionSlotData> ___mTimedMissionSlotList) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.stableMission_instantCompletion) {
@@ -63,7 +64,6 @@ namespace SoD_BaseMod.asm {
 			}
 		}
 
-		[UsedImplicitly]
 		private static void GetNextMissionPrefix(ref int ___mCheatPreferredMissionID) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null) {
@@ -73,7 +73,6 @@ namespace SoD_BaseMod.asm {
 			___mCheatPreferredMissionID = hackConfig.stableMission_forceMissionID;
 		}
 
-		[UsedImplicitly]
 		private static void GetNextMissionPostfix(TimedMission __result) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.stableMission_instantCompletion) {
@@ -83,14 +82,12 @@ namespace SoD_BaseMod.asm {
 			__result.Duration = 0;
 		}
 
-		[UsedImplicitly]
 		private static bool IsMissionValidPrefix(TimedMission mission, out bool __result) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			__result = hackConfig != null && hackConfig.stableMission_forceMissionID == mission.MissionID;
 			return !__result;
 		}
 
-		[UsedImplicitly]
 		private static bool GetWinProbabilityPrefix(ref float __result) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.stableMission_forceWin) {
@@ -101,10 +98,9 @@ namespace SoD_BaseMod.asm {
 			return false;
 		}
 
-		[UsedImplicitly]
 		private static IEnumerable<CodeInstruction> CompleteMissionTranspiler(IEnumerable<CodeInstruction> instructions) {
 			MethodInfo setAchievementHook = AccessTools.Method(
-					typeof(TimedMissionManagerPatcher), "SetAchievementByEntityIDsHook",
+					typeof(TimedMissionManagerPatcher), nameof(SetAchievementByEntityIDsHook),
 					new[] { typeof(int), typeof(Guid?[]), typeof(string), typeof(WsServiceEventHandler), typeof(object) });
 
 			List<CodeInstruction> instructionList = new List<CodeInstruction>(instructions);
@@ -133,7 +129,6 @@ namespace SoD_BaseMod.asm {
 			return result;
 		}
 
-		[UsedImplicitly]
 		public static void SetAchievementByEntityIDsHook(int achievementId, Guid?[] petIDs, string inGroupID, WsServiceEventHandler inCallback,
 				object inUserData) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;

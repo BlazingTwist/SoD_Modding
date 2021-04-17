@@ -1,51 +1,80 @@
-﻿using SoD_BlazingTwist_Core;
-using System;
+﻿using System;
+using JetBrains.Annotations;
+using SoD_BaseMod.basemod;
+using SoD_BaseMod.basemod.config;
+using SoD_BlazingTwist_Core;
 using UnityEngine;
 
-namespace SoD_Enable_Logging.AsmFirstpass
-{
-	public class UtDebugPatcher : RuntimePatcher
-	{
+namespace SoD_Enable_Logging.AsmFirstpass {
+	[UsedImplicitly]
+	public class UtDebugPatcher : RuntimePatcher {
 		public override void ApplyPatches() {
 			Type originalType = typeof(UtDebug);
 			Type patcherType = typeof(UtDebugPatcher);
 
-			PatchPrefixMethod(originalType, patcherType, "Log", new Type[] { typeof(object), typeof(int) });
-			PatchPrefixMethod(originalType, patcherType, "Log", new Type[] { typeof(object), typeof(uint) });
-			PatchPrefixMethod(originalType, patcherType, "LogFastP", new Type[] { typeof(int), typeof(object[]) });
-			PatchPrefixMethod(originalType, patcherType, "LogFastM", new Type[] { typeof(uint), typeof(object[]) });
-			PatchPrefixMethod(originalType, patcherType, "LogWarning", new Type[] { typeof(object), typeof(int) });
-			PatchPrefixMethod(originalType, patcherType, "LogError", new Type[] { typeof(object), typeof(int) });
-
-			logger.LogInfo("UtDebug: finished patching");
+			PatchPrefixMethod(originalType, patcherType, nameof(Log), new[] { typeof(object), typeof(int) });
+			PatchPrefixMethod(originalType, patcherType, nameof(Log), new[] { typeof(object), typeof(uint) });
+			PatchPrefixMethod(originalType, patcherType, nameof(LogFastP), new[] { typeof(int), typeof(object[]) });
+			PatchPrefixMethod(originalType, patcherType, nameof(LogFastM), new[] { typeof(uint), typeof(object[]) });
+			PatchPrefixMethod(originalType, patcherType, nameof(LogWarning), new[] { typeof(object), typeof(int) });
+			PatchPrefixMethod(originalType, patcherType, nameof(LogError), new[] { typeof(object), typeof(int) });
 		}
 
-		public static bool Log(object message, int priority) {
+		private static bool IsUTDebugEnabled() {
+			BTConfig config = BTDebugCamInputManager.GetConfigHolder().config;
+			return config != null && config.enableUTDebug;
+		}
+
+		private static bool Log(object message, int priority) {
+			if (!IsUTDebugEnabled()) {
+				return true;
+			}
+
 			Debug.Log(message);
 			return false;
 		}
 
-		public static bool Log(object message, uint mask) {
+		private static bool Log(object message, uint mask) {
+			if (!IsUTDebugEnabled()) {
+				return true;
+			}
+
 			Debug.Log(message);
 			return false;
 		}
 
-		public static bool LogFastP(int priority, params object[] message) {
+		private static bool LogFastP(int priority, params object[] message) {
+			if (!IsUTDebugEnabled()) {
+				return true;
+			}
+
 			Debug.Log(String.Concat(message));
 			return false;
 		}
 
-		public static bool LogFastM(uint mask, params object[] message) {
+		private static bool LogFastM(uint mask, params object[] message) {
+			if (!IsUTDebugEnabled()) {
+				return true;
+			}
+
 			Debug.Log(String.Concat(message));
 			return false;
 		}
 
-		public static bool LogWarning(object message, int priority) {
+		private static bool LogWarning(object message, int priority) {
+			if (!IsUTDebugEnabled()) {
+				return true;
+			}
+
 			Debug.LogWarning(message);
 			return false;
 		}
 
-		public static bool LogError(object message, int priority) {
+		private static bool LogError(object message, int priority) {
+			if (!IsUTDebugEnabled()) {
+				return true;
+			}
+
 			Debug.LogError(message);
 			return false;
 		}

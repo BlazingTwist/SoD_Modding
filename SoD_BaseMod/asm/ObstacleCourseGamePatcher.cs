@@ -17,13 +17,12 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod updatePrefix = new HarmonyMethod(AccessTools.Method(patcherType, "UpdatePrefix",
-					new[] { typeof(ObstacleCourseGame), typeof(UiFlightSchoolHUD), typeof(float) }));
+			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix),
+					new[] { typeof(ObstacleCourseGame), typeof(UiFlightSchoolHUD), typeof(float) });
 
 			harmony.Patch(updateOriginal, updatePrefix);
 		}
 
-		[UsedImplicitly]
 		private static void UpdatePrefix(ObstacleCourseGame __instance, UiFlightSchoolHUD ___mKAUIHud, float ___mTimeLeft) {
 			int instanceID = __instance.GetInstanceID();
 			if (obstacleCourseGameID != instanceID) {

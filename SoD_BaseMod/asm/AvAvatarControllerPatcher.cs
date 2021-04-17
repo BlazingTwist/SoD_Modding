@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
+using SoD_BaseMod.basemod.config;
 using SoD_BlazingTwist_Core;
 
 namespace SoD_BaseMod.asm {
@@ -26,19 +27,19 @@ namespace SoD_BaseMod.asm {
 			MethodInfo updateFlyingControlOriginal = AccessTools.Method(originalType, "UpdateFlyingControl", new[] { typeof(float), typeof(float) });
 
 			HarmonyMethod setPFlyingDataPrefix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "SetPFlyingDataPrefix", new[] { typeof(AvAvatarFlyingData).MakeByRefType() }));
+					new HarmonyMethod(patcherType, nameof(SetPFlyingDataPrefix), new[] { typeof(AvAvatarFlyingData).MakeByRefType() });
 			HarmonyMethod keyboardUpdatePrefix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "KeyboardUpdatePrefix"));
+					new HarmonyMethod(patcherType, nameof(KeyboardUpdatePrefix));
 			HarmonyMethod keyboardUpdateTranspiler =
-					new HarmonyMethod(AccessTools.Method(patcherType, "KeyboardUpdateTranspiler", new[] { typeof(IEnumerable<CodeInstruction>) }));
+					new HarmonyMethod(patcherType, nameof(KeyboardUpdateTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 			HarmonyMethod getHorizontalFromInputPostfix =
-					new HarmonyMethod(AccessTools.Method(patcherType, "GetHorizontalFromInputPostfix", new[] { typeof(float).MakeByRefType() }));
+					new HarmonyMethod(patcherType, nameof(GetHorizontalFromInputPostfix), new[] { typeof(float).MakeByRefType() });
 			HarmonyMethod doUpdateTranspiler =
-					new HarmonyMethod(AccessTools.Method(patcherType, "DoUpdateTranspiler", new[] { typeof(IEnumerable<CodeInstruction>) }));
+					new HarmonyMethod(patcherType, nameof(DoUpdateTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 			HarmonyMethod updateFlyingTranspiler =
-					new HarmonyMethod(AccessTools.Method(patcherType, "UpdateFlyingTranspiler", new[] { typeof(IEnumerable<CodeInstruction>) }));
+					new HarmonyMethod(patcherType, nameof(UpdateFlyingTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 			HarmonyMethod updateFlyingControlTranspiler =
-					new HarmonyMethod(AccessTools.Method(patcherType, "UpdateFlyingControlTranspiler", new[] { typeof(IEnumerable<CodeInstruction>) }));
+					new HarmonyMethod(patcherType, nameof(UpdateFlyingControlTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(setFlyingDataOriginal, setPFlyingDataPrefix);
 			harmony.Patch(keyboardUpdateOriginal, keyboardUpdatePrefix, null, keyboardUpdateTranspiler);
@@ -48,7 +49,6 @@ namespace SoD_BaseMod.asm {
 			harmony.Patch(updateFlyingControlOriginal, null, null, updateFlyingControlTranspiler);
 		}
 
-		[UsedImplicitly]
 		private static void SetPFlyingDataPrefix(ref AvAvatarFlyingData value) {
 			BTConfigHolder configHolder = BTDebugCamInputManager.GetConfigHolder();
 			BTHackConfig hackConfig = configHolder.hackConfig;
@@ -58,14 +58,12 @@ namespace SoD_BaseMod.asm {
 			}
 		}
 
-		[UsedImplicitly]
 		private static bool KeyboardUpdatePrefix() {
 			return !BTDebugCam.useDebugCam;
 		}
 
-		[UsedImplicitly]
 		private static IEnumerable<CodeInstruction> KeyboardUpdateTranspiler(IEnumerable<CodeInstruction> instructions) {
-			MethodInfo movementFactorProvider = AccessTools.Method(typeof(AvAvatarControllerPatcher), "GetFastMovementFactor");
+			MethodInfo movementFactorProvider = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(GetFastMovementFactor));
 
 			List<CodeInstruction> instructionList = new List<CodeInstruction>(instructions);
 			List<CodeInstruction> result = new List<CodeInstruction>();
@@ -109,7 +107,6 @@ namespace SoD_BaseMod.asm {
 			return result;
 		}
 
-		[UsedImplicitly]
 		private static void GetHorizontalFromInputPostfix(ref float __result) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {
@@ -117,9 +114,8 @@ namespace SoD_BaseMod.asm {
 			}
 		}
 
-		[UsedImplicitly]
 		private static IEnumerable<CodeInstruction> DoUpdateTranspiler(IEnumerable<CodeInstruction> instructions) {
-			MethodInfo movementFactorProvider = AccessTools.Method(typeof(AvAvatarControllerPatcher), "GetFastMovementFactor");
+			MethodInfo movementFactorProvider = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(GetFastMovementFactor));
 
 			List<CodeInstruction> instructionList = new List<CodeInstruction>(instructions);
 			List<CodeInstruction> result = new List<CodeInstruction>();
@@ -129,7 +125,7 @@ namespace SoD_BaseMod.asm {
 			for (int i = 0; i < instructionCount; i++) {
 				CodeInstruction inst = instructionList[i];
 
-				if (inst.opcode == OpCodes.Call && (i + 1) < instructionCount) {
+				if (inst.opcode == OpCodes.Call && i + 1 < instructionCount) {
 					CodeInstruction inst1 = instructionList[i + 1];
 
 					if (inst1.opcode == OpCodes.Stfld) {
@@ -160,9 +156,8 @@ namespace SoD_BaseMod.asm {
 			return result;
 		}
 
-		[UsedImplicitly]
 		private static IEnumerable<CodeInstruction> UpdateFlyingTranspiler(IEnumerable<CodeInstruction> instructions) {
-			MethodInfo turnFactorFunction = AccessTools.Method(typeof(AvAvatarControllerPatcher), "GetTurnFactor", new[] { typeof(float) });
+			MethodInfo turnFactorFunction = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(GetTurnFactor), new[] { typeof(float) });
 
 			List<CodeInstruction> instructionList = new List<CodeInstruction>(instructions);
 			List<CodeInstruction> result = new List<CodeInstruction>();
@@ -191,11 +186,10 @@ namespace SoD_BaseMod.asm {
 			return result;
 		}
 
-		[UsedImplicitly]
 		private static IEnumerable<CodeInstruction> UpdateFlyingControlTranspiler(IEnumerable<CodeInstruction> instructions) {
-			MethodInfo speedApplier = AccessTools.Method(typeof(AvAvatarControllerPatcher), "ApplySpeedModifiers",
+			MethodInfo speedApplier = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(ApplySpeedModifiers),
 					new[] { typeof(float).MakeByRefType(), typeof(float).MakeByRefType() });
-			MethodInfo wingsuitSpeedApplier = AccessTools.Method(typeof(AvAvatarControllerPatcher), "ApplyWingsuitSpeedModifier",
+			MethodInfo wingsuitSpeedApplier = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(ApplyWingsuitSpeedModifier),
 					new[] { typeof(float) });
 
 			List<CodeInstruction> instructionList = new List<CodeInstruction>(instructions);
@@ -264,7 +258,6 @@ namespace SoD_BaseMod.asm {
 			return result;
 		}
 
-		[UsedImplicitly]
 		public static float GetFastMovementFactor() {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig != null && hackConfig.controls_fastMovementFactor > 0 && BTDebugCamInputManager.IsKeyDown("DebugCamFastMovement")) {
@@ -274,7 +267,6 @@ namespace SoD_BaseMod.asm {
 			return 1f;
 		}
 
-		[UsedImplicitly]
 		public static float GetTurnFactor(float fallback) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {
@@ -284,7 +276,6 @@ namespace SoD_BaseMod.asm {
 			return fallback;
 		}
 
-		[UsedImplicitly]
 		public static void ApplySpeedModifiers(ref float maxSpeed, ref float acceleration) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {
@@ -293,7 +284,6 @@ namespace SoD_BaseMod.asm {
 			}
 		}
 
-		[UsedImplicitly]
 		public static float ApplyWingsuitSpeedModifier(float speed) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {

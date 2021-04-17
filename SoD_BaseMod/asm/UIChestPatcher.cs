@@ -3,6 +3,7 @@ using System.Reflection;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
+using SoD_BaseMod.basemod.config;
 using SoD_BlazingTwist_Core;
 using SquadTactics;
 
@@ -15,22 +16,21 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo initChestOriginal = AccessTools.Method(originalType, "InitChest");
 
-			HarmonyMethod initChestPrefix = new HarmonyMethod(AccessTools.Method(patcherType, "InitChestPrefix", new[] {typeof(UiChest)}));
+			HarmonyMethod initChestPrefix = new HarmonyMethod(patcherType, nameof(InitChestPrefix), new[] { typeof(UiChest) });
 
 			harmony.Patch(initChestOriginal, initChestPrefix);
 		}
 
-		public static bool ShouldOpenChest() {
+		private static bool ShouldOpenChest() {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			return hackConfig != null && hackConfig.squadTactics_autochest > 0;
 		}
 
-		[UsedImplicitly]
 		private static bool InitChestPrefix(UiChest __instance) {
 			if (!ShouldOpenChest()) {
 				return true;
 			}
-			
+
 			OpenChest(__instance);
 			return false;
 		}

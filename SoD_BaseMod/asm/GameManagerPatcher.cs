@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
+using SoD_BaseMod.basemod.config;
 using SquadTactics;
 
 namespace SoD_BaseMod.asm {
@@ -16,12 +17,11 @@ namespace SoD_BaseMod.asm {
 			MethodInfo processMouseUpOriginal = AccessTools.Method(originalType, "ProcessMouseUp", new[] { typeof(Node) });
 
 			HarmonyMethod processMouseUpPrefix =
-				new HarmonyMethod(AccessTools.Method(patcherType, "ProcessMouseUpPrefix", new[] { typeof(GameManager), typeof(Node) }));
+				new HarmonyMethod(patcherType, nameof(ProcessMouseUpPrefix), new[] { typeof(GameManager), typeof(Node) });
 
 			harmony.Patch(processMouseUpOriginal, processMouseUpPrefix);
 		}
 
-		[UsedImplicitly]
 		private static bool ProcessMouseUpPrefix(GameManager __instance, Node selectedNode) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.squadTactics_infiniteRange) {
