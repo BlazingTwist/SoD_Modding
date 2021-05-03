@@ -2,7 +2,7 @@
 using BepInEx;
 using HarmonyLib;
 using JetBrains.Annotations;
-using SoD_BlazingTwist_Core;
+using BlazingTwist_Core;
 using UnityEngine;
 
 namespace SoD_Enable_Logging

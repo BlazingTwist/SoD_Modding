@@ -4,7 +4,7 @@ using System;
 using System.Reflection;
 using JetBrains.Annotations;
 
-namespace SoD_BlazingTwist_Core {
+namespace BlazingTwist_Core {
 	[PublicAPI]
 	public abstract class RuntimePatcher {
 		protected ManualLogSource logger;

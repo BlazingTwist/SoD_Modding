@@ -5,7 +5,7 @@ using HarmonyLib;
 using BepInEx.Logging;
 using JetBrains.Annotations;
 
-namespace SoD_BlazingTwist_Core {
+namespace BlazingTwist_Core {
 	[PublicAPI]
 	public static class RuntimePatcherUtils {
 		public static void RunPatchers(ManualLogSource logger, Harmony harmony, Type[] types) {

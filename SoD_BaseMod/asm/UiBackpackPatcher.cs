@@ -2,7 +2,7 @@
 using System.Reflection;
 using HarmonyLib;
 using JetBrains.Annotations;
-using SoD_BlazingTwist_Core;
+using BlazingTwist_Core;
 
 namespace SoD_BaseMod.asm {
 	[HarmonyPatch]

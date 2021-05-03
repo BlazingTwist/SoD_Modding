@@ -4,7 +4,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
 using SoD_BaseMod.basemod.config;
-using SoD_BlazingTwist_Core;
+using BlazingTwist_Core;
 using SquadTactics;
 
 namespace SoD_BaseMod.asm {

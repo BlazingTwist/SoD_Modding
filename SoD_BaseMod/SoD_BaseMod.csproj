@@ -49,11 +49,14 @@
     <Reference Include="BepInEx.Harmony">
       <HintPath>..\SoD_BepInEx_Libraries\BepInEx.Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="BlazingTwistConfigTools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\BlazingTwistConfigTools\bin\Debug\BlazingTwistConfigTools.dll</HintPath>
+    </Reference>
+    <Reference Include="BlazingTwist_Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\SoD_BlazingTwist_Core\bin\Deploy\BlazingTwist_Core.dll</HintPath>
+    </Reference>
     <Reference Include="KnowledgeAdventure.Multiplayer">
       <HintPath>..\SoD_BepInEx_Libraries\KnowledgeAdventure.Multiplayer.dll</HintPath>
-    </Reference>
-    <Reference Include="SoD_BlazingTwist_Core">
-      <HintPath>..\SoD_BlazingTwist_Core\bin\Deploy\SoD_BlazingTwist_Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -129,11 +132,7 @@
     <Compile Include="asm\UiSelectProfilePatcher.cs" />
     <Compile Include="asm\WeaponManagerPatcher.cs" />
     <Compile Include="basemod\BTAnimationPlayerManager.cs" />
-    <Compile Include="basemod\BTCommands.cs" />
     <Compile Include="basemod\BTConfigHolder.cs" />
-    <Compile Include="basemod\BTConfigUtils.cs" />
-    <Compile Include="basemod\BTConsole.cs" />
-    <Compile Include="basemod\BTConsoleCommand.cs" />
     <Compile Include="basemod\BTCutsceneManager.cs" />
     <Compile Include="basemod\BTDebugCam.cs" />
     <Compile Include="basemod\BTDebugCamInputManager.cs" />
@@ -149,6 +148,46 @@
     <Compile Include="basemod\config\BTHackConfig.cs" />
     <Compile Include="basemod\config\BTLevelConfigEntry.cs" />
     <Compile Include="basemod\config\BTLoggerConfigEntry.cs" />
+    <Compile Include="basemod\console\BTCommandUtils.cs" />
+    <Compile Include="basemod\console\BTConsole.cs" />
+    <Compile Include="basemod\console\BTConsoleCommand.cs" />
+    <Compile Include="basemod\console\BTNoArgsInput.cs" />
+    <Compile Include="basemod\console\commands\BTAchievementCommands.cs" />
+    <Compile Include="basemod\console\commands\BTAssetBundleCommands.cs" />
+    <Compile Include="basemod\console\commands\BTAvatarCommands.cs" />
+    <Compile Include="basemod\console\commands\BTBuildInfoCommand.cs" />
+    <Compile Include="basemod\console\commands\BTCheckPasswordCommand.cs" />
+    <Compile Include="basemod\console\commands\BTClsCommand.cs" />
+    <Compile Include="basemod\console\commands\BTCogsCommands.cs" />
+    <Compile Include="basemod\console\commands\BTCoinsAddCommand.cs" />
+    <Compile Include="basemod\console\commands\BTConfigReloadCommand.cs" />
+    <Compile Include="basemod\console\commands\BTConsumableCommands.cs" />
+    <Compile Include="basemod\console\commands\BTDailyCommands.cs" />
+    <Compile Include="basemod\console\commands\BTDebugCommands.cs" />
+    <Compile Include="basemod\console\commands\BTDeletePlayerPrefCommand.cs" />
+    <Compile Include="basemod\console\commands\BTFieldGuideUnlockCommand.cs" />
+    <Compile Include="basemod\console\commands\BTFishCommands.cs" />
+    <Compile Include="basemod\console\commands\BTFrameRateCommands.cs" />
+    <Compile Include="basemod\console\commands\BTGlowUICommand.cs" />
+    <Compile Include="basemod\console\commands\BTGPUStatsCommand.cs" />
+    <Compile Include="basemod\console\commands\BTHelpCommand.cs" />
+    <Compile Include="basemod\console\commands\BTIncredibleMachineCommands.cs" />
+    <Compile Include="basemod\console\commands\BTInventoryCommands.cs" />
+    <Compile Include="basemod\console\commands\BTJoystickSetupCommand.cs" />
+    <Compile Include="basemod\console\commands\BTLabCommands.cs" />
+    <Compile Include="basemod\console\commands\BTLevelCommands.cs" />
+    <Compile Include="basemod\console\commands\BTMemProfilerCommand.cs" />
+    <Compile Include="basemod\console\commands\BTMissionCommands.cs" />
+    <Compile Include="basemod\console\commands\BTMMOCommands.cs" />
+    <Compile Include="basemod\console\commands\BTMysteryChestSpawnAllCommand.cs" />
+    <Compile Include="basemod\console\commands\BTPetCommands.cs" />
+    <Compile Include="basemod\console\commands\BTPlayerCommands.cs" />
+    <Compile Include="basemod\console\commands\BTQualityCommand.cs" />
+    <Compile Include="basemod\console\commands\BTServerCommands.cs" />
+    <Compile Include="basemod\console\commands\BTShowFlySpeedDataCommand.cs" />
+    <Compile Include="basemod\console\commands\BTTaskCommands.cs" />
+    <Compile Include="basemod\console\commands\BTTutorialCommands.cs" />
+    <Compile Include="basemod\console\commands\BTTweakDataCommand.cs" />
     <Compile Include="SodBaseMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -49,12 +49,11 @@
     <Reference Include="BepInEx.Harmony">
       <HintPath>Libs\BepInEx.Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="BlazingTwist_Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\SoD_BlazingTwist_Core\bin\Deploy\BlazingTwist_Core.dll</HintPath>
+    </Reference>
     <Reference Include="SoD_BaseMod, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\Releases\Current\SoD_BaseMod.dll</HintPath>
-    </Reference>
-    <Reference Include="SoD_BlazingTwist_Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SoD_BlazingTwist_Core\bin\Deploy\SoD_BlazingTwist_Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

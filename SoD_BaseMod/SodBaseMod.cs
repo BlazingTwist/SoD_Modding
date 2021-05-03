@@ -1,7 +1,7 @@
 ﻿using BepInEx;
 using HarmonyLib;
 using SoD_BaseMod.basemod;
-using SoD_BlazingTwist_Core;
+using BlazingTwist_Core;
 using System.Reflection;
 using JetBrains.Annotations;
 
@@ -16,7 +16,7 @@ namespace SoD_BaseMod {
 		public void Awake() {
 			BTDebugCamInputManager.AttachToScene();
 
-			Harmony harmony = new Harmony(pluginGuid);
+			var harmony = new Harmony(pluginGuid);
 			harmony.PatchAll();
 			RuntimePatcherUtils.RunPatchers(Logger, harmony, RuntimePatcherUtils.GetTypesInNamespace(Assembly.GetExecutingAssembly(), "SoD_BaseMod.AsmFirstpass"));
 			RuntimePatcherUtils.RunPatchers(Logger, harmony, RuntimePatcherUtils.GetTypesInNamespace(Assembly.GetExecutingAssembly(), "SoD_BaseMod.asm"));

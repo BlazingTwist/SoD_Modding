@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlazingTwistConfigTools.blazingtwist.config;
 using SoD_BaseMod.basemod.config;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -54,7 +54,7 @@ namespace SoD_BaseMod.basemod {
 				return;
 			}
 
-			StringBuilder logBuilder = new StringBuilder();
+			var logBuilder = new StringBuilder();
 			logBuilder
 					.Append("[")
 					.Append(logTypeString)
@@ -70,7 +70,7 @@ namespace SoD_BaseMod.basemod {
 
 			if (loggerConfigEntry.logStackTrace) {
 				logBuilder.Append("\nProvided Trace: ").Append(stackTrace);
-				StackTrace trace = new StackTrace();
+				var trace = new StackTrace();
 				logBuilder.Append("\n").Append(trace);
 			}
 
@@ -82,10 +82,10 @@ namespace SoD_BaseMod.basemod {
 		}
 
 		public void LoadConfigs() {
-			config = LoadConfigFile(configFileName, config);
+			config = BTConfigUtils.LoadConfigFile(basePath + configFileName, config);
 			LoadHackConfig();
 			if (hackConfig != null && hackConfig.controls_useFlightStatsOverride) {
-				flightStats = LoadConfigFile(flightStatsFileName, flightStats);
+				flightStats = BTConfigUtils.LoadConfigFile(basePath + flightStatsFileName, flightStats);
 			}
 		}
 
@@ -101,32 +101,11 @@ namespace SoD_BaseMod.basemod {
 
 			try {
 				using (StreamReader reader = File.OpenText((basePath + hackConfigFileName).Replace('/', Path.DirectorySeparatorChar))) {
-					hackConfig = BTConfigUtils.LoadConfig<BTHackConfig>(reader);
+					hackConfig = BTConfigTools.LoadConfig<BTHackConfig>(reader);
 				}
 			} catch (Exception e) {
 				LogMessage(LogType.Error, "Encountered an exception during parsing of the hackConfig!\nException: " + e);
 				hackConfig = null;
-			}
-		}
-
-		private static T LoadConfigFile<T>(string fileName, T instance) {
-			String filePath = (basePath + fileName).Replace('/', Path.DirectorySeparatorChar);
-			if (!File.Exists(filePath)) {
-				return default;
-			}
-
-			try {
-				using (StreamReader reader = File.OpenText(filePath)) {
-					if (instance == null) {
-						return BTConfigUtils.LoadConfig<T>(reader);
-					}
-
-					BTConfigUtils.LoadConfig(reader, instance);
-					return instance;
-				}
-			} catch (Exception e) {
-				LogMessage(LogType.Error, "Encountered an exception during parsing of the file `" + fileName + "`!\nException: " + e);
-				return default;
 			}
 		}
 	}

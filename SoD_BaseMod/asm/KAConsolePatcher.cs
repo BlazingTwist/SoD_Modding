@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using SoD_BaseMod.basemod;
-using SoD_BlazingTwist_Core;
+using BlazingTwist_Core;
 using System;
 using System.Reflection;
 

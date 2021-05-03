@@ -4,10 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace SoD_BaseMod.basemod
-{
-	public class BTConsoleCommand
-	{
+namespace SoD_BaseMod.basemod.console {
+	public class BTConsoleCommand {
 		private readonly List<string> commandNamespace;
 		private readonly BTCommandInput commandInput;
 		private readonly string helpText;
@@ -28,27 +26,29 @@ namespace SoD_BaseMod.basemod
 			this.executeCallback = executeCallback;
 		}
 
-		public static bool InputPartiallyMatches(string input, string target) {
+		private static bool InputPartiallyMatches(string input, string target) {
 			char[] inputChars = input.ToCharArray();
 			int inputCharsLength = inputChars.GetLength(0);
 			char[] targetChars = target.ToCharArray();
 			int targetCharsLength = targetChars.GetLength(0);
 			int targetIndex = 0;
-			for(int inputIndex = 0; inputIndex < inputCharsLength; inputIndex++) {
+			for (int inputIndex = 0; inputIndex < inputCharsLength; inputIndex++) {
 				char inputChar = char.ToUpperInvariant(inputChars[inputIndex]);
-				while(inputChar != char.ToUpperInvariant(targetChars[targetIndex])) {
+				while (inputChar != char.ToUpperInvariant(targetChars[targetIndex])) {
 					targetIndex++;
-					if(targetIndex >= targetCharsLength) {
+					if (targetIndex >= targetCharsLength) {
 						// unable to find matching character in target
 						return false;
 					}
 				}
+
 				targetIndex++;
-				if(targetIndex >= targetCharsLength && (inputIndex + 1) < inputCharsLength) {
+				if (targetIndex >= targetCharsLength && (inputIndex + 1) < inputCharsLength) {
 					// reached end of target string, but still have input chars to check
 					return false;
 				}
 			}
+
 			return true;
 		}
 
@@ -56,34 +56,32 @@ namespace SoD_BaseMod.basemod
 			int inputCount = input.Count;
 			int namespaceCount = commandNamespace.Count;
 			int totalArgumentCount = commandInput.TotalArgumentCount();
-			if(namespaceCount + totalArgumentCount < inputCount) {
+			if (namespaceCount + totalArgumentCount < inputCount) {
 				// input is too long to ever match this
 				return 0;
 			}
 
 			int consumedNamespaceKeywords = 0;
-			for(int inputIndex = 0, namespaceIndex = 0; inputIndex < inputCount; inputIndex++) {
+			for (int inputIndex = 0, namespaceIndex = 0; inputIndex < inputCount; inputIndex++) {
 				int remainingInputCount = inputCount - inputIndex;
 				string inputString = input[inputIndex];
 
-				while(namespaceIndex < namespaceCount) {
-					if(InputPartiallyMatches(inputString, commandNamespace[namespaceIndex])) {
+				while (namespaceIndex < namespaceCount) {
+					if (InputPartiallyMatches(inputString, commandNamespace[namespaceIndex])) {
 						remainingInputCount--;
 						namespaceIndex++;
 						consumedNamespaceKeywords++;
 						break;
 					}
+
 					namespaceIndex++;
 				}
 
-				if(namespaceIndex >= namespaceCount) {
-					if(remainingInputCount > totalArgumentCount) {
-						return 0;
-					} else {
-						return consumedNamespaceKeywords;
-					}
+				if (namespaceIndex >= namespaceCount) {
+					return remainingInputCount > totalArgumentCount ? 0 : consumedNamespaceKeywords;
 				}
 			}
+
 			// reached end of input
 			return consumedNamespaceKeywords;
 		}
@@ -94,23 +92,24 @@ namespace SoD_BaseMod.basemod
 			StringBuilder resultBuilder = new StringBuilder();
 
 			int inputConsumptionCount = 0;
-			for(int namespaceIndex = 0; namespaceIndex < namespaceCount; namespaceIndex++) {
+			for (int namespaceIndex = 0; namespaceIndex < namespaceCount; namespaceIndex++) {
 				string namespaceString = commandNamespace[namespaceIndex];
 
-				if(namespaceIndex != 0) {
+				if (namespaceIndex != 0) {
 					resultBuilder.Append(" ");
 				}
 
-				if(inputConsumptionCount < inputCount) {
+				if (inputConsumptionCount < inputCount) {
 					string nextInputString = input[inputConsumptionCount];
-					if(InputPartiallyMatches(nextInputString, namespaceString)) {
+					if (InputPartiallyMatches(nextInputString, namespaceString)) {
 						inputConsumptionCount++;
 					}
 				}
+
 				resultBuilder.Append(namespaceString);
 			}
 
-			for(int inputIndex = inputConsumptionCount; inputIndex < inputCount; inputIndex++) {
+			for (int inputIndex = inputConsumptionCount; inputIndex < inputCount; inputIndex++) {
 				resultBuilder.Append(" ").Append(input[inputIndex]);
 			}
 
@@ -121,16 +120,18 @@ namespace SoD_BaseMod.basemod
 			int inputCount = input.Count;
 			int namespaceCount = commandNamespace.Count;
 			int totalArgumentCount = commandInput.TotalArgumentCount();
-			if(inputCount < namespaceCount || inputCount > namespaceCount + totalArgumentCount) {
+			if (inputCount < namespaceCount || inputCount > namespaceCount + totalArgumentCount) {
 				return false;
 			}
-			for(int index = 0; index < namespaceCount; index++) {
+
+			for (int index = 0; index < namespaceCount; index++) {
 				string inputString = input[index];
 				string namespaceString = commandNamespace[index];
-				if(!InputPartiallyMatches(inputString, namespaceString)) {
+				if (!InputPartiallyMatches(inputString, namespaceString)) {
 					return false;
 				}
 			}
+
 			return true;
 		}
 
@@ -139,21 +140,24 @@ namespace SoD_BaseMod.basemod
 			int namespaceCount = commandNamespace.Count;
 			int totalArgumentCount = commandInput.TotalArgumentCount();
 			int requiredArgumentCount = commandInput.RequiredArgumentCount();
-			if(namespaceCount + requiredArgumentCount > inputCount) {
+			if (namespaceCount + requiredArgumentCount > inputCount) {
 				// input too short to match this command
 				return false;
 			}
-			if(namespaceCount + totalArgumentCount < inputCount) {
+
+			if (namespaceCount + totalArgumentCount < inputCount) {
 				// input too long to match this command
 				return false;
 			}
-			for(int namespaceIndex = 0; namespaceIndex < namespaceCount; namespaceIndex++) {
+
+			for (int namespaceIndex = 0; namespaceIndex < namespaceCount; namespaceIndex++) {
 				string inputString = input[namespaceIndex];
 				string namespaceString = commandNamespace[namespaceIndex];
-				if(!InputPartiallyMatches(inputString, namespaceString)) {
+				if (!InputPartiallyMatches(inputString, namespaceString)) {
 					return false;
 				}
 			}
+
 			return true;
 		}
 
@@ -163,11 +167,11 @@ namespace SoD_BaseMod.basemod
 		}
 
 		public string GetNamespaceString() {
-			return String.Join(" ", commandNamespace);
+			return string.Join(" ", commandNamespace);
 		}
 
 		public string ShortHelp() {
-			StringBuilder builder = new StringBuilder("");
+			var builder = new StringBuilder("");
 			builder.Append(GetNamespaceString());
 			builder.Append(" ").Append(commandInput.GetArgumentTemplate());
 			builder.Append(" - ").Append(helpText);
@@ -175,32 +179,32 @@ namespace SoD_BaseMod.basemod
 		}
 
 		public string Help() {
-			StringBuilder builder = new StringBuilder("");
+			var builder = new StringBuilder("");
 			builder.Append(GetNamespaceString());
 			builder.Append(" ").Append(commandInput.GetArgumentTemplate());
 			builder.Append("\n").Append(helpText);
-			foreach(string argHelpText in commandInput.GetArgumentHelp()) {
+			foreach (string argHelpText in commandInput.GetArgumentHelp()) {
 				builder.Append("\n\t").Append(argHelpText);
 			}
+
 			return builder.ToString();
 		}
 
-		public abstract class BTCommandInput
-		{
-			private List<BTConsoleArgument> requiredArguments = null;
-			private List<BTConsoleArgument> optionalArguments = null;
+		public abstract class BTCommandInput {
+			private List<BTConsoleArgument> requiredArguments;
+			private List<BTConsoleArgument> optionalArguments;
 
-			public BTCommandInput() {
+			protected BTCommandInput() {
 				Prepare();
 			}
 
 			protected abstract List<BTConsoleArgument> BuildConsoleArguments();
 
-			public void Prepare() {
+			private void Prepare() {
 				requiredArguments = new List<BTConsoleArgument>();
 				optionalArguments = new List<BTConsoleArgument>();
-				foreach(BTConsoleArgument argument in BuildConsoleArguments()) {
-					if(argument.IsOptional()) {
+				foreach (BTConsoleArgument argument in BuildConsoleArguments()) {
+					if (argument.IsOptional()) {
 						optionalArguments.Add(argument);
 					} else {
 						requiredArguments.Add(argument);
@@ -208,18 +212,19 @@ namespace SoD_BaseMod.basemod
 				}
 			}
 
-			private List<BTConsoleArgument> GetConsoleArguments() {
-				if(requiredArguments == null || optionalArguments == null) {
+			private IEnumerable<BTConsoleArgument> GetConsoleArguments() {
+				if (requiredArguments == null || optionalArguments == null) {
 					Prepare();
 				}
-				return requiredArguments.Concat(optionalArguments).ToList();
+
+				return requiredArguments.Concat(optionalArguments);
 			}
 
 			public void ParseArguments(List<string> stringArguments, int consumedArguments) {
 				int argumentCount = stringArguments.Count;
-				foreach(BTConsoleArgument argument in GetConsoleArguments()) {
+				foreach (BTConsoleArgument argument in GetConsoleArguments()) {
 					argument.Reset();
-					if(consumedArguments < argumentCount) {
+					if (consumedArguments < argumentCount) {
 						argument.Consume(stringArguments[consumedArguments]);
 						consumedArguments++;
 					}
@@ -236,20 +241,19 @@ namespace SoD_BaseMod.basemod
 
 			public string GetArgumentTemplate() {
 				List<string> argumentTexts = GetConsoleArguments()
-					.Select(arg => arg.GetFormattedDisplayName())
-					.ToList();
+						.Select(arg => arg.GetFormattedDisplayName())
+						.ToList();
 				return String.Join(" ", argumentTexts);
 			}
 
 			public List<string> GetArgumentHelp() {
 				return GetConsoleArguments()
-					.Select(arg => arg.GetFormattedHelpText())
-					.ToList();
+						.Select(arg => arg.GetFormattedHelpText())
+						.ToList();
 			}
 		}
 
-		public class BTConsoleArgument
-		{
+		public class BTConsoleArgument {
 			private readonly string displayName;
 			private readonly bool optional;
 			private readonly string helpText;
@@ -273,27 +277,26 @@ namespace SoD_BaseMod.basemod
 			}
 
 			public void Consume(string value) {
-				if(valueType.IsEnum) {
-					valueConsumer.Invoke(Enum.Parse(valueType, value, true), true);
-				} else {
-					valueConsumer.Invoke(Convert.ChangeType(value, valueType, CultureInfo.InvariantCulture), true);
-				}
+				object argument = valueType.IsEnum
+						? Enum.Parse(valueType, value, true)
+						: Convert.ChangeType(value, valueType, CultureInfo.InvariantCulture);
+				valueConsumer.Invoke(argument, true);
 			}
 
 			public string GetFormattedDisplayName() {
-				if(optional) {
+				if (optional) {
 					return "<" + displayName + ">";
-				} else {
-					return "[" + displayName + "]";
 				}
+
+				return "[" + displayName + "]";
 			}
 
 			public string GetFormattedHelpText() {
 				return GetFormattedDisplayName()
-					+ ": "
-					+ valueType.Name
-					+ " - "
-					+ helpText;
+						+ ": "
+						+ valueType.Name
+						+ " - "
+						+ helpText;
 			}
 		}
 	}
