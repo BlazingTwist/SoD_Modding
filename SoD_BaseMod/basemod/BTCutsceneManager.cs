@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SoD_BaseMod.basemod.config;
 using UnityEngine;
@@ -8,31 +9,29 @@ using UnityEngine.UI;
 
 namespace SoD_BaseMod.basemod {
 	public class BTCutsceneManager : MonoBehaviour {
-		private static GameObject cutscenePlayerObject = null;
-		private static Toggle unloockCameraMovementToggle = null;
-		private static Dropdown cutsceneDropdown = null;
-		private static InputField timestampInputField = null;
-		private static InputField speedInputField = null;
-		private static GameObject playPauseButtonPlayIcon = null;
-		private static GameObject playPauseButtonPauseIcon = null;
-		private static Slider frameSlider = null;
+		private static GameObject cutscenePlayerObject;
+		private static Toggle unlockCameraMovementToggle;
+		private static Dropdown cutsceneDropdown;
+		private static InputField timestampInputField;
+		private static InputField speedInputField;
+		private static GameObject playPauseButtonPlayIcon;
+		private static GameObject playPauseButtonPauseIcon;
+		private static Slider frameSlider;
 
-		private static GameObject currentCutsceneObject = null;
-		private static KAMonoBase cutsceneAnimationContainer = null;
+		private static GameObject currentCutsceneObject;
+		private static KAMonoBase cutsceneAnimationContainer;
 
-		private static Camera cameraOverrideCam = null;
-		private static Camera previousUICamera = null;
-		private static Camera previousCameraBeforeOverride = null;
+		private static Camera cameraOverrideCam;
+		private static Camera previousUICamera;
+		private static Camera previousCameraBeforeOverride;
 
-		public static BTCutsceneManager instance = null;
+		private static BTCutsceneManager instance;
 
-		private static BTConfigHolder ConfigHolder {
-			get { return BTDebugCamInputManager.GetConfigHolder(); }
-		}
+		private static BTConfigHolder ConfigHolder => BTDebugCamInputManager.GetConfigHolder();
 
 		private void Awake() {
 			if (instance != null) {
-				UnityEngine.Object.Destroy(instance);
+				Destroy(instance);
 			}
 
 			instance = this;
@@ -42,18 +41,16 @@ namespace SoD_BaseMod.basemod {
 			SetAnimationSpeed(0f);
 			GoToCutsceneTimestamp(0f);
 			if (currentCutsceneObject != null) {
-				CoAnimController animController = currentCutsceneObject.GetComponentInChildren<CoAnimController>();
+				var animController = currentCutsceneObject.GetComponentInChildren<CoAnimController>();
 				if (animController != null) {
 					animController.CutSceneDone();
 				}
 
-				UnityEngine.Object.Destroy(currentCutsceneObject);
+				Destroy(currentCutsceneObject);
 				currentCutsceneObject = null;
 			}
 
-			if (cutsceneAnimationContainer != null) {
-				cutsceneAnimationContainer = null;
-			}
+			cutsceneAnimationContainer = null;
 		}
 
 		public static void Initialize(GameObject cutscenePlayerObject) {
@@ -78,7 +75,7 @@ namespace SoD_BaseMod.basemod {
 
 			GameObject unlockCameraMovementObject = BTUIUtils.FindGameObjectAtPath(contentContainerObject, "FreeCameraTickboxContainer/Toggle");
 			if (unlockCameraMovementObject != null) {
-				unloockCameraMovementToggle = unlockCameraMovementObject.GetComponent<Toggle>();
+				unlockCameraMovementToggle = unlockCameraMovementObject.GetComponent<Toggle>();
 			} else {
 				BTConfigHolder.LogMessage(LogType.Error, "BTCutsceneManager could not initialize UIComponent FreeCameraTickboxContainer/Toggle from bundle");
 			}
@@ -163,7 +160,6 @@ namespace SoD_BaseMod.basemod {
 			GoToCutsceneTimestamp(0f);
 			yield return new WaitForSecondsRealtime(0.1f);
 			LoadCutscene(GetSelectedCutscene());
-			yield break;
 		}
 
 		private static void OnTimestampInputChanged(string inputValue) {
@@ -171,11 +167,11 @@ namespace SoD_BaseMod.basemod {
 				return;
 			}
 
-			GoToCutsceneTimestamp(Mathf.Clamp(float.Parse(inputValue, System.Globalization.CultureInfo.InvariantCulture), 0f, frameSlider.maxValue));
+			GoToCutsceneTimestamp(Mathf.Clamp(float.Parse(inputValue, CultureInfo.InvariantCulture), 0f, frameSlider.maxValue));
 		}
 
 		private static void OnSpeedInputChanged(string inputValue) {
-			SetAnimationSpeed(Mathf.Max(0f, float.Parse(inputValue, System.Globalization.CultureInfo.InvariantCulture)));
+			SetAnimationSpeed(Mathf.Max(0f, float.Parse(inputValue, CultureInfo.InvariantCulture)));
 		}
 
 		private static void OnPlayPauseButtonClicked() {
@@ -187,13 +183,8 @@ namespace SoD_BaseMod.basemod {
 				return;
 			}
 
-			if (ConfigHolder.config != null) {
-				// if frameStep provided
-				GoToCutsceneTimestamp(Mathf.Clamp(frameSlider.value - ConfigHolder.config.cutscenePlayerTimeStep, 0f, frameSlider.maxValue));
-			} else {
-				// otherwise default value
-				GoToCutsceneTimestamp(Mathf.Clamp(frameSlider.value - (1f / 30), 0f, frameSlider.maxValue));
-			}
+			float frameStep = ConfigHolder?.config?.cutscenePlayerTimeStep ?? 1f / 30f;
+			GoToCutsceneTimestamp(Mathf.Clamp(frameSlider.value - frameStep, 0f, frameSlider.maxValue));
 		}
 
 		private static void OnNextFrameButtonClicked() {
@@ -201,13 +192,8 @@ namespace SoD_BaseMod.basemod {
 				return;
 			}
 
-			if (ConfigHolder.config != null) {
-				// if frameStep provided
-				GoToCutsceneTimestamp(Mathf.Clamp(frameSlider.value + ConfigHolder.config.cutscenePlayerTimeStep, 0f, frameSlider.maxValue));
-			} else {
-				// otherwise default value
-				GoToCutsceneTimestamp(Mathf.Clamp(frameSlider.value + (1f / 30), 0f, frameSlider.maxValue));
-			}
+			float frameStep = ConfigHolder?.config?.cutscenePlayerTimeStep ?? 1f / 30f;
+			GoToCutsceneTimestamp(Mathf.Clamp(frameSlider.value + frameStep, 0f, frameSlider.maxValue));
 		}
 
 		private static void OnFrameSliderValueChanged(float dragValue) {
@@ -250,7 +236,8 @@ namespace SoD_BaseMod.basemod {
 		}
 
 		private static void SetTimestampInputText(string text, bool notify, bool force) {
-			if (timestampInputField == null || (timestampInputField.isFocused && !force)) {
+			if (timestampInputField == null
+					|| timestampInputField.isFocused && !force) {
 				return;
 			}
 
@@ -262,7 +249,8 @@ namespace SoD_BaseMod.basemod {
 		}
 
 		private static void SetSpeedInputText(string text, bool notify, bool force) {
-			if (speedInputField == null || (speedInputField.isFocused && !force)) {
+			if (speedInputField == null 
+					|| speedInputField.isFocused && !force) {
 				return;
 			}
 
@@ -278,15 +266,13 @@ namespace SoD_BaseMod.basemod {
 				return;
 			}
 
-			AnimationState firstAnimState = null;
-			foreach (AnimationState animState in cutsceneAnimationContainer.animation) {
-				firstAnimState = animState;
-				break;
-			}
+			AnimationState firstAnimState = cutsceneAnimationContainer.animation.Cast<AnimationState>().FirstOrDefault();
 
-			SetSliderValue(firstAnimState.time, false);
-			SetTimestampInputText(firstAnimState.time.ToString(), false, false);
-			SetSpeedInputText(firstAnimState.speed.ToString(), false, false);
+			if (!(firstAnimState is null)) {
+				SetSliderValue(firstAnimState.time, false);
+				SetTimestampInputText(firstAnimState.time.ToString(CultureInfo.InvariantCulture), false, false);
+				SetSpeedInputText(firstAnimState.speed.ToString(CultureInfo.InvariantCulture), false, false);
+			}
 		}
 
 		/* Access to UI Content
@@ -311,18 +297,23 @@ namespace SoD_BaseMod.basemod {
 				TogglePlayCutscene();
 			}
 
-			if ((cutscenePlayerObject.activeInHierarchy && unloockCameraMovementToggle.isOn) || (currentCutsceneObject != null && cameraOverrideCam != null)) {
+			if (cutscenePlayerObject.activeInHierarchy && unlockCameraMovementToggle.isOn
+					|| currentCutsceneObject != null && cameraOverrideCam != null) {
 				if (cameraOverrideCam == null) {
+					// ReSharper disable once Unity.PerformanceCriticalCodeCameraMain
 					previousCameraBeforeOverride = Camera.main;
 					previousUICamera = Camera.current;
-					previousCameraBeforeOverride.enabled = false;
-					previousUICamera.enabled = false;
-					cameraOverrideCam = this.gameObject.AddComponent<Camera>();
-					cameraOverrideCam.cullingMask = previousCameraBeforeOverride.cullingMask;
+					if (!(previousCameraBeforeOverride is null)) {
+						previousCameraBeforeOverride.enabled = false;
+						previousUICamera.enabled = false;
+						cameraOverrideCam = gameObject.AddComponent<Camera>();
+						cameraOverrideCam.cullingMask = previousCameraBeforeOverride.cullingMask;
+					}
+
 					BTDebugCam.SetMainCamera(cameraOverrideCam);
 				}
 
-				foreach (Camera cam in UnityEngine.Object.FindObjectsOfType<Camera>()) {
+				foreach (Camera cam in FindObjectsOfType<Camera>()) {
 					if (cam != cameraOverrideCam) {
 						cam.enabled = false;
 					}
@@ -330,7 +321,7 @@ namespace SoD_BaseMod.basemod {
 			} else {
 				if (cameraOverrideCam != null) {
 					BTDebugCam.RemoveMainCamera(cameraOverrideCam);
-					UnityEngine.Object.Destroy(cameraOverrideCam);
+					Destroy(cameraOverrideCam);
 					cameraOverrideCam = null;
 					previousCameraBeforeOverride.enabled = true;
 					previousCameraBeforeOverride = null;
@@ -346,8 +337,8 @@ namespace SoD_BaseMod.basemod {
 		/*============================================================================
 		Config Management */
 
-		public static void UpdateAvailableCutscenes() {
-			if (ConfigHolder.config == null || ConfigHolder.config.availableCutscenes == null) {
+		private static void UpdateAvailableCutscenes() {
+			if (ConfigHolder.config?.availableCutscenes == null) {
 				BTConfigHolder.LogMessage(LogType.Error, "could not find availableCutscenes in config!");
 				return;
 			}
@@ -360,13 +351,10 @@ namespace SoD_BaseMod.basemod {
 			List<string> cutsceneOptions = new List<string> {
 					"None" //require first `None` element to avoid having to load cutscenes on startup
 			};
-			foreach (KeyValuePair<string, BTCutsceneConfigEntry> kvp in ConfigHolder.config.availableCutscenes) {
-				cutsceneOptions.Add(kvp.Key);
-			}
+			cutsceneOptions.AddRange(ConfigHolder.config.availableCutscenes.Select(kvp => kvp.Key));
 
 			if (cutsceneOptions.Count != cutsceneDropdown.options.Count
 					|| cutsceneDropdown.options.Any(entry => !cutsceneOptions.Contains(entry.text))) {
-				int selectionBeforeUpdate = cutsceneDropdown.value;
 				cutsceneDropdown.ClearOptions();
 				cutsceneDropdown.AddOptions(cutsceneOptions);
 				cutsceneDropdown.value = 0; // set cutscene to None and send unload-Notify
@@ -374,17 +362,14 @@ namespace SoD_BaseMod.basemod {
 		}
 
 		private static BTCutsceneConfigEntry GetSelectedCutscene() {
-			if (cutsceneDropdown == null || cutsceneDropdown.options.Count <= 1
-					|| ConfigHolder.config == null || ConfigHolder.config.availableCutscenes == null || ConfigHolder.config.availableCutscenes.Count == 0) {
+			if (cutsceneDropdown == null || cutsceneDropdown.options.Count <= 1 || ConfigHolder.config?.availableCutscenes == null ||
+					ConfigHolder.config.availableCutscenes.Count == 0) {
 				return null;
 			}
 
-			if (cutsceneDropdown.value == 0) {
-				//None-option selected
-				return null;
-			}
-
-			return ConfigHolder.config.availableCutscenes[cutsceneDropdown.options[cutsceneDropdown.value].text];
+			return cutsceneDropdown.value == 0
+					? null
+					: ConfigHolder.config.availableCutscenes[cutsceneDropdown.options[cutsceneDropdown.value].text];
 		}
 
 		/* ConfigManagement
@@ -408,7 +393,7 @@ namespace SoD_BaseMod.basemod {
 						return;
 					}
 
-					GameObject uninstantiatedCutsceneObject = assetBundle.LoadAsset<GameObject>(targetCutscene.assetName);
+					var uninstantiatedCutsceneObject = assetBundle.LoadAsset<GameObject>(targetCutscene.assetName);
 					if (uninstantiatedCutsceneObject == null) {
 						BTConfigHolder.LogMessage(LogType.Log, "Unable to find GameObject (" + targetCutscene.assetName + ") in loaded assetBundle");
 						return;
@@ -424,7 +409,7 @@ namespace SoD_BaseMod.basemod {
 				RsResourceManager.LoadAssetFromBundle(
 						targetCutscene.resourcePath,
 						targetCutscene.assetName,
-						new RsResourceEventHandler(CutsceneLoadEvent),
+						CutsceneLoadEvent,
 						typeof(GameObject),
 						false,
 						false
@@ -437,7 +422,7 @@ namespace SoD_BaseMod.basemod {
 				return;
 			}
 
-			KAUICursorManager.SetDefaultCursor("Arrow", true);
+			KAUICursorManager.SetDefaultCursor("Arrow");
 			if (inObject == null || (bool) inUserData) {
 				BTConfigHolder.LogMessage(LogType.Warning, "CutsceneLoadEvent yielded null object! (that's bad)");
 				return;
@@ -448,15 +433,15 @@ namespace SoD_BaseMod.basemod {
 
 		private static void CutsceneLoadDone(GameObject loadedCutsceneObject) {
 			try {
-				currentCutsceneObject = UnityEngine.Object.Instantiate<GameObject>(loadedCutsceneObject);
+				currentCutsceneObject = Instantiate(loadedCutsceneObject);
 				if (currentCutsceneObject == null) {
 					BTConfigHolder.LogMessage(LogType.Warning, "Instantiation of GameObject failed!");
 					return;
 				}
 
 				currentCutsceneObject.name = loadedCutsceneObject.name;
-				CoAnimController animationController = currentCutsceneObject.GetComponentInChildren<CoAnimController>();
-				cutsceneAnimationContainer = (KAMonoBase) animationController;
+				var animationController = currentCutsceneObject.GetComponentInChildren<CoAnimController>();
+				cutsceneAnimationContainer = animationController;
 
 				GoToCutsceneTimestamp(0f);
 
@@ -497,7 +482,7 @@ namespace SoD_BaseMod.basemod {
 					animationController.CutSceneStart();
 				}
 			} catch (Exception e) {
-				BTConfigHolder.LogMessage(LogType.Error, "caught unexpected exception: " + e.ToString());
+				BTConfigHolder.LogMessage(LogType.Error, "caught unexpected exception: " + e);
 			}
 		}
 
@@ -540,11 +525,8 @@ namespace SoD_BaseMod.basemod {
 
 			bool allSpeedZero = true;
 			foreach (Animation anim in cutsceneAnimationContainer.transform.GetComponentsInChildren<Animation>()) {
-				foreach (AnimationState animState in anim) {
-					if (animState.speed != 0f) {
-						allSpeedZero = false;
-						break;
-					}
+				if (anim.Cast<AnimationState>().Any(animState => animState.speed != 0f)) {
+					allSpeedZero = false;
 				}
 			}
 			/*foreach(AnimationState animState in cutsceneAnimationContainer.animation){
@@ -554,11 +536,7 @@ namespace SoD_BaseMod.basemod {
 				}
 			}*/
 
-			if (allSpeedZero) {
-				SetAnimationSpeed(1f);
-			} else {
-				SetAnimationSpeed(0f);
-			}
+			SetAnimationSpeed(allSpeedZero ? 1f : 0f);
 		}
 
 		/* Cutscene Control

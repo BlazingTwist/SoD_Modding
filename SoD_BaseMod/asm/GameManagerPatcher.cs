@@ -16,8 +16,8 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo processMouseUpOriginal = AccessTools.Method(originalType, "ProcessMouseUp", new[] { typeof(Node) });
 
-			HarmonyMethod processMouseUpPrefix =
-				new HarmonyMethod(patcherType, nameof(ProcessMouseUpPrefix), new[] { typeof(GameManager), typeof(Node) });
+			var processMouseUpPrefix =
+					new HarmonyMethod(patcherType, nameof(ProcessMouseUpPrefix), new[] { typeof(GameManager), typeof(Node) });
 
 			harmony.Patch(processMouseUpOriginal, processMouseUpPrefix);
 		}

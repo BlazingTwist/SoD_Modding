@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using SoD_BaseMod.basemod;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
 using JetBrains.Annotations;
 using SoD_BaseMod.basemod.config;
@@ -26,17 +27,17 @@ namespace SoD_BaseMod.asm {
 			MethodInfo completeMissionOriginal =
 					AccessTools.Method(originalType, "CompleteMission", new[] { typeof(TimedMissionSlotData), typeof(TimedMissionCompletion) });
 
-			HarmonyMethod updateSlotStatesPostfix =
+			var updateSlotStatesPostfix =
 					new HarmonyMethod(patcherType, nameof(UpdateSlotStatesPostfix), new[] { typeof(List<TimedMissionSlotData>) });
-			HarmonyMethod getNextMissionPrefix =
+			var getNextMissionPrefix =
 					new HarmonyMethod(patcherType, nameof(GetNextMissionPrefix), new[] { typeof(int).MakeByRefType() });
-			HarmonyMethod getNextMissionPostfix =
+			var getNextMissionPostfix =
 					new HarmonyMethod(patcherType, nameof(GetNextMissionPostfix), new[] { typeof(TimedMission) });
-			HarmonyMethod isMissionValidPrefix =
+			var isMissionValidPrefix =
 					new HarmonyMethod(patcherType, nameof(IsMissionValidPrefix), new[] { typeof(TimedMission), typeof(bool).MakeByRefType() });
-			HarmonyMethod getWinProbabilityPrefix =
+			var getWinProbabilityPrefix =
 					new HarmonyMethod(patcherType, nameof(GetWinProbabilityPrefix), new[] { typeof(float).MakeByRefType() });
-			HarmonyMethod completeMissionTranspiler =
+			var completeMissionTranspiler =
 					new HarmonyMethod(patcherType, nameof(CompleteMissionTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(updateSlotStatesOriginal, null, updateSlotStatesPostfix);
@@ -46,17 +47,14 @@ namespace SoD_BaseMod.asm {
 			harmony.Patch(completeMissionOriginal, null, null, completeMissionTranspiler);
 		}
 
+		// ReSharper disable once ParameterTypeCanBeEnumerable.Local
 		private static void UpdateSlotStatesPostfix(List<TimedMissionSlotData> ___mTimedMissionSlotList) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			if (hackConfig == null || !hackConfig.stableMission_instantCompletion) {
 				return;
 			}
 
-			foreach (TimedMissionSlotData missionData in ___mTimedMissionSlotList) {
-				if (missionData == null) {
-					continue;
-				}
-
+			foreach (TimedMissionSlotData missionData in ___mTimedMissionSlotList.Where(missionData => missionData != null)) {
 				missionData.pCoolDownDuration = 0;
 				if (missionData.pMission != null) {
 					missionData.pMission.Duration = 0;
@@ -112,7 +110,7 @@ namespace SoD_BaseMod.asm {
 				CodeInstruction inst = instructionList[i];
 
 				if (inst.opcode == OpCodes.Call) {
-					MethodInfo method = inst.operand as MethodInfo;
+					var method = inst.operand as MethodInfo;
 					if (method != null && method.DeclaringType == typeof(WsWebService) && method.Name.Equals("SetAchievementByEntityIDs")) {
 						inst.operand = setAchievementHook;
 						found++;
@@ -123,7 +121,7 @@ namespace SoD_BaseMod.asm {
 			}
 
 			if (found != 1) {
-				instance?.logger.LogWarning("CompleteMission found " + found + " entrypoints, but expected: 1");
+				instance?.logger.LogWarning("CompleteMission found " + found + " entry-points, but expected: 1");
 			}
 
 			return result;

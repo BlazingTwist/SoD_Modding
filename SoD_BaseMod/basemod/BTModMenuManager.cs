@@ -1,24 +1,22 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoD_BaseMod.basemod
-{
-	public class BTModMenuManager
-	{
-		private static GameObject modMenuObject = null;
-		private static Text toggleFogButtonText = null;
-		private static Text toggleSkyboxButtonText = null;
-		private static Text toggleOrthographicButtonText = null;
+namespace SoD_BaseMod.basemod {
+	public static class BTModMenuManager {
+		private static GameObject modMenuObject;
+		private static Text toggleFogButtonText;
+		private static Text toggleSkyboxButtonText;
+		private static Text toggleOrthographicButtonText;
 
 		public static void Initialize(GameObject modMenuObject) {
-			if(BTModMenuManager.modMenuObject == modMenuObject) {
+			if (BTModMenuManager.modMenuObject == modMenuObject) {
 				return;
 			}
 
 			BTModMenuManager.modMenuObject = modMenuObject;
 
 			GameObject togglesContainer = BTUIUtils.FindGameObjectAtPath(modMenuObject, "TogglesContainer");
-			if(togglesContainer == null) {
+			if (togglesContainer == null) {
 				return;
 			}
 
@@ -27,30 +25,30 @@ namespace SoD_BaseMod.basemod
 			GameObject disableWaterButton = BTUIUtils.FindGameObjectAtPath(togglesContainer, "DisableWaterContainer/DisableWaterButton");
 			GameObject toggleOrthographicButton = BTUIUtils.FindGameObjectAtPath(togglesContainer, "ToggleOrthographicContainer/ToggleOrthographicButton");
 
-			if(toggleFogButton != null) {
+			if (toggleFogButton != null) {
 				toggleFogButton.GetComponent<Button>().onClick.AddListener(ToggleFogClicked);
 				GameObject text = BTUIUtils.FindGameObjectAtPath(toggleFogButton, "Text");
-				if(text != null) {
+				if (text != null) {
 					toggleFogButtonText = text.GetComponent<Text>();
 				}
 			}
 
-			if(toggleSkyboxButton != null) {
+			if (toggleSkyboxButton != null) {
 				toggleSkyboxButton.GetComponent<Button>().onClick.AddListener(ToggleSkyboxClicked);
 				GameObject text = BTUIUtils.FindGameObjectAtPath(toggleSkyboxButton, "Text");
-				if(text != null) {
+				if (text != null) {
 					toggleSkyboxButtonText = text.GetComponent<Text>();
 				}
 			}
 
-			if(disableWaterButton != null) {
+			if (disableWaterButton != null) {
 				disableWaterButton.GetComponent<Button>().onClick.AddListener(DisableWaterClicked);
 			}
 
-			if(toggleOrthographicButton != null) {
+			if (toggleOrthographicButton != null) {
 				toggleOrthographicButton.GetComponent<Button>().onClick.AddListener(ToggleOrthographicClicked);
 				GameObject text = BTUIUtils.FindGameObjectAtPath(toggleOrthographicButton, "Text");
-				if(text != null) {
+				if (text != null) {
 					toggleOrthographicButtonText = text.GetComponent<Text>();
 				}
 			}
@@ -70,25 +68,25 @@ namespace SoD_BaseMod.basemod
 
 		private static void ToggleOrthographicClicked() {
 			Camera cam = BTDebugCam.FindMainCamera();
-			if(cam != null) {
+			if (cam != null) {
 				BTDebugCam.ToggleOrthographic(cam);
 			}
 		}
 
 		public static void SetFogText(string text) {
-			if(toggleFogButtonText != null) {
+			if (toggleFogButtonText != null) {
 				toggleFogButtonText.text = text;
 			}
 		}
 
 		public static void SetSkyboxText(string text) {
-			if(toggleSkyboxButtonText != null) {
+			if (toggleSkyboxButtonText != null) {
 				toggleSkyboxButtonText.text = text;
 			}
 		}
 
 		public static void SetOrthographicText(string text) {
-			if(toggleOrthographicButtonText != null) {
+			if (toggleOrthographicButtonText != null) {
 				toggleOrthographicButtonText.text = text;
 			}
 		}

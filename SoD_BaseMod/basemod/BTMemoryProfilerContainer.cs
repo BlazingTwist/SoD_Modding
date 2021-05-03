@@ -1,18 +1,17 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SoD_BaseMod.basemod
 {
 	public class BTMemoryProfilerContainer : MonoBehaviour
 	{
-		public BTMemoryProfiler memProfiler = new BTMemoryProfiler();
+		private readonly BTMemoryProfiler memProfiler = new BTMemoryProfiler();
 
 		private void Start() {
-			memProfiler._OwnerGO = this.gameObject;
+			memProfiler._OwnerGO = gameObject;
 		}
 
 		private void OnGUI() {
-			GUILayout.BeginArea(new Rect(0f, 0f, (float)Screen.width, (float)Screen.height));
+			GUILayout.BeginArea(new Rect(0f, 0f, Screen.width, Screen.height));
 			memProfiler.RenderGUI();
 			GUILayout.EndArea();
 		}

@@ -16,7 +16,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo onEelHitOriginal = AccessTools.Method(originalType, "OnEelHit");
 
-			HarmonyMethod onEelHitPrefix = new HarmonyMethod(patcherType, nameof(OnEelHitPrefix), new[] { typeof(EREel) });
+			var onEelHitPrefix = new HarmonyMethod(patcherType, nameof(OnEelHitPrefix), new[] { typeof(EREel) });
 
 			harmony.Patch(onEelHitOriginal, onEelHitPrefix);
 		}
@@ -47,7 +47,7 @@ namespace SoD_BaseMod.asm {
 			Vector3 position = SanctuaryManager.pCurPetInstance.GetHeadPosition() + __instance._HappinessTextDragonOffset;
 			GameObject gameObject2 = UnityEngine.Object.Instantiate(__instance._EelHit3DScore.gameObject, position,
 			                                                        __instance._EelHit3DScore.transform.rotation);
-			TargetHit3DScore component = gameObject2.GetComponent<TargetHit3DScore>();
+			var component = gameObject2.GetComponent<TargetHit3DScore>();
 			component.mDisplayScore = (int) __instance._PetHappiness;
 			component.mDisplayText = __instance._PetHappinessText._Text;
 			gameObject2.transform.parent = __instance._PrtParent.transform;

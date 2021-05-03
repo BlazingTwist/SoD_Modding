@@ -14,7 +14,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo lateUpdateOriginal = AccessTools.Method(originalType, "LateUpdate");
 
-			HarmonyMethod lateUpdatePrefix = new HarmonyMethod(patcherType, nameof(LateUpdatePrefix));
+			var lateUpdatePrefix = new HarmonyMethod(patcherType, nameof(LateUpdatePrefix));
 
 			harmony.Patch(lateUpdateOriginal, lateUpdatePrefix);
 		}

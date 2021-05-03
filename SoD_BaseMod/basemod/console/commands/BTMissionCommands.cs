@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SoD_BaseMod.basemod.console.commands {
 	public static class BTMissionCommands {
@@ -96,7 +97,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.save = !isPresent || (bool) save;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"save",
@@ -133,7 +134,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.fail = isPresent && (bool) fail;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"fail",
@@ -170,7 +171,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.syncDB = !isPresent || (bool) syncDB;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"syncDB",
@@ -207,7 +208,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.unlock = isPresent && (bool) unlock;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"unlock",
@@ -256,7 +257,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.missionID = isPresent ? (int) missionID : -1;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"missionID",
@@ -313,12 +314,11 @@ namespace SoD_BaseMod.basemod.console.commands {
 
 		private static void MarkPrerequisiteMissionsComplete(Mission mission) {
 			List<int> prerequisites = mission.MissionRule.GetPrerequisites<int>(PrerequisiteRequiredType.Mission);
-			for (int i = 0; i < prerequisites.Count; i++) {
-				Mission prerequisiteMission = MissionManager.pInstance.GetMission(prerequisites[i]);
-				if (prerequisiteMission != null) {
-					prerequisiteMission.Completed = 1;
-					MarkPrerequisiteMissionsComplete(prerequisiteMission);
-				}
+			foreach (Mission prerequisiteMission in prerequisites
+					.Select(prerequisite => MissionManager.pInstance.GetMission(prerequisite))
+					.Where(prerequisiteMission => prerequisiteMission != null)) {
+				prerequisiteMission.Completed = 1;
+				MarkPrerequisiteMissionsComplete(prerequisiteMission);
 			}
 		}
 	}

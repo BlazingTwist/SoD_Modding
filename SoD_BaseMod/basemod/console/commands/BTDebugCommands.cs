@@ -95,7 +95,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.show = (bool) show;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"show",
@@ -126,7 +126,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.fileName = isPresent ? "_" + (string) fileName : "";
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"fileName",
@@ -157,8 +157,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 
 		private static void OnExecuteDebugParticles(BTConsoleCommand.BTCommandInput input) {
 			var cmdInput = (BTDebugParticlesInput) input;
-			ParticleSystem[] allParticleSystems = Resources.FindObjectsOfTypeAll(typeof(ParticleSystem)) as ParticleSystem[];
-			if (allParticleSystems == null) {
+			if (!(Resources.FindObjectsOfTypeAll(typeof(ParticleSystem)) is ParticleSystem[] allParticleSystems)) {
 				BTConsole.WriteLine("Did not find any particle systems!");
 				return;
 			}
@@ -179,7 +178,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.enable = (bool) enable;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"enable",
@@ -218,7 +217,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.add = (bool) add;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"mask",

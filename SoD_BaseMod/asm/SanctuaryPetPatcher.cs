@@ -13,6 +13,9 @@ using UnityEngine;
 namespace SoD_BaseMod.asm {
 	[UsedImplicitly]
 	public class SanctuaryPetPatcher : RuntimePatcher {
+		private static readonly int EmissiveColor = Shader.PropertyToID("_EmissiveColor");
+		private static readonly int EmissiveMap = Shader.PropertyToID("_EmissiveMap");
+
 		public override void ApplyPatches() {
 			Type originalType = typeof(SanctuaryPet);
 			Type patcherType = typeof(SanctuaryPetPatcher);
@@ -24,13 +27,13 @@ namespace SoD_BaseMod.asm {
 			MethodInfo setSleepParticleOriginal = AccessTools.Method(originalType, "SetSleepParticle", new[] { typeof(bool), typeof(Transform) });
 			MethodInfo setPWeaponShotsAvailableOriginal = AccessTools.PropertySetter(originalType, "pWeaponShotsAvailable");
 
-			HarmonyMethod setMeterPrefix = new HarmonyMethod(patcherType, nameof(SetMeterPrefix),
+			var setMeterPrefix = new HarmonyMethod(patcherType, nameof(SetMeterPrefix),
 					new[] { typeof(SanctuaryPetMeterInstance), typeof(float).MakeByRefType(), typeof(bool).MakeByRefType(), typeof(SanctuaryPet) });
-			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix));
-			HarmonyMethod updateShadersPostfix = new HarmonyMethod(patcherType, nameof(UpdateShadersPostfix),
+			var updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix));
+			var updateShadersPostfix = new HarmonyMethod(patcherType, nameof(UpdateShadersPostfix),
 					new[] { typeof(SanctuaryPet), typeof(Dictionary<string, SkinnedMeshRenderer>) });
-			HarmonyMethod setSleepParticlePostfix = new HarmonyMethod(patcherType, nameof(SetSleepParticlePostfix), new[] { typeof(SanctuaryPet) });
-			HarmonyMethod setPWeaponShotsAvailablePrefix = new HarmonyMethod(patcherType, nameof(SetPWeaponShotsAvailablePrefix));
+			var setSleepParticlePostfix = new HarmonyMethod(patcherType, nameof(SetSleepParticlePostfix), new[] { typeof(SanctuaryPet) });
+			var setPWeaponShotsAvailablePrefix = new HarmonyMethod(patcherType, nameof(SetPWeaponShotsAvailablePrefix));
 
 			harmony.Patch(setMeterOriginal, setMeterPrefix);
 			harmony.Patch(updateOriginal, updatePrefix);
@@ -72,15 +75,13 @@ namespace SoD_BaseMod.asm {
 				return;
 			}
 
-			foreach (SkinnedMeshRenderer renderer in ___mRendererMap.Values) {
-				foreach (Material material in renderer.materials) {
-					if (material.HasProperty("_EmissiveColor")) {
-						material.SetColor("_EmissiveColor", new Color(0f, 0f, 0f));
-					}
+			foreach (Material material in ___mRendererMap.Values.SelectMany(renderer => renderer.materials)) {
+				if (material.HasProperty("_EmissiveColor")) {
+					material.SetColor(EmissiveColor, new Color(0f, 0f, 0f));
+				}
 
-					if (material.HasProperty("_EmissiveMap")) {
-						material.SetTexture("_EmissiveMap", null);
-					}
+				if (material.HasProperty("_EmissiveMap")) {
+					material.SetTexture(EmissiveMap, null);
 				}
 			}
 		}

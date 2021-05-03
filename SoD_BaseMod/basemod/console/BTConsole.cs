@@ -9,7 +9,7 @@ namespace SoD_BaseMod.basemod.console {
 		private static readonly List<BTConsoleCommand> commandList = new List<BTConsoleCommand>();
 		private static bool showConsole;
 
-		private static readonly int maxHistoryCount = 20;
+		private const int maxHistoryCount = 20;
 		private static readonly List<string> commandHistory = new List<string>();
 
 		private static string inputText = "help";
@@ -59,7 +59,7 @@ namespace SoD_BaseMod.basemod.console {
 			}
 
 			// Check input to enable caching
-			inputChanged = !String.Equals(suggestionInput, inputText);
+			inputChanged = !string.Equals(suggestionInput, inputText);
 			suggestionInput = inputText;
 			BuildSuggestions();
 
@@ -70,7 +70,7 @@ namespace SoD_BaseMod.basemod.console {
 			GUILayout.EndArea();
 		}
 
-		private void BuildSuggestions() {
+		private static void BuildSuggestions() {
 			if (!inputChanged) {
 				return;
 			}
@@ -97,29 +97,30 @@ namespace SoD_BaseMod.basemod.console {
 			}
 		}
 
-		private void RenderCommandLine() {
+		private static void RenderCommandLine() {
 			if (consoleInputIsFocused && Event.current.type == EventType.KeyDown && Event.current.isKey) {
-				if ((Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter)) {
-					OnCommandSubmitted(inputText, true);
-				}
-
-				if (Event.current.keyCode == KeyCode.UpArrow) {
-					SelectPreviousCommand();
-				}
-
-				if (Event.current.keyCode == KeyCode.DownArrow) {
-					SelectNextCommand();
-				}
-
-				if (Event.current.keyCode == KeyCode.Escape) {
-					GUI.FocusControl(null);
+				// ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+				switch (Event.current.keyCode) {
+					case KeyCode.Return:
+					case KeyCode.KeypadEnter:
+						OnCommandSubmitted(inputText, true);
+						break;
+					case KeyCode.UpArrow:
+						SelectPreviousCommand();
+						break;
+					case KeyCode.DownArrow:
+						SelectNextCommand();
+						break;
+					case KeyCode.Escape:
+						GUI.FocusControl(null);
+						break;
 				}
 			}
 
 			GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
 			GUI.SetNextControlName("consoleInputField");
 			inputText = GUILayout.TextField(inputText, GUILayout.ExpandWidth(true));
-			consoleInputIsFocused = (GUI.GetNameOfFocusedControl() == "consoleInputField");
+			consoleInputIsFocused = GUI.GetNameOfFocusedControl() == "consoleInputField";
 			if (GUILayout.Button("X", GUILayout.Width(20f))) {
 				inputText = "";
 			}
@@ -135,7 +136,7 @@ namespace SoD_BaseMod.basemod.console {
 			GUILayout.EndHorizontal();
 		}
 
-		private void RenderIntelliSense() {
+		private static void RenderIntelliSense() {
 			float lineHeight = GUI.skin.button.lineHeight + GUI.skin.button.margin.top + GUI.skin.button.padding.top + GUI.skin.button.padding.bottom;
 			intellisenseScrollViewPos = GUILayout.BeginScrollView(intellisenseScrollViewPos, GUILayout.MaxHeight(lineHeight * SuggestionCount),
 					GUILayout.ExpandHeight(true));
@@ -243,7 +244,7 @@ namespace SoD_BaseMod.basemod.console {
 			bool isEscaped = false;
 			foreach (char c in command) {
 				bool wasEscaped = isEscaped;
-				isEscaped = (c == '\\');
+				isEscaped = c == '\\';
 				if (isEscaped) {
 					if (wasEscaped) {
 						// backslash must escape backslash too
@@ -261,7 +262,7 @@ namespace SoD_BaseMod.basemod.console {
 					continue;
 				}
 
-				if (Char.IsWhiteSpace(c) && !isString) {
+				if (char.IsWhiteSpace(c) && !isString) {
 					if (currentArgument.Length != 0) {
 						result.Add(currentArgument.ToString());
 						currentArgument.Clear();
@@ -280,7 +281,7 @@ namespace SoD_BaseMod.basemod.console {
 			return result;
 		}
 
-		private void OnCommandSubmitted(string multiCommand, bool addToHistory) {
+		private static void OnCommandSubmitted(string multiCommand, bool addToHistory) {
 			if (addToHistory) {
 				AddCommandToHistory(multiCommand);
 				currentHistoryIndex = -1;
@@ -425,7 +426,7 @@ namespace SoD_BaseMod.basemod.console {
 		}
 
 		public static void WriteLine(string line) {
-			consoleText += (line + "\n");
+			consoleText += line + "\n";
 		}
 
 		public static void ClearConsole() {

@@ -17,7 +17,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix),
+			var updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix),
 					new[] { typeof(ObstacleCourseGame), typeof(UiFlightSchoolHUD), typeof(float) });
 
 			harmony.Patch(updateOriginal, updatePrefix);

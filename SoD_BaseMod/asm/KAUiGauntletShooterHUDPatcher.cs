@@ -14,7 +14,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo continueFireBallFrenzyOriginal = AccessTools.Method(originalType, "ContinueFireBallFrenzy");
 
-			HarmonyMethod continueFireBallFrenzyPostfix =
+			var continueFireBallFrenzyPostfix =
 					new HarmonyMethod(patcherType, nameof(ContinueFireBallFrenzyPostfix), new[] { typeof(GauntletRailShootManager) });
 
 			harmony.Patch(continueFireBallFrenzyOriginal, continueFireBallFrenzyPostfix);

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace SoD_BaseMod.basemod.console.commands {
-	public class BTConfigReloadCommand {
+	public static class BTConfigReloadCommand {
 		public static void Register() {
 			BTConsole.AddCommand(new BTConsoleCommand(
 					new List<string> { "config", "reload" },

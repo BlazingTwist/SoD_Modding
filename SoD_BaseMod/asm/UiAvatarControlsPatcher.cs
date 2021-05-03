@@ -17,13 +17,13 @@ namespace SoD_BaseMod.asm {
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 			MethodInfo hideAvatarOriginal = AccessTools.Method(originalType, "HideAvatar", new[] { typeof(bool) });
 
-			HarmonyMethod showAvatarToggleButtonPrefix =
+			var showAvatarToggleButtonPrefix =
 					new HarmonyMethod(patcherType, nameof(ShowAvatarToggleButtonPrefix), new[] { typeof(bool).MakeByRefType() });
-			HarmonyMethod getWeaponCooldownPostfix =
+			var getWeaponCooldownPostfix =
 					new HarmonyMethod(patcherType, nameof(GetWeaponCooldownPostfix), new[] { typeof(float).MakeByRefType() });
-			HarmonyMethod updatePostfix = new HarmonyMethod(patcherType, nameof(UpdatePostfix),
+			var updatePostfix = new HarmonyMethod(patcherType, nameof(UpdatePostfix),
 					new[] { typeof(UiAvatarControls), typeof(bool), typeof(bool), typeof(bool) });
-			HarmonyMethod hideAvatarPostfix =
+			var hideAvatarPostfix =
 					new HarmonyMethod(patcherType, nameof(HideAvatarPostfix), new[] { typeof(UiAvatarControls), typeof(bool) });
 
 			harmony.Patch(showAvatarToggleButtonOriginal, showAvatarToggleButtonPrefix);
@@ -49,7 +49,8 @@ namespace SoD_BaseMod.asm {
 				return;
 			}
 
-			if ((___mEnableFireOnButtonDown && KAInput.GetButton("DragonFire")) || (___mEnableFireOnButtonUp && KAInput.GetButtonUp("DragonFire"))) {
+			if (___mEnableFireOnButtonDown && KAInput.GetButton("DragonFire")
+					|| ___mEnableFireOnButtonUp && KAInput.GetButtonUp("DragonFire")) {
 				FireReverse(__instance);
 			}
 		}

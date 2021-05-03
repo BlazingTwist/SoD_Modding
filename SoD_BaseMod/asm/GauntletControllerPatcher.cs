@@ -14,7 +14,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix), new[] {typeof(GauntletController)});
+			var updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix), new[] {typeof(GauntletController)});
 
 			harmony.Patch(updateOriginal, updatePrefix);
 		}

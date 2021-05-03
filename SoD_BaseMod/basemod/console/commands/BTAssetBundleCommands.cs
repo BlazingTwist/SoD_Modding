@@ -44,8 +44,8 @@ namespace SoD_BaseMod.basemod.console.commands {
 					return;
 				}
 
-				BTConsole.WriteLine("AssetNames: {'" + String.Join("', '", assetBundle.GetAllAssetNames()) + "'}");
-				BTConsole.WriteLine("ScenePaths: {'" + String.Join("', '", assetBundle.GetAllScenePaths()) + "'}");
+				BTConsole.WriteLine("AssetNames: {'" + string.Join("', '", assetBundle.GetAllAssetNames()) + "'}");
+				BTConsole.WriteLine("ScenePaths: {'" + string.Join("', '", assetBundle.GetAllScenePaths()) + "'}");
 			} catch (Exception e) {
 				BTConsole.WriteLine("AssetBundle list failed - " + e);
 			} finally {
@@ -62,7 +62,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.assetPath = (string) assetPath;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"assetPath",
@@ -165,7 +165,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.assetName = (string) assetName;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"assetPath",
@@ -197,7 +197,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.sceneIndex = isPresent ? (int) sceneIndex : 0;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"assetPath",

@@ -3,7 +3,6 @@ using SoD_BaseMod.basemod;
 using BlazingTwist_Core;
 using System;
 using System.Reflection;
-using JetBrains.Annotations;
 using SoD_BaseMod.basemod.config;
 using UnityEngine;
 
@@ -27,7 +26,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo spawnEelsOriginal = AccessTools.Method(originalType, "SpawnEels");
 
-			HarmonyMethod spawnEelsPrefix = new HarmonyMethod(patcherType, nameof(SpawnEelsPrefix));
+			var spawnEelsPrefix = new HarmonyMethod(patcherType, nameof(SpawnEelsPrefix));
 
 			harmony.Patch(spawnEelsOriginal, spawnEelsPrefix);
 		}

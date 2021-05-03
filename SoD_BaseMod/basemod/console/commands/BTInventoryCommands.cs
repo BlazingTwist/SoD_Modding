@@ -94,7 +94,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.updateServer = (bool) updateServer;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"itemID",
@@ -148,7 +148,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.updateServer = (bool) updateServer;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"itemID",
@@ -177,7 +177,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 
 		private static void OnExecuteInventoryAddRange(BTConsoleCommand.BTCommandInput input) {
 			var cmdInput = (BTInventoryAddRangeInput) input;
-			bool isReverse = (cmdInput.idStart > cmdInput.idEnd);
+			bool isReverse = cmdInput.idStart > cmdInput.idEnd;
 			int start = isReverse ? cmdInput.idEnd : cmdInput.idStart;
 			int end = isReverse ? cmdInput.idStart : cmdInput.idEnd;
 			for (int itemID = start; itemID <= end; itemID++) {
@@ -206,7 +206,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.updateServer = (bool) updateServer;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"idStart",
@@ -270,7 +270,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.itemTier = (int) itemTier;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"itemID",
@@ -322,7 +322,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.show = isPresent ? show : null;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"show",
@@ -338,7 +338,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 		private static void OnExecuteInventoryDumpItemData(BTConsoleCommand.BTCommandInput input) {
 			var cmdInput = (BTInventoryDumpItemDataInput) input;
 
-			bool isReverse = (cmdInput.idStart > cmdInput.idEnd);
+			bool isReverse = cmdInput.idStart > cmdInput.idEnd;
 			int start = isReverse ? cmdInput.idEnd : cmdInput.idStart;
 			int end = isReverse ? cmdInput.idStart : cmdInput.idEnd;
 
@@ -381,7 +381,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 
 			public void RequestNextBatch() {
 				int loadedItemDataCount = loadedItemData.Count;
-				int requestsRemainingCount = (endID - startID + 1) - loadedItemDataCount;
+				int requestsRemainingCount = endID - startID + 1 - loadedItemDataCount;
 				int batchStartID = startID + loadedItemDataCount;
 				int batchEndID;
 				if (requestsRemainingCount < batchSize) {
@@ -408,7 +408,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 			}
 
 			private bool AllItemsLoaded() {
-				return loadedItemData.Count >= (endID - startID + 1);
+				return loadedItemData.Count >= endID - startID + 1;
 			}
 
 			private void OnAllItemsLoaded() {
@@ -482,13 +482,13 @@ namespace SoD_BaseMod.basemod.console.commands {
 							if (index == 0) {
 								textureNames += texture.TextureName;
 								textureTypeNames += texture.TextureTypeName;
-								offsetX += (texture.OffsetX == null) ? "null" : texture.OffsetX.Value.ToString(CultureInfo.InvariantCulture);
-								offsetY += (texture.OffsetY == null) ? "null" : texture.OffsetY.Value.ToString(CultureInfo.InvariantCulture);
+								offsetX += texture.OffsetX == null ? "null" : texture.OffsetX.Value.ToString(CultureInfo.InvariantCulture);
+								offsetY += texture.OffsetY == null ? "null" : texture.OffsetY.Value.ToString(CultureInfo.InvariantCulture);
 							} else {
-								textureNames += (", " + texture.TextureName);
-								textureTypeNames += (", " + texture.TextureTypeName);
-								offsetX += (", " + ((texture.OffsetX == null) ? "null" : texture.OffsetX.Value.ToString(CultureInfo.InvariantCulture)));
-								offsetY += (", " + ((texture.OffsetY == null) ? "null" : texture.OffsetY.Value.ToString(CultureInfo.InvariantCulture)));
+								textureNames += ", " + texture.TextureName;
+								textureTypeNames += ", " + texture.TextureTypeName;
+								offsetX += ", " + (texture.OffsetX == null ? "null" : texture.OffsetX.Value.ToString(CultureInfo.InvariantCulture));
+								offsetY += ", " + (texture.OffsetY == null ? "null" : texture.OffsetY.Value.ToString(CultureInfo.InvariantCulture));
 							}
 						}
 
@@ -513,9 +513,9 @@ namespace SoD_BaseMod.basemod.console.commands {
 								categoryNames += category.CategoryName;
 								iconNames += category.IconName;
 							} else {
-								categoryIDs += (", " + category.CategoryId);
-								categoryNames += (", " + category.CategoryName);
-								iconNames += (", " + category.IconName);
+								categoryIDs += ", " + category.CategoryId;
+								categoryNames += ", " + category.CategoryName;
+								iconNames += ", " + category.IconName;
 							}
 						}
 
@@ -541,10 +541,10 @@ namespace SoD_BaseMod.basemod.console.commands {
 								relationshipWeights += relationship.Weight;
 								relationshipQuantities += relationship.Quantity;
 							} else {
-								relationshipTypes += (", " + relationship.Type);
-								relationshipItemIDs += (", " + relationship.ItemId);
-								relationshipWeights += (", " + relationship.Weight);
-								relationshipQuantities += (", " + relationship.Quantity);
+								relationshipTypes += ", " + relationship.Type;
+								relationshipItemIDs += ", " + relationship.ItemId;
+								relationshipWeights += ", " + relationship.Weight;
+								relationshipQuantities += ", " + relationship.Quantity;
 							}
 						}
 
@@ -588,7 +588,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.batchSize = isPresent ? (int) batchSize : 100;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"idStart",

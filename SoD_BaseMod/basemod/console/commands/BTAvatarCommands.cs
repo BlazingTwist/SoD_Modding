@@ -111,7 +111,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.makePreviousPosition = isPresent && (bool) makePreviousPosition;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"makePreviousPosition",
@@ -161,7 +161,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.distance = (float) distance;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"object name",
@@ -211,7 +211,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.z = (float) z;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"x",
@@ -366,7 +366,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.value = (string) value;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"part",
@@ -418,7 +418,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.speed = (float) speed;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"speed",

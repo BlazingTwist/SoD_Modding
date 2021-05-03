@@ -22,7 +22,7 @@ namespace SoD_BaseMod.basemod
 			}
 
 			GameObject title = titleTransform.gameObject;
-			BTUIDragHandler dragHandler = title.AddComponent<BTUIDragHandler>();
+			var dragHandler = title.AddComponent<BTUIDragHandler>();
 			dragHandler.Initialize(window.GetComponent<RectTransform>(), canvas.GetComponent<Canvas>());
 
 			return window;
@@ -34,13 +34,10 @@ namespace SoD_BaseMod.basemod
 			}
 
 			Transform temp = FindTransformAtPath(root.transform, path);
-			if(temp != null) {
-				return temp.gameObject;
-			}
-			return null;
+			return temp != null ? temp.gameObject : null;
 		}
 
-		public static Transform FindTransformAtPath(Transform root, string pathString) {
+		private static Transform FindTransformAtPath(Transform root, string pathString) {
 			if(root == null || pathString == null) {
 				return null;
 			}

@@ -33,7 +33,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.name = (string) name;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"name",
@@ -50,11 +50,10 @@ namespace SoD_BaseMod.basemod.console.commands {
 			var cmdInput = (BTTutorialResetInput) input;
 			bool result = ProductData.ResetTutorial(cmdInput.name);
 			if (cmdInput.name == null) {
-				if (result) {
-					BTConsole.WriteLine("Tutorial play status reset.");
-				} else {
-					BTConsole.WriteLine("Could not reset Tutorials");
-				}
+				string message = result
+						? "Tutorial play status reset."
+						: "Could not reset Tutorials";
+				BTConsole.WriteLine(message);
 			} else {
 				if (result) {
 					BTConsole.WriteLine("Tutorial " + cmdInput.name + " reset (not saved)");
@@ -71,7 +70,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.name = (string) name;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"name",

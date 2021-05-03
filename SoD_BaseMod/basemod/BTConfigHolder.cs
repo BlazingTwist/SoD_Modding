@@ -76,7 +76,7 @@ namespace SoD_BaseMod.basemod {
 
 			logBuilder.Append("\n");
 
-			using (StreamWriter writer = new StreamWriter((basePath + logFileName).Replace('/', Path.DirectorySeparatorChar), true)) {
+			using (var writer = new StreamWriter((basePath + logFileName).Replace('/', Path.DirectorySeparatorChar), true)) {
 				writer.WriteLine(logBuilder.ToString());
 			}
 		}

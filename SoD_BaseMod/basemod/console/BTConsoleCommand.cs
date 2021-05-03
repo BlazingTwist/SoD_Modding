@@ -43,7 +43,7 @@ namespace SoD_BaseMod.basemod.console {
 				}
 
 				targetIndex++;
-				if (targetIndex >= targetCharsLength && (inputIndex + 1) < inputCharsLength) {
+				if (targetIndex >= targetCharsLength && inputIndex + 1 < inputCharsLength) {
 					// reached end of target string, but still have input chars to check
 					return false;
 				}
@@ -89,7 +89,7 @@ namespace SoD_BaseMod.basemod.console {
 		public string Autocomplete(List<string> input) {
 			int inputCount = input.Count;
 			int namespaceCount = commandNamespace.Count;
-			StringBuilder resultBuilder = new StringBuilder();
+			var resultBuilder = new StringBuilder();
 
 			int inputConsumptionCount = 0;
 			for (int namespaceIndex = 0; namespaceIndex < namespaceCount; namespaceIndex++) {
@@ -198,7 +198,7 @@ namespace SoD_BaseMod.basemod.console {
 				Prepare();
 			}
 
-			protected abstract List<BTConsoleArgument> BuildConsoleArguments();
+			protected abstract IEnumerable<BTConsoleArgument> BuildConsoleArguments();
 
 			private void Prepare() {
 				requiredArguments = new List<BTConsoleArgument>();
@@ -243,10 +243,10 @@ namespace SoD_BaseMod.basemod.console {
 				List<string> argumentTexts = GetConsoleArguments()
 						.Select(arg => arg.GetFormattedDisplayName())
 						.ToList();
-				return String.Join(" ", argumentTexts);
+				return string.Join(" ", argumentTexts);
 			}
 
-			public List<string> GetArgumentHelp() {
+			public IEnumerable<string> GetArgumentHelp() {
 				return GetConsoleArguments()
 						.Select(arg => arg.GetFormattedHelpText())
 						.ToList();

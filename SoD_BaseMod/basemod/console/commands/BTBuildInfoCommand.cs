@@ -16,7 +16,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 		private static void OnExecute(BTConsoleCommand.BTCommandInput input) {
 			BTConsole.WriteLine("Unity Project ID - " + Application.cloudProjectId);
 			string changeListNumber = ProductSettings.pInstance.GetChangelistNumber();
-			string formattedCLNumber = (string.IsNullOrEmpty(changeListNumber) ? "not found" : changeListNumber);
+			string formattedCLNumber = string.IsNullOrEmpty(changeListNumber) ? "not found" : changeListNumber;
 			BTConsole.WriteLine("Application.version - " + Application.version);
 			BTConsole.WriteLine("Application.unityVersion - " + Application.unityVersion);
 			BTConsole.WriteLine("ChangeList Number - " + formattedCLNumber);

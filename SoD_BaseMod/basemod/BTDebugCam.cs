@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace SoD_BaseMod.basemod
-{
-	public class BTDebugCam
-	{
-		public static Material prevSkybox = null;
-		public static List<int> toggledUIElements = new List<int>();
-		public static GameObject currentCutsceneObject;
+namespace SoD_BaseMod.basemod {
+	public static class BTDebugCam {
+		private static Material prevSkybox;
+		private static readonly List<int> toggledUIElements = new List<int>();
 
 		public static bool useDebugCam;
-		public static Vector2 mMousePrev;
+		private static Vector2 mMousePrev;
 
-		public static float camRotationX;
-		public static float camRotationY;
+		private static float camRotationX;
+		private static float camRotationY;
 
 		private static Vector3 initialPosition;
 		private static Quaternion initialRotation;
@@ -24,62 +24,62 @@ namespace SoD_BaseMod.basemod
 		private static float initialTreeDistance;
 		private static float initialTreeBillboardDistance;
 
-		private static Camera overrideCamera = null;
+		private static Camera overrideCamera;
 
-		private static BTConfigHolder ConfigHolder {
-			get {
-				return BTDebugCamInputManager.GetConfigHolder();
-			}
-		}
+		private static BTConfigHolder ConfigHolder => BTDebugCamInputManager.GetConfigHolder();
 
 		public static void SetMainCamera(Camera targetCam) {
 			overrideCamera = targetCam;
 		}
 
 		public static void RemoveMainCamera(Camera targetCam) {
-			if(targetCam == overrideCamera) {
+			if (targetCam == overrideCamera) {
 				overrideCamera = null;
 			}
 		}
 
 		public static Camera FindMainCamera() {
-			if(overrideCamera != null) {
+			if (overrideCamera != null) {
 				return overrideCamera;
 			}
+
+			// ReSharper disable once Unity.PerformanceCriticalCodeCameraMain
 			Camera camera = Camera.main;
-			if(camera == null) {
-				AQUAS_Camera aquasCam = UnityEngine.Object.FindObjectOfType<AQUAS_Camera>();
-				if(aquasCam != null) {
+			if (camera == null) {
+				var aquasCam = Object.FindObjectOfType<AQUAS_Camera>();
+				if (aquasCam != null) {
 					camera = aquasCam.GetComponent<Camera>();
 				}
 			}
+
 			return camera;
 		}
 
-		public static void ResetFOV(Camera camera) {
-			if(ConfigHolder == null) {
+		private static void ResetFOV(Camera camera) {
+			if (ConfigHolder == null) {
 				return;
 			}
 
-			if(BTDebugCam.useDebugCam) {
+			if (useDebugCam) {
 				SetFOV(camera, ConfigHolder.config.cameraFOV);
 				SetOrthographicSize(camera, ConfigHolder.config.orthographicSize);
 			} else {
-				SetFOV(camera, BTDebugCam.initialFOV);
+				SetFOV(camera, initialFOV);
 				SetOrthographicSize(camera, initialOrthographicSize);
 			}
 		}
 
-		public static void ToggleDebugCam(Camera camera) {
-			if(ConfigHolder == null) {
+		private static void ToggleDebugCam(Camera camera) {
+			if (ConfigHolder == null) {
 				return;
 			}
 
 			useDebugCam = !useDebugCam;
-			if(useDebugCam) {
+			if (useDebugCam) {
 				//store current values
-				Vector3 position = camera.transform.position;
-				Quaternion rotation = camera.transform.rotation;
+				Transform transform = camera.transform;
+				Vector3 position = transform.position;
+				Quaternion rotation = transform.rotation;
 				initialPosition = new Vector3(position.x, position.y, position.z);
 				initialRotation = new Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
 				initialFOV = camera.fieldOfView;
@@ -91,31 +91,33 @@ namespace SoD_BaseMod.basemod
 				camera.farClipPlane = ConfigHolder.config.cameraRenderDistance;
 
 				//set terrain values
-				Terrain terrain = (Terrain)UnityEngine.Object.FindObjectOfType(typeof(Terrain));
-				if(terrain != null) {
+				var terrain = (Terrain) Object.FindObjectOfType(typeof(Terrain));
+				if (terrain != null) {
 					initialDetailObjectDistance = terrain.detailObjectDistance;
 					initialTreeDistance = terrain.treeDistance;
 					initialTreeBillboardDistance = terrain.treeBillboardDistance;
 					terrain.detailObjectDistance = ConfigHolder.config.cameraRenderDistance;
 					terrain.treeDistance = ConfigHolder.config.cameraRenderDistance;
 					terrain.treeBillboardDistance = ConfigHolder.config.cameraRenderDistance;
-					float[] newheighterror = new float[terrain.terrainData.GetMaximumHeightError().Length];
-					for(int i = 0; i < newheighterror.Length; i++) {
-						newheighterror[i] = 1f;
+					float[] newHeightError = new float[terrain.terrainData.GetMaximumHeightError().Length];
+					for (int i = 0; i < newHeightError.Length; i++) {
+						newHeightError[i] = 1f;
 					}
-					terrain.terrainData.OverrideMaximumHeightError(newheighterror);
+
+					terrain.terrainData.OverrideMaximumHeightError(newHeightError);
 				}
 			} else {
 				//restore old values
-				camera.transform.position = initialPosition;
-				camera.transform.rotation = initialRotation;
+				Transform transform = camera.transform;
+				transform.position = initialPosition;
+				transform.rotation = initialRotation;
 				SetFOV(camera, initialFOV);
 				SetOrthographicSize(camera, initialOrthographicSize);
 				camera.farClipPlane = initialFarClipPlane;
 
 				//restore terrain
-				Terrain terrain = (Terrain)UnityEngine.Object.FindObjectOfType(typeof(Terrain));
-				if(terrain != null) {
+				var terrain = (Terrain) Object.FindObjectOfType(typeof(Terrain));
+				if (terrain != null) {
 					terrain.detailObjectDistance = initialDetailObjectDistance;
 					terrain.treeDistance = initialTreeDistance;
 					terrain.treeBillboardDistance = initialTreeBillboardDistance;
@@ -124,109 +126,116 @@ namespace SoD_BaseMod.basemod
 			}
 		}
 
-		public static void DeleteLookedAtObject(Camera camera) {
-			if(Physics.Raycast(camera.transform.position, camera.transform.forward, out RaycastHit raycastHit)) {
+		private static void DeleteLookedAtObject(Component camera) {
+			if (Physics.Raycast(camera.transform.position, camera.transform.forward, out RaycastHit raycastHit)) {
 				raycastHit.transform.gameObject.SetActive(false);
 			}
 		}
 
-		public static void HandleCameraInput(Camera camera) {
-			if(ConfigHolder == null) {
+		private static void HandleCameraInput(Camera camera) {
+			if (ConfigHolder == null) {
 				return;
 			}
 
-			if(camera == null) {
+			if (camera == null) {
 				return;
 			}
 
-			if(BTDebugCamInputManager.IsKeyJustDown("ToggleOrthographicMode")) {
+			if (BTDebugCamInputManager.IsKeyJustDown("ToggleOrthographicMode")) {
 				ToggleOrthographic(camera);
 			}
 
-			if(BTDebugCamInputManager.IsKeyDown("DebugCamFovReset")) {
+			if (BTDebugCamInputManager.IsKeyDown("DebugCamFovReset")) {
 				ResetFOV(camera);
 			}
 
-			if(BTDebugCamInputManager.IsKeyJustDown("DebugCamToggle")) {
+			if (BTDebugCamInputManager.IsKeyJustDown("DebugCamToggle")) {
 				ToggleDebugCam(camera);
 			}
 
-			if(useDebugCam) {
-				if(BTDebugCamInputManager.IsKeyJustDown("DeleteLookedAtObject")) {
+			if (useDebugCam) {
+				if (BTDebugCamInputManager.IsKeyJustDown("DeleteLookedAtObject")) {
 					DeleteLookedAtObject(camera);
 				}
 
-				Vector3 movementInput = new Vector3(0f, 0f, 0f);
-				float movementSpeed;
-				if(BTDebugCamInputManager.IsKeyDown("DebugCamFastMovement")) {
-					movementSpeed = ConfigHolder.config.cameraFastSpeed;
-				} else {
-					movementSpeed = ConfigHolder.config.cameraSpeed;
-				}
+				var movementInput = new Vector3(0f, 0f, 0f);
+				float movementSpeed = BTDebugCamInputManager.IsKeyDown("DebugCamFastMovement")
+						? ConfigHolder.config.cameraFastSpeed
+						: ConfigHolder.config.cameraSpeed;
 
 				float forwardInput = 0f;
 				float rightInput = 0f;
-				if(BTDebugCamInputManager.IsKeyDown("DebugCamForward")) {
+				if (BTDebugCamInputManager.IsKeyDown("DebugCamForward")) {
 					forwardInput += movementSpeed;
 				}
-				if(BTDebugCamInputManager.IsKeyDown("DebugCamBack")) {
+
+				if (BTDebugCamInputManager.IsKeyDown("DebugCamBack")) {
 					forwardInput -= movementSpeed;
 				}
-				if(BTDebugCamInputManager.IsKeyDown("DebugCamRight")) {
+
+				if (BTDebugCamInputManager.IsKeyDown("DebugCamRight")) {
 					rightInput += movementSpeed;
 				}
-				if(BTDebugCamInputManager.IsKeyDown("DebugCamLeft")) {
+
+				if (BTDebugCamInputManager.IsKeyDown("DebugCamLeft")) {
 					rightInput -= movementSpeed;
 				}
 
-				if(forwardInput != 0f) {
-					Vector3 forward = (camRotationY == 90f) ? camera.transform.up : ((camRotationY != -90f) ? camera.transform.forward : (-camera.transform.up));
+				Transform cameraTransform = camera.transform;
+				if (forwardInput != 0f) {
+					Vector3 cameraUp = cameraTransform.up;
+					Vector3 forward = Math.Abs(camRotationY - 90f) < float.Epsilon
+							? cameraUp
+							: Math.Abs(camRotationY + 90f) < float.Epsilon
+									? cameraTransform.forward
+									: -cameraUp;
 					forward.y = 0f;
 					movementInput += Vector3.Normalize(forward) * forwardInput;
 				}
 
-				if(rightInput != 0f) {
-					Vector3 right = camera.transform.right;
+				if (rightInput != 0f) {
+					Vector3 right = cameraTransform.right;
 					right.y = 0f;
 					movementInput += Vector3.Normalize(right) * rightInput;
 				}
 
-				if(BTDebugCamInputManager.IsKeyDown("DebugCamUp")) {
+				if (BTDebugCamInputManager.IsKeyDown("DebugCamUp")) {
 					movementInput.y += movementSpeed;
 				}
 
-				if(BTDebugCamInputManager.IsKeyDown("DebugCamDown")) {
+				if (BTDebugCamInputManager.IsKeyDown("DebugCamDown")) {
 					movementInput.y -= movementSpeed;
 				}
-				camera.transform.position += movementInput;
+
+				cameraTransform.position += movementInput;
 
 				//mouse input;
 				camRotationX += KAInput.GetAxis("CameraRotationX") * 0.2f;
 				camRotationX += KAInput.GetAxis("CameraRotationY") * 0.2f;
-				if(KAInput.GetMouseButton(1)) {
+				if (KAInput.GetMouseButton(1)) {
 					camRotationX += (Input.mousePosition.x - mMousePrev.x) * 0.2f;
 					camRotationY -= (Input.mousePosition.y - mMousePrev.y) * 0.2f;
 				}
 
-				if(camRotationX > 180f) {
+				if (camRotationX > 180f) {
 					camRotationX -= 360f;
-				} else if(camRotationX < -180f) {
+				} else if (camRotationX < -180f) {
 					camRotationX += 360f;
 				}
 
-				if(camRotationY > 90f) {
+				if (camRotationY > 90f) {
 					camRotationY = 90f;
-				} else if(camRotationY < -90f) {
+				} else if (camRotationY < -90f) {
 					camRotationY = -90f;
 				}
 
 				Quaternion rotation = Quaternion.Euler(camRotationY, camRotationX, 0f);
-				camera.transform.rotation = rotation;
+				cameraTransform.rotation = rotation;
 				mMousePrev = Input.mousePosition;
 
 				float scrollInput = Input.mouseScrollDelta.y;
-				if(camera.orthographic) {
-					SetOrthographicSize(camera, camera.orthographicSize - (2f * scrollInput));
+				if (camera.orthographic) {
+					SetOrthographicSize(camera, camera.orthographicSize - 2f * scrollInput);
 				} else {
 					SetFOV(camera, camera.fieldOfView - scrollInput);
 				}
@@ -234,19 +243,19 @@ namespace SoD_BaseMod.basemod
 		}
 
 		public static void Update() {
-			if(BTDebugCamInputManager.IsKeyJustDown("DisableWater")) {
+			if (BTDebugCamInputManager.IsKeyJustDown("DisableWater")) {
 				DisableWater();
 			}
 
-			if(BTDebugCamInputManager.IsKeyJustDown("ToggleFog")) {
+			if (BTDebugCamInputManager.IsKeyJustDown("ToggleFog")) {
 				ToggleFog();
 			}
 
-			if(BTDebugCamInputManager.IsKeyJustDown("ToggleSkybox")) {
+			if (BTDebugCamInputManager.IsKeyJustDown("ToggleSkybox")) {
 				ToggleSkybox();
 			}
 
-			if(BTDebugCamInputManager.IsKeyJustDown("ToggleUIElements")) {
+			if (BTDebugCamInputManager.IsKeyJustDown("ToggleUIElements")) {
 				ToggleUIElements();
 			}
 
@@ -255,7 +264,7 @@ namespace SoD_BaseMod.basemod
 
 		public static void DisableWater() {
 			GameObject gameObject;
-			while((gameObject = GameObject.Find("Water")) != null) {
+			while ((gameObject = GameObject.Find("Water")) != null) {
 				gameObject.SetActive(false);
 			}
 		}
@@ -268,7 +277,7 @@ namespace SoD_BaseMod.basemod
 		}
 
 		public static void ToggleSkybox() {
-			if(RenderSettings.skybox != null) {
+			if (RenderSettings.skybox != null) {
 				prevSkybox = RenderSettings.skybox;
 				RenderSettings.skybox = null;
 				BTInfoHUDManager.SetSkyboxText("False");
@@ -280,21 +289,22 @@ namespace SoD_BaseMod.basemod
 			}
 		}
 
-		public static void ToggleUIElements() {
+		private static void ToggleUIElements() {
 			KAWidget[] elements = Resources.FindObjectsOfTypeAll<KAWidget>();
-			if(toggledUIElements.Count == 0) {
-				foreach(KAWidget widget in elements) {
-					if(widget != null && widget.GetVisibility()) {
+			if (toggledUIElements.Count == 0) {
+				foreach (KAWidget widget in elements) {
+					if (widget != null && widget.GetVisibility()) {
 						toggledUIElements.Add(widget.GetInstanceID());
 						widget.SetVisibility(false);
 					}
 				}
 			} else {
-				foreach(KAWidget widget in elements) {
-					if(widget != null && toggledUIElements.Contains(widget.GetInstanceID())) {
+				foreach (KAWidget widget in elements) {
+					if (widget != null && toggledUIElements.Contains(widget.GetInstanceID())) {
 						widget.SetVisibility(true);
 					}
 				}
+
 				toggledUIElements.Clear();
 			}
 		}
@@ -306,14 +316,14 @@ namespace SoD_BaseMod.basemod
 			BTModMenuManager.SetOrthographicText(camera.orthographic ? "enabled" : "disabled");
 		}
 
-		public static void SetFOV(Camera camera, float fov) {
+		private static void SetFOV(Camera camera, float fov) {
 			camera.fieldOfView = fov;
-			BTInfoHUDManager.SetFOVText(fov.ToString());
+			BTInfoHUDManager.SetFOVText(fov.ToString(CultureInfo.InvariantCulture));
 		}
 
-		public static void SetOrthographicSize(Camera camera, float orthographicSize) {
+		private static void SetOrthographicSize(Camera camera, float orthographicSize) {
 			camera.orthographicSize = orthographicSize;
-			BTInfoHUDManager.SetOrthographicSizeText(orthographicSize.ToString());
+			BTInfoHUDManager.SetOrthographicSizeText(orthographicSize.ToString(CultureInfo.InvariantCulture));
 		}
 	}
 }

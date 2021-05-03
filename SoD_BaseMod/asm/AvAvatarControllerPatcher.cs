@@ -26,19 +26,19 @@ namespace SoD_BaseMod.asm {
 			MethodInfo updateFlyingOriginal = AccessTools.Method(originalType, "UpdateFlying", new[] { typeof(float), typeof(float) });
 			MethodInfo updateFlyingControlOriginal = AccessTools.Method(originalType, "UpdateFlyingControl", new[] { typeof(float), typeof(float) });
 
-			HarmonyMethod setPFlyingDataPrefix =
+			var setPFlyingDataPrefix =
 					new HarmonyMethod(patcherType, nameof(SetPFlyingDataPrefix), new[] { typeof(AvAvatarFlyingData).MakeByRefType() });
-			HarmonyMethod keyboardUpdatePrefix =
+			var keyboardUpdatePrefix =
 					new HarmonyMethod(patcherType, nameof(KeyboardUpdatePrefix));
-			HarmonyMethod keyboardUpdateTranspiler =
+			var keyboardUpdateTranspiler =
 					new HarmonyMethod(patcherType, nameof(KeyboardUpdateTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
-			HarmonyMethod getHorizontalFromInputPostfix =
+			var getHorizontalFromInputPostfix =
 					new HarmonyMethod(patcherType, nameof(GetHorizontalFromInputPostfix), new[] { typeof(float).MakeByRefType() });
-			HarmonyMethod doUpdateTranspiler =
+			var doUpdateTranspiler =
 					new HarmonyMethod(patcherType, nameof(DoUpdateTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
-			HarmonyMethod updateFlyingTranspiler =
+			var updateFlyingTranspiler =
 					new HarmonyMethod(patcherType, nameof(UpdateFlyingTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
-			HarmonyMethod updateFlyingControlTranspiler =
+			var updateFlyingControlTranspiler =
 					new HarmonyMethod(patcherType, nameof(UpdateFlyingControlTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(setFlyingDataOriginal, setPFlyingDataPrefix);
@@ -73,14 +73,14 @@ namespace SoD_BaseMod.asm {
 			for (int i = 0; i < instructionCount; i++) {
 				CodeInstruction inst = instructionList[i];
 
-				if (inst.opcode == OpCodes.Ldarg_0 && (i + 1) < instructionCount) {
+				if (inst.opcode == OpCodes.Ldarg_0 && i + 1 < instructionCount) {
 					CodeInstruction inst1 = instructionList[i + 1];
 
 					if (inst1.opcode == OpCodes.Ldfld) {
-						FieldInfo field1 = inst1.operand as FieldInfo;
+						var field1 = inst1.operand as FieldInfo;
 
 						if (field1 != null && field1.DeclaringType == typeof(AvAvatarController) && field1.Name.Equals("mIsBouncing")) {
-							CodeInstruction baseInstruction = new CodeInstruction(OpCodes.Call, movementFactorProvider);
+							var baseInstruction = new CodeInstruction(OpCodes.Call, movementFactorProvider);
 							baseInstruction.labels.AddRange(inst.labels);
 							inst.labels.Clear();
 							result.Add(baseInstruction);
@@ -101,7 +101,7 @@ namespace SoD_BaseMod.asm {
 			}
 
 			if (found != 1) {
-				instance?.logger.LogWarning("KeyboardUpdate found " + found + " entrypoints, but expected: 1");
+				instance?.logger.LogWarning("KeyboardUpdate found " + found + " entry-points, but expected: 1");
 			}
 
 			return result;
@@ -129,8 +129,8 @@ namespace SoD_BaseMod.asm {
 					CodeInstruction inst1 = instructionList[i + 1];
 
 					if (inst1.opcode == OpCodes.Stfld) {
-						MethodInfo method0 = inst.operand as MethodInfo;
-						FieldInfo field1 = inst1.operand as FieldInfo;
+						var method0 = inst.operand as MethodInfo;
+						var field1 = inst1.operand as FieldInfo;
 
 						if (method0 != null && field1 != null
 								&& method0.DeclaringType == typeof(AvAvatarController) && method0.Name.Equals("GetJumpVelocity")
@@ -150,7 +150,7 @@ namespace SoD_BaseMod.asm {
 			}
 
 			if (found != 1) {
-				instance?.logger.LogWarning("DoUpdate found " + found + " entrypoints, but expected: 1");
+				instance?.logger.LogWarning("DoUpdate found " + found + " entry-points, but expected: 1");
 			}
 
 			return result;
@@ -180,7 +180,7 @@ namespace SoD_BaseMod.asm {
 			}
 
 			if (found != 1) {
-				instance?.logger.LogWarning("UpdateFlying found " + found + " entrypoints, but expected: 1");
+				instance?.logger.LogWarning("UpdateFlying found " + found + " entry-points, but expected: 1");
 			}
 
 			return result;
@@ -201,17 +201,17 @@ namespace SoD_BaseMod.asm {
 			for (int i = 0; i < instructionCount; i++) {
 				CodeInstruction inst = instructionList[i];
 
-				if (inst.opcode == OpCodes.Ldarg_0 && (i + 3) < instructionCount) {
+				if (inst.opcode == OpCodes.Ldarg_0 && i + 3 < instructionCount) {
 					CodeInstruction inst1 = instructionList[i + 1];
 					CodeInstruction inst2 = instructionList[i + 2];
 					CodeInstruction inst3 = instructionList[i + 3];
 
 					if (inst1.opcode == OpCodes.Ldfld && inst2.opcode == OpCodes.Ldloc_S &&
 							(inst3.opcode == OpCodes.Bge_Un_S || inst3.opcode == OpCodes.Bge_Un)) {
-						FieldInfo field1 = inst1.operand as FieldInfo;
+						var field1 = inst1.operand as FieldInfo;
 
 						if (field1 != null && field1.DeclaringType == typeof(AvAvatarController) && field1.Name.Equals("mFlightSpeed")) {
-							CodeInstruction baseInstruction = new CodeInstruction(OpCodes.Ldloca_S, 8);
+							var baseInstruction = new CodeInstruction(OpCodes.Ldloca_S, 8);
 							baseInstruction.labels.AddRange(inst.labels);
 							inst.labels.Clear();
 							result.Add(baseInstruction);
@@ -234,7 +234,7 @@ namespace SoD_BaseMod.asm {
 						foundWingsuitSpeedAssignment++;
 
 						if (foundWingsuitSpeedAssignment == 2) {
-							CodeInstruction baseInstruction = new CodeInstruction(OpCodes.Call, wingsuitSpeedApplier);
+							var baseInstruction = new CodeInstruction(OpCodes.Call, wingsuitSpeedApplier);
 							baseInstruction.labels.AddRange(inst.labels);
 							inst.labels.Clear();
 							result.Add(baseInstruction);
@@ -248,11 +248,11 @@ namespace SoD_BaseMod.asm {
 			}
 
 			if (found != 1) {
-				instance?.logger.LogWarning("UpadteFlyingControl found " + found + " entrypoints, but expected: 1");
+				instance?.logger.LogWarning("UpdateFlyingControl found " + found + " entry-points, but expected: 1");
 			}
 
 			if (foundWingsuitSpeedAssignment != 2) {
-				instance?.logger.LogWarning("UpdateFlyingControl found " + foundWingsuitSpeedAssignment + " wingsuit entrypoints, but expected: 2");
+				instance?.logger.LogWarning("UpdateFlyingControl found " + foundWingsuitSpeedAssignment + " wingsuit entry-points, but expected: 2");
 			}
 
 			return result;

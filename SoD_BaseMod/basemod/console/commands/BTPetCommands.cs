@@ -100,7 +100,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.gender = isPresent ? (Gender) gender : Gender.Male;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"type",
@@ -188,7 +188,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.meterType = (SanctuaryPetMeterType) meterType;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"meterType",
@@ -220,7 +220,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.forceUpdate = isPresent && (bool) forceUpdate;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"meterType",
@@ -295,7 +295,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.resetSkills = !isPresent || (bool) resetSkills;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"age",

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using HarmonyLib;
-using JetBrains.Annotations;
 using SoD_BaseMod.basemod;
 using SoD_BaseMod.basemod.config;
 using BlazingTwist_Core;
@@ -16,7 +15,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo initChestOriginal = AccessTools.Method(originalType, "InitChest");
 
-			HarmonyMethod initChestPrefix = new HarmonyMethod(patcherType, nameof(InitChestPrefix), new[] { typeof(UiChest) });
+			var initChestPrefix = new HarmonyMethod(patcherType, nameof(InitChestPrefix), new[] { typeof(UiChest) });
 
 			harmony.Patch(initChestOriginal, initChestPrefix);
 		}

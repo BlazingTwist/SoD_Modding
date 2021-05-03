@@ -15,7 +15,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo initQuickLaunchButtonsOriginal = AccessTools.Method(originalType, "InitQuickLaunchButtons");
 
-			HarmonyMethod initQuickLaunchButtonsPostfix =
+			var initQuickLaunchButtonsPostfix =
 					new HarmonyMethod(patcherType, nameof(InitQuickLaunchButtonsPostfix), new[] { typeof(UiSelectProfile) });
 
 			harmony.Patch(initQuickLaunchButtonsOriginal, null, initQuickLaunchButtonsPostfix);

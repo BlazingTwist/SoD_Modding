@@ -1,53 +1,49 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoD_BaseMod.basemod
-{
-	public class BTAnimationPlayerManager : MonoBehaviour
-	{
+namespace SoD_BaseMod.basemod {
+	public class BTAnimationPlayerManager : MonoBehaviour {
 		private static readonly Dictionary<string, AnimationState> animationDict = new Dictionary<string, AnimationState>();
-		private static GameObject animationPlayerObject = null;
-		private static Dropdown animationDropdown = null;
-		private static InputField frameInputField = null;
-		private static InputField speedInputField = null;
-		private static Slider frameSlider = null;
+		private static GameObject animationPlayerObject;
+		private static Dropdown animationDropdown;
+		private static InputField frameInputField;
+		private static InputField speedInputField;
+		private static Slider frameSlider;
 
-		private static GameObject playPauseButtonPlayIcon = null;
-		private static GameObject playPauseButtonPauseIcon = null;
+		private static GameObject playPauseButtonPlayIcon;
+		private static GameObject playPauseButtonPauseIcon;
 
-		private static BTConfigHolder ConfigHolder {
-			get {
-				return BTDebugCamInputManager.GetConfigHolder();
-			}
-		}
+		private static BTConfigHolder ConfigHolder => BTDebugCamInputManager.GetConfigHolder();
 
 		public static void Initialize(GameObject animationPlayerObject) {
-			if(BTAnimationPlayerManager.animationPlayerObject == animationPlayerObject) {
+			if (BTAnimationPlayerManager.animationPlayerObject == animationPlayerObject) {
 				return;
 			}
 
 			BTAnimationPlayerManager.animationPlayerObject = animationPlayerObject;
 
 			GameObject animationLoadButton = BTUIUtils.FindGameObjectAtPath(animationPlayerObject, "LoadAnimsButtonContainer/LoadAnimsButton");
-			if(animationLoadButton != null) {
+			if (animationLoadButton != null) {
 				animationLoadButton.GetComponent<Button>().onClick.AddListener(FindAnimationsClicked);
 			}
 
 			GameObject animDropdownObject = BTUIUtils.FindGameObjectAtPath(animationPlayerObject, "AnimSelectorContainer/Dropdown");
-			if(animDropdownObject != null) {
+			if (animDropdownObject != null) {
 				animationDropdown = animDropdownObject.GetComponent<Dropdown>();
 				animationDropdown.onValueChanged.AddListener(OnSelectedAnimationChanged);
 			}
 
 			GameObject frameInputFieldObject = BTUIUtils.FindGameObjectAtPath(animationPlayerObject, "AnimPlayer/FrameSelector/InputField");
-			if(frameInputFieldObject != null) {
+			if (frameInputFieldObject != null) {
 				frameInputField = frameInputFieldObject.GetComponent<InputField>();
 				frameInputField.onEndEdit.AddListener(OnSelectedFrameChanged);
 			}
 
 			GameObject speedInputFieldObject = BTUIUtils.FindGameObjectAtPath(animationPlayerObject, "AnimPlayer/SpeedSelector/InputField");
-			if(speedInputFieldObject != null) {
+			if (speedInputFieldObject != null) {
 				speedInputField = speedInputFieldObject.GetComponent<InputField>();
 				speedInputField.onEndEdit.AddListener(OnSelectedSpeedChanged);
 			}
@@ -56,17 +52,17 @@ namespace SoD_BaseMod.basemod
 			GameObject playPauseButtonObject = BTUIUtils.FindGameObjectAtPath(frameStepper, "PlayPauseButton");
 			playPauseButtonPlayIcon = BTUIUtils.FindGameObjectAtPath(playPauseButtonObject, "PlayImage");
 			playPauseButtonPauseIcon = BTUIUtils.FindGameObjectAtPath(playPauseButtonObject, "PauseImage");
-			if(playPauseButtonObject != null) {
+			if (playPauseButtonObject != null) {
 				playPauseButtonObject.GetComponent<Button>().onClick.AddListener(PlayPauseAnimation);
 			}
 
 			GameObject previousFrameButtonObject = BTUIUtils.FindGameObjectAtPath(frameStepper, "PreviousFrameButton");
-			if(previousFrameButtonObject != null) {
+			if (previousFrameButtonObject != null) {
 				previousFrameButtonObject.GetComponent<Button>().onClick.AddListener(OnPreviousFrameButtonClicked);
 			}
 
 			GameObject sliderObject = BTUIUtils.FindGameObjectAtPath(frameStepper, "Slider");
-			if(sliderObject != null) {
+			if (sliderObject != null) {
 				frameSlider = sliderObject.GetComponent<Slider>();
 				frameSlider.onValueChanged.AddListener(OnFrameSliderDragged);
 				frameSlider.minValue = 0f;
@@ -74,7 +70,7 @@ namespace SoD_BaseMod.basemod
 			}
 
 			GameObject nextFrameButtonObject = BTUIUtils.FindGameObjectAtPath(frameStepper, "NextFrameButton");
-			if(nextFrameButtonObject != null) {
+			if (nextFrameButtonObject != null) {
 				nextFrameButtonObject.GetComponent<Button>().onClick.AddListener(OnNextFrameButtonClicked);
 			}
 		}
@@ -85,20 +81,17 @@ namespace SoD_BaseMod.basemod
 		private static void FindAnimationsClicked() {
 			StoreAnimationStates();
 
-			if(animationDropdown == null) {
+			if (animationDropdown == null) {
 				return;
 			}
 
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
-			if(pet == null || pet.animation == null) {
+			if (pet == null || pet.animation == null) {
 				return;
 			}
 
 			animationDropdown.ClearOptions();
-			List<string> animOptions = new List<string>();
-			foreach(AnimationState state in pet.animation) {
-				animOptions.Add(state.name);
-			}
+			List<string> animOptions = (from AnimationState state in pet.animation select state.name).ToList();
 			animationDropdown.AddOptions(animOptions);
 			ChangeAnimation(animOptions[0]);
 		}
@@ -108,40 +101,33 @@ namespace SoD_BaseMod.basemod
 		}
 
 		private static void OnSelectedFrameChanged(string inputValue) {
-			if(frameSlider == null) {
+			if (frameSlider == null) {
 				return;
 			}
-			GoToAnimationTimestamp(Mathf.Clamp(float.Parse(inputValue, System.Globalization.CultureInfo.InvariantCulture), 0f, frameSlider.maxValue));
+
+			GoToAnimationTimestamp(Mathf.Clamp(float.Parse(inputValue, CultureInfo.InvariantCulture), 0f, frameSlider.maxValue));
 		}
 
 		private static void OnSelectedSpeedChanged(string inputValue) {
-			SetAnimSpeed(Mathf.Max(0f, float.Parse(inputValue, System.Globalization.CultureInfo.InvariantCulture)));
+			SetAnimSpeed(Mathf.Max(0f, float.Parse(inputValue, CultureInfo.InvariantCulture)));
 		}
 
 		private static void OnPreviousFrameButtonClicked() {
-			if(frameSlider == null) {
+			if (frameSlider == null) {
 				return;
 			}
-			if(ConfigHolder != null && ConfigHolder.config != null) {
-				//if frame step provided
-				GoToAnimationTimestamp(Mathf.Clamp(frameSlider.value - ConfigHolder.config.animPlayerTimeStep, 0f, frameSlider.maxValue));
-			} else {
-				//otherwise default value
-				GoToAnimationTimestamp(Mathf.Clamp(frameSlider.value - (1f / 30f), 0f, frameSlider.maxValue));
-			}
+
+			float frameStep = ConfigHolder?.config?.animPlayerTimeStep ?? 1f / 30f;
+			GoToAnimationTimestamp(Mathf.Clamp(frameSlider.value - frameStep, 0f, frameSlider.maxValue));
 		}
 
 		private static void OnNextFrameButtonClicked() {
-			if(frameSlider == null) {
+			if (frameSlider == null) {
 				return;
 			}
-			if(ConfigHolder != null && ConfigHolder.config != null) {
-				//if frame step provided
-				GoToAnimationTimestamp(Mathf.Clamp(frameSlider.value + ConfigHolder.config.animPlayerTimeStep, 0f, frameSlider.maxValue));
-			} else {
-				//otherwise default value
-				GoToAnimationTimestamp(Mathf.Clamp(frameSlider.value + (1f / 30f), 0f, frameSlider.maxValue));
-			}
+
+			float frameStep = ConfigHolder?.config?.animPlayerTimeStep ?? 1f / 30f;
+			GoToAnimationTimestamp(Mathf.Clamp(frameSlider.value + frameStep, 0f, frameSlider.maxValue));
 		}
 
 		private static void OnFrameSliderDragged(float dragValue) {
@@ -154,12 +140,12 @@ namespace SoD_BaseMod.basemod
 		/*============================================================================
 		Access to UI Content */
 
-		public static void ToggleAnimPlayer() {
-			animationPlayerObject.SetActive(!BTAnimationPlayerManager.animationPlayerObject.activeInHierarchy);
+		private static void ToggleAnimPlayer() {
+			animationPlayerObject.SetActive(!animationPlayerObject.activeInHierarchy);
 		}
 
 		private static void ShowPauseIcon() {
-			if(playPauseButtonPlayIcon == null || playPauseButtonPauseIcon == null) {
+			if (playPauseButtonPlayIcon == null || playPauseButtonPauseIcon == null) {
 				return;
 			}
 
@@ -168,7 +154,7 @@ namespace SoD_BaseMod.basemod
 		}
 
 		private static void ShowPlayIcon() {
-			if(playPauseButtonPlayIcon == null || playPauseButtonPauseIcon == null) {
+			if (playPauseButtonPlayIcon == null || playPauseButtonPauseIcon == null) {
 				return;
 			}
 
@@ -176,54 +162,59 @@ namespace SoD_BaseMod.basemod
 			playPauseButtonPauseIcon.SetActive(false);
 		}
 
-		public static string GetSelectedAnimation() {
-			if(animationDropdown == null || animationDropdown.options.Count == 0) {
+		private static string GetSelectedAnimation() {
+			if (animationDropdown == null || animationDropdown.options.Count == 0) {
 				return null;
 			}
+
 			return animationDropdown.options[animationDropdown.value].text;
 		}
 
 		private static void SetSliderValue(float val) {
-			if(frameSlider == null) {
+			if (frameSlider == null) {
 				return;
 			}
+
 			frameSlider.SetValueWithoutNotify(val);
 		}
 
 		private static void SetFrameInputText(string text) {
-			if(frameInputField == null) {
+			if (frameInputField == null) {
 				return;
 			}
+
 			frameInputField.SetTextWithoutNotify(text);
 		}
 
 		private static void SetSpeedInputText(string text) {
-			if(speedInputField == null) {
+			if (speedInputField == null) {
 				return;
 			}
+
 			speedInputField.SetTextWithoutNotify(text);
 		}
 
 		private static void UpdateAnimUI() {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
 			string targetAnimation = GetSelectedAnimation();
-			if(pet == null || targetAnimation == null || pet.animation[targetAnimation] == null) {
+			if (pet == null || targetAnimation == null || pet.animation[targetAnimation] == null) {
 				return;
 			}
 
 			AnimationState animState = pet.animation[targetAnimation];
 			float animProgress = animState.time;
-			if(animProgress > animState.length) {
+			if (animProgress > animState.length) {
 				animProgress %= animState.length;
 			}
+
 			SetSliderValue(animProgress);
 
-			if(frameInputField != null && !frameInputField.isFocused) {
-				SetFrameInputText(animProgress.ToString());
+			if (frameInputField != null && !frameInputField.isFocused) {
+				SetFrameInputText(animProgress.ToString(CultureInfo.InvariantCulture));
 			}
 
-			if(speedInputField != null && !speedInputField.isFocused) {
-				SetSpeedInputText(animState.speed.ToString());
+			if (speedInputField != null && !speedInputField.isFocused) {
+				SetSpeedInputText(animState.speed.ToString(CultureInfo.InvariantCulture));
 			}
 		}
 
@@ -237,22 +228,24 @@ namespace SoD_BaseMod.basemod
 			return animationPlayerObject != null && animationPlayerObject.activeInHierarchy;
 		}
 
+		// ReSharper disable once Unity.IncorrectMethodSignature
 		public static void Update() {
-			if(BTAnimationPlayerManager.animationPlayerObject == null) {
+			if (animationPlayerObject == null) {
 				return;
 			}
 
-			if(BTDebugCamInputManager.IsKeyJustDown("ToggleAnimPlayer")) {
+			if (BTDebugCamInputManager.IsKeyJustDown("ToggleAnimPlayer")) {
 				ToggleAnimPlayer();
 			}
 
-			if(BTAnimationPlayerManager.animationPlayerObject.activeInHierarchy) {
-				if(BTDebugCamInputManager.IsKeyJustDown("ToggleAnimPlayerAnimation")) {
+			if (animationPlayerObject.activeInHierarchy) {
+				if (BTDebugCamInputManager.IsKeyJustDown("ToggleAnimPlayerAnimation")) {
 					PlayPauseAnimation();
 				}
+
 				UpdateAnimUI();
 			} else {
-				if(animationDict.Count != 0) {
+				if (animationDict.Count != 0) {
 					RestoreAnimationStates();
 				}
 			}
@@ -266,25 +259,26 @@ namespace SoD_BaseMod.basemod
 
 		private static void StoreAnimationStates() {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
-			if(pet == null || pet.animation == null) {
+			if (pet == null || pet.animation == null) {
 				return;
 			}
 
-			if(animationDict.Count != 0) {
+			if (animationDict.Count != 0) {
 				RestoreAnimationStates();
 			}
 
-			foreach(AnimationState state in pet.animation) {
-				AnimationState result = new AnimationState();
+			foreach (AnimationState state in pet.animation) {
+				var result = new AnimationState();
 				AssignAnimationState(state, result);
 				animationDict[state.name] = result;
 			}
 		}
 
 		private static void AssignAnimationState(AnimationState source, AnimationState target) {
-			if(source == null || target == null) {
+			if (source == null || target == null) {
 				return;
 			}
+
 			target.blendMode = source.blendMode;
 			target.enabled = source.enabled;
 			target.layer = source.layer;
@@ -299,45 +293,47 @@ namespace SoD_BaseMod.basemod
 
 		private static void RestoreAnimationStates() {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
-			if(pet == null || pet.animation == null) {
+			if (pet == null || pet.animation == null) {
 				return;
 			}
 
-			foreach(KeyValuePair<string, AnimationState> kvp in animationDict) {
+			foreach (KeyValuePair<string, AnimationState> kvp in animationDict) {
 				AssignAnimationState(kvp.Value, pet.animation[kvp.Key]);
 			}
 
 			animationDict.Clear();
 		}
 
-		public static void PlayPauseAnimation() {
+		private static void PlayPauseAnimation() {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
-			if(pet == null) {
+			if (pet == null) {
 				return;
 			}
 
 			string targetAnimation = GetSelectedAnimation();
 			AnimationState animState = pet.animation[targetAnimation];
-			if(animState == null) {
+			if (animState == null) {
 				return;
 			}
 
-			if(animState.speed == 0f) {
+			if (animState.speed == 0f) {
 				animState.speed = 1f;
 				ShowPauseIcon();
 			} else {
 				animState.speed = 0f;
 				ShowPlayIcon();
 			}
+
 			PlayAnim(targetAnimation);
 		}
 
 		private static void PlayAnim(string name) {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
-			if(pet == null) {
+			if (pet == null) {
 				return;
 			}
-			if(pet.animation[name] == null) {
+
+			if (pet.animation[name] == null) {
 				return;
 			}
 
@@ -345,15 +341,15 @@ namespace SoD_BaseMod.basemod
 			pet.animation.Play(name, PlayMode.StopAll);
 		}
 
-		public static void GoToAnimationTimestamp(float time) {
+		private static void GoToAnimationTimestamp(float time) {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
-			if(pet == null) {
+			if (pet == null) {
 				return;
 			}
 
 			string targetAnimation = GetSelectedAnimation();
 			AnimationState animState = pet.animation[targetAnimation];
-			if(animState == null) {
+			if (animState == null) {
 				return;
 			}
 
@@ -361,38 +357,38 @@ namespace SoD_BaseMod.basemod
 			PlayAnim(targetAnimation);
 		}
 
-		public static void SetAnimSpeed(float speed) {
+		private static void SetAnimSpeed(float speed) {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
 			string targetAnimation = GetSelectedAnimation();
-			if(pet == null || targetAnimation == null || pet.animation[targetAnimation] == null) {
+			if (pet == null || targetAnimation == null || pet.animation[targetAnimation] == null) {
 				return;
 			}
 
 			pet.animation[targetAnimation].speed = speed;
 			PlayAnim(targetAnimation);
 
-			if(speed > 0f) {
+			if (speed > 0f) {
 				ShowPauseIcon();
 			} else {
 				ShowPlayIcon();
 			}
 		}
 
-		public static void ChangeAnimation(string animationName) {
+		private static void ChangeAnimation(string animationName) {
 			SanctuaryPet pet = SanctuaryManager.pCurPetInstance;
-			if(pet == null) {
+			if (pet == null) {
 				return;
 			}
 
 			AnimationState animState = pet.animation[animationName];
-			if(animState == null) {
+			if (animState == null) {
 				return;
 			}
 
 			animState.time = 0f;
 			frameSlider.maxValue = animState.length;
-			if(ConfigHolder != null && ConfigHolder.config != null && ConfigHolder.config.animPlayerPlayByDefault) {
-				//if explicitely stated so, play the animation
+			if (ConfigHolder?.config != null && ConfigHolder.config.animPlayerPlayByDefault) {
+				//if explicitly stated so, play the animation
 				animState.speed = 1f;
 				ShowPauseIcon();
 			} else {
@@ -400,6 +396,7 @@ namespace SoD_BaseMod.basemod
 				animState.speed = 0f;
 				ShowPlayIcon();
 			}
+
 			PlayAnim(animationName);
 		}
 

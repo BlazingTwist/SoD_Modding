@@ -23,7 +23,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo selectItemOriginal = AccessTools.Method(originalType, "SelectItem", new[] { typeof(KAWidget) });
 
-			HarmonyMethod selectItemPostfix =
+			var selectItemPostfix =
 					new HarmonyMethod(patcherType, nameof(SelectItemPostfix), new[] { typeof(UiBackpack), typeof(UserItemData), typeof(KAWidget) });
 
 			harmony.Patch(selectItemOriginal, null, selectItemPostfix);
@@ -31,7 +31,7 @@ namespace SoD_BaseMod.asm {
 
 		private static void SelectItemPostfix(UiBackpack __instance, UserItemData ___mSelectedUserItemData, KAWidget item) {
 			ItemData selectedItem = ___mSelectedUserItemData.Item;
-			KAUISelectItemData kAUISelectItemData = (KAUISelectItemData) item.GetUserData();
+			var kAUISelectItemData = (KAUISelectItemData) item.GetUserData();
 			if (selectedItem.HasCategory(424)) { // DragonSkin category
 				__instance.ApplyOnPetReverse(kAUISelectItemData._UserItemData);
 			}

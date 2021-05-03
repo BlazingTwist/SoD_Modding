@@ -22,7 +22,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo setRewardsOriginal = AccessTools.Method(originalType, "SetRewards");
 
-			HarmonyMethod setRewardsTranspiler = new HarmonyMethod(patcherType, nameof(SetRewardsTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
+			var setRewardsTranspiler = new HarmonyMethod(patcherType, nameof(SetRewardsTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(setRewardsOriginal, null, null, setRewardsTranspiler);
 		}
@@ -46,13 +46,13 @@ namespace SoD_BaseMod.asm {
 			for (int i = 0; i < instructionCount; i++) {
 				CodeInstruction inst = instructionList[i];
 
-				if (inst.opcode == OpCodes.Ldarg_0 && (i + 2) < instructionCount) {
+				if (inst.opcode == OpCodes.Ldarg_0 && i + 2 < instructionCount) {
 					CodeInstruction inst1 = instructionList[i + 1];
 					CodeInstruction inst2 = instructionList[i + 2];
 
 					if (inst1.opcode == OpCodes.Ldfld && inst2.opcode == OpCodes.Ldfld) {
-						FieldInfo field1 = inst1.operand as FieldInfo;
-						FieldInfo field2 = inst2.operand as FieldInfo;
+						var field1 = inst1.operand as FieldInfo;
+						var field2 = inst2.operand as FieldInfo;
 
 						if (field1 != null && field2 != null
 								&& field1.DeclaringType == typeof(UiEndDB) && field1.Name.Equals("mResultInfo")
@@ -72,7 +72,7 @@ namespace SoD_BaseMod.asm {
 			}
 
 			if (found != 1) {
-				instance?.logger.LogWarning("SetRewards found " + found + " entrypoints, but expected: 1");
+				instance?.logger.LogWarning("SetRewards found " + found + " entry-points, but expected: 1");
 			}
 
 			return result;

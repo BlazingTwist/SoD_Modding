@@ -5,8 +5,8 @@ namespace SoD_BaseMod.basemod
 {
 	public class BTUIDragHandler : MonoBehaviour, IDragHandler, IPointerDownHandler
 	{
-		private RectTransform dragRectTransform = null;
-		private Canvas canvas = null;
+		private RectTransform dragRectTransform;
+		private Canvas canvas;
 
 		public void Initialize(RectTransform dragRectTransform, Canvas canvas) {
 			this.dragRectTransform = dragRectTransform;

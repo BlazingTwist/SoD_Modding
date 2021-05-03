@@ -23,7 +23,7 @@ namespace SoD_BaseMod.AsmFirstpass {
 			MethodInfo methodStart = AccessTools.Method(originalType, "Start");
 			MethodInfo methodSetCursor = AccessTools.Method(originalType, "SetCursor", new[] { typeof(string), typeof(bool) });
 
-			HarmonyMethod patcherMethod = new HarmonyMethod(patcherType, nameof(CursorAssignmentTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
+			var patcherMethod = new HarmonyMethod(patcherType, nameof(CursorAssignmentTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(methodStart, null, null, patcherMethod);
 			harmony.Patch(methodSetCursor, null, null, patcherMethod);
@@ -58,9 +58,9 @@ namespace SoD_BaseMod.AsmFirstpass {
 				CodeInstruction inst = instructionList[i];
 
 				if (inst.opcode == OpCodes.Call) {
-					MethodInfo method = inst.operand as MethodInfo;
+					var method = inst.operand as MethodInfo;
 					if (method != null && method.Name.Equals("set_visible") && method.DeclaringType == typeof(Cursor)) {
-						CodeInstruction baseInstruction = new CodeInstruction(OpCodes.Call, cursorVisibilityModifier);
+						var baseInstruction = new CodeInstruction(OpCodes.Call, cursorVisibilityModifier);
 						baseInstruction.labels.AddRange(inst.labels);
 						inst.labels.Clear();
 						result.Add(baseInstruction);

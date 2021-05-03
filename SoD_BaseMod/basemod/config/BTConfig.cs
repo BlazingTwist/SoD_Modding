@@ -1,49 +1,47 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace SoD_BaseMod.basemod.config
-{
+namespace SoD_BaseMod.basemod.config {
 	[PublicAPI]
-	public class BTConfig
-	{
-		public float fileCheckInterval = 0f;
-		public float uiScaleFactor = 0f;
+	public class BTConfig {
+		public float fileCheckInterval;
+		public float uiScaleFactor;
 
-		public bool disableZZZParticles = false;
+		public bool disableZZZParticles;
 
-		public bool animPlayerPlayByDefault = false;
-		public float animPlayerTimeStep = 0f;
+		public bool animPlayerPlayByDefault;
+		public float animPlayerTimeStep;
 
-		public bool cutscenePlayerPlayByDefault = false;
-		public float cutscenePlayerTimeStep = 0f;
+		public bool cutscenePlayerPlayByDefault;
+		public float cutscenePlayerTimeStep;
 
 		// DebugCam Config
-		public float cameraSpeed = 0f;
-		public float cameraFastSpeed = 0f;
-		public float cameraRenderDistance = 0f;
-		public float cameraFOV = 0f;
-		public float orthographicSize = 0f;
+		public float cameraSpeed;
+		public float cameraFastSpeed;
+		public float cameraRenderDistance;
+		public float cameraFOV;
+		public float orthographicSize;
 
-		public Dictionary<string, BTCutsceneConfigEntry> availableCutscenes = null;
+		public Dictionary<string, BTCutsceneConfigEntry> availableCutscenes;
 
-		public Dictionary<string, List<string>> inputBinds = null;
+		public Dictionary<string, List<string>> inputBinds;
 
-		public Dictionary<string, BTLevelConfigEntry> loadLevelBinds = null;
+		public Dictionary<string, BTLevelConfigEntry> loadLevelBinds;
 
 		// Logger Config
-		public Dictionary<string, BTLoggerConfigEntry> loggerConfig = null;
-		public List<string> logMessageFilter = null;
-		public bool enableUTDebug = false;
-		public bool logServiceCalls = false;
-		public List<WsServiceType> serviceCallFilter = null;
+		public Dictionary<string, BTLoggerConfigEntry> loggerConfig;
+		public List<string> logMessageFilter;
+		public bool enableUTDebug;
+		public bool logServiceCalls;
+		public List<WsServiceType> serviceCallFilter;
 
 		// Console Config
 		public float consoleHeight = 0.3f;
 		public int suggestionCount = 5;
-		public bool consoleOpenByDefault = false;
+		public bool consoleOpenByDefault;
 		public string consoleDefaultCommand = "help";
-		public Dictionary<string, List<string>> commandBinds = null;
-		
+		public Dictionary<string, List<string>> commandBinds;
+
 		// Cursor
 		public BTCursorVisibility cursorVisibility = BTCursorVisibility.Default;
 	}

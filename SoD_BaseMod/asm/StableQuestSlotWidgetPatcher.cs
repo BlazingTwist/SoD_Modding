@@ -20,7 +20,7 @@ namespace SoD_BaseMod.asm {
 
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod updateTranspiler =
+			var updateTranspiler =
 					new HarmonyMethod(patcherType, nameof(UpdateTranspiler), new[] { typeof(IEnumerable<CodeInstruction>) });
 
 			harmony.Patch(updateOriginal, null, null, updateTranspiler);
@@ -38,7 +38,7 @@ namespace SoD_BaseMod.asm {
 				CodeInstruction inst = instructionList[i];
 
 				if (inst.opcode == OpCodes.Call && i + 1 < instructionCount) {
-					MethodInfo method = inst.operand as MethodInfo;
+					var method = inst.operand as MethodInfo;
 					CodeInstruction inst1 = instructionList[i + 1];
 
 					if (method != null && method.DeclaringType == typeof(Mathf) && method.Name.Equals("FloorToInt")
@@ -63,7 +63,7 @@ namespace SoD_BaseMod.asm {
 			}
 
 			if (found != 1) {
-				instance?.logger.LogWarning("Update found " + found + " entrypoints, but expected: 1");
+				instance?.logger.LogWarning("Update found " + found + " entry-points, but expected: 1");
 			}
 
 			return result;

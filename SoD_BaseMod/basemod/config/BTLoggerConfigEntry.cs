@@ -1,9 +1,10 @@
-﻿namespace SoD_BaseMod.basemod.config
-{
-	public class BTLoggerConfigEntry
-	{
+﻿using JetBrains.Annotations;
+
+namespace SoD_BaseMod.basemod.config {
+	[PublicAPI]
+	public class BTLoggerConfigEntry {
 		public bool logMessage = true;
-		public bool logStackTrace = false;
+		public bool logStackTrace;
 
 		public bool AnythingToLog() {
 			return logMessage;

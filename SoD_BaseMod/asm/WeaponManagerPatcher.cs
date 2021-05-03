@@ -15,8 +15,8 @@ namespace SoD_BaseMod.asm {
 			MethodInfo originalRangeGetter = AccessTools.PropertyGetter(originalType, "pRange");
 			MethodInfo originalCooldownGetter = AccessTools.Method(originalType, "GetCooldown");
 
-			HarmonyMethod patchedRangeGetter = new HarmonyMethod(patcherType, nameof(GetRange), new[] { typeof(WeaponManager), typeof(float).MakeByRefType() });
-			HarmonyMethod patchedCooldownGetter = new HarmonyMethod(patcherType, nameof(GetCooldown), new[] { typeof(float).MakeByRefType() });
+			var patchedRangeGetter = new HarmonyMethod(patcherType, nameof(GetRange), new[] { typeof(WeaponManager), typeof(float).MakeByRefType() });
+			var patchedCooldownGetter = new HarmonyMethod(patcherType, nameof(GetCooldown), new[] { typeof(float).MakeByRefType() });
 
 			harmony.Patch(originalRangeGetter, patchedRangeGetter);
 			harmony.Patch(originalCooldownGetter, patchedCooldownGetter);

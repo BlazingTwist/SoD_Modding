@@ -22,22 +22,8 @@ namespace SoD_BaseMod.basemod {
 		private static GameObject infoHUDObject;
 		private static GameObject cutscenePlayerObject;
 
-		private static BTConsole console;
-
 		public static BTConfigHolder GetConfigHolder() {
 			return configHolder;
-		}
-
-		public static GameObject GetInfoHUDWindow() {
-			return infoHUDObject;
-		}
-
-		public static GameObject GetModMenuWindow() {
-			return modMenuObject;
-		}
-
-		public static GameObject GetAnimPlayerWindow() {
-			return animPlayerObject;
 		}
 
 		public static void AttachToScene() {
@@ -52,7 +38,7 @@ namespace SoD_BaseMod.basemod {
 				targetParent = new GameObject("DebugCamGameObject");
 				targetParent.AddComponent<BTDebugCamInputManager>();
 				targetParent.AddComponent<BTCutsceneManager>();
-				console = targetParent.AddComponent<BTConsole>();
+				targetParent.AddComponent<BTConsole>();
 				DontDestroyOnLoad(targetParent);
 			} catch (Exception e) {
 				BTConfigHolder.LogMessage(LogType.Error, "Attaching inputManager failed due to error!\nError: " + e);
@@ -199,7 +185,7 @@ namespace SoD_BaseMod.basemod {
 		}
 
 		private static void HandleSquadTacticsKillSwitch() {
-			GameManager gameManager = GameManager.pInstance;
+			var gameManager = GameManager.pInstance;
 			if (gameManager == null) {
 				return;
 			}
@@ -218,20 +204,13 @@ namespace SoD_BaseMod.basemod {
 		}
 
 		private static void DoLoadLevelCheck() {
-			if (configHolder == null || configHolder.config == null || configHolder.config.loadLevelBinds == null) {
+			if (configHolder?.config?.loadLevelBinds == null) {
 				return;
 			}
 
-			Dictionary<string, BTLevelConfigEntry> levelBinds = configHolder.config.loadLevelBinds;
-			foreach (KeyValuePair<string, BTLevelConfigEntry> kvp in levelBinds) {
-				if (kvp.Value.hotkey == null) {
-					continue;
-				}
-
-				if (!AreKeysJustDown(kvp.Value.hotkey)) {
-					continue;
-				}
-
+			IEnumerable<KeyValuePair<string, BTLevelConfigEntry>> pressedLevelBinds = configHolder.config.loadLevelBinds
+					.Where(kvp => kvp.Value.hotkey != null && AreKeysJustDown(kvp.Value.hotkey));
+			foreach (KeyValuePair<string, BTLevelConfigEntry> kvp in pressedLevelBinds) {
 				BTConfigHolder.LogMessage(LogType.Log, "loading level: " + kvp.Key);
 				if (kvp.Value.isLocalFile) {
 					LoadLocalLevel(kvp.Key);
@@ -281,7 +260,7 @@ namespace SoD_BaseMod.basemod {
 				return false;
 			}
 
-			if (configHolder.hackConfig != null && configHolder.hackConfig.inputBinds != null) {
+			if (configHolder.hackConfig?.inputBinds != null) {
 				if (configHolder.hackConfig.inputBinds.ContainsKey(bindName)) {
 					if (AreKeysDown(configHolder.hackConfig.inputBinds[bindName])) {
 						return true;
@@ -289,7 +268,7 @@ namespace SoD_BaseMod.basemod {
 				}
 			}
 
-			if (configHolder.config != null && configHolder.config.inputBinds != null) {
+			if (configHolder.config?.inputBinds != null) {
 				if (configHolder.config.inputBinds.ContainsKey(bindName)) {
 					if (AreKeysDown(configHolder.config.inputBinds[bindName])) {
 						return true;
@@ -305,7 +284,7 @@ namespace SoD_BaseMod.basemod {
 				return false;
 			}
 
-			if (configHolder.hackConfig != null && configHolder.hackConfig.inputBinds != null) {
+			if (configHolder.hackConfig?.inputBinds != null) {
 				if (configHolder.hackConfig.inputBinds.ContainsKey(bindName)) {
 					if (AreKeysJustDown(configHolder.hackConfig.inputBinds[bindName])) {
 						return true;
@@ -313,7 +292,7 @@ namespace SoD_BaseMod.basemod {
 				}
 			}
 
-			if (configHolder.config != null && configHolder.config.inputBinds != null) {
+			if (configHolder.config?.inputBinds != null) {
 				if (configHolder.config.inputBinds.ContainsKey(bindName)) {
 					if (AreKeysJustDown(configHolder.config.inputBinds[bindName])) {
 						return true;
@@ -324,7 +303,7 @@ namespace SoD_BaseMod.basemod {
 			return false;
 		}
 
-		private static bool AreKeysDown(List<string> keys) {
+		private static bool AreKeysDown(IEnumerable<string> keys) {
 			bool onlyNullOrWhitespace = true;
 			foreach (string key in keys.Where(key => !string.IsNullOrWhiteSpace(key))) {
 				onlyNullOrWhitespace = false;
@@ -337,21 +316,7 @@ namespace SoD_BaseMod.basemod {
 		}
 
 		public static bool AreKeysJustDown(List<string> keys) {
-			if (!AreKeysDown(keys)) {
-				return false;
-			}
-
-			foreach (string key in keys) {
-				if (String.IsNullOrWhiteSpace(key)) {
-					continue;
-				}
-
-				if (IsCustomKeyJustDown(key)) {
-					return true;
-				}
-			}
-
-			return false;
+			return AreKeysDown(keys) && keys.Where(key => !string.IsNullOrWhiteSpace(key)).Any(IsCustomKeyJustDown);
 		}
 
 		private static bool IsCustomKeyDown(string key) {

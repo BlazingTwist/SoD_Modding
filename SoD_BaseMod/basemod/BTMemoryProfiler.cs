@@ -4,183 +4,146 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Profiling;
+using Object = UnityEngine.Object;
 
-namespace SoD_BaseMod.basemod
-{
-	public class BTMemoryProfiler
-	{
-		public static void ForceMemoryCleanUp() {
-			foreach(SpawnPool spawnPool in UnityEngine.Object.FindObjectsOfType(typeof(SpawnPool)) as SpawnPool[]) {
-				for(int i = spawnPool._prefabPools.Count - 1; i >= 0; i--) {
-					PrefabPool prefabPool = spawnPool._prefabPools[i];
-					int j = 0;
-					int count = prefabPool.despawned.Count;
-					while(j < count) {
-						if(prefabPool.despawned[j] != null) {
-							UnityEngine.Object.Destroy(prefabPool.despawned[j].gameObject);
-						}
-						j++;
-					}
-					prefabPool._despawned.Clear();
-					if(prefabPool.spawned.Count <= 0) {
-						spawnPool.prefabs._prefabs.Remove(prefabPool.prefab.name);
-						spawnPool._prefabPools.RemoveAt(i);
-					}
-				}
-			}
-			RsResourceManager.UnloadUnusedAssets(true);
-		}
-
+namespace SoD_BaseMod.basemod {
+	public class BTMemoryProfiler {
 		public void RenderGUI() {
-			if(this.boxReflectFontStyle == null) {
-				this.boxReflectFontStyle = new GUIStyle(GUI.skin.box);
-				this.boxReflectFontStyle.alignment = TextAnchor.MiddleLeft;
+			if (boxReflectFontStyle == null) {
+				boxReflectFontStyle = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleLeft };
 			}
-			GUILayoutOption guilayoutOption = GUILayout.ExpandWidth(false);
-			if(this.mCollapsed) {
-				if(GUILayout.Button("MemProfiler", new GUILayoutOption[]
-				{
-				guilayoutOption
-				})) {
-					this.mCollapsed = false;
+
+			GUILayoutOption guiLayoutOption = GUILayout.ExpandWidth(false);
+			if (mCollapsed) {
+				if (GUILayout.Button("MemProfiler", guiLayoutOption)) {
+					mCollapsed = false;
 				}
+
 				return;
 			}
+
 			GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
-			if(GUILayout.Button("Close", new GUILayoutOption[]
-			{
-			guilayoutOption
-			})) {
-				this.CloseProfiler();
+			if (GUILayout.Button("Close", guiLayoutOption)) {
+				CloseProfiler();
 			}
-			if(GUILayout.Button("Collapse", new GUILayoutOption[]
-			{
-			guilayoutOption
-			})) {
-				this.mCollapsed = true;
+
+			if (GUILayout.Button("Collapse", guiLayoutOption)) {
+				mCollapsed = true;
 			}
+
 			GUILayout.Space(20f);
-			if(GUILayout.Button("SnapShot", Array.Empty<GUILayoutOption>())) {
-				this.TakeSnapShot();
+			if (GUILayout.Button("SnapShot", Array.Empty<GUILayoutOption>())) {
+				TakeSnapShot();
 			}
-			if(GUILayout.Button("Refresh", Array.Empty<GUILayoutOption>())) {
-				this.TakeLightSnapShot();
+
+			if (GUILayout.Button("Refresh", Array.Empty<GUILayoutOption>())) {
+				TakeLightSnapShot();
 			}
+
 			GUILayout.EndHorizontal();
-			this.RenderGUI_Stats();
+			RenderGUI_Stats();
 		}
 
 		private void CloseProfiler() {
-			if(this._OwnerGO != null) {
-				UnityEngine.Object.Destroy(this._OwnerGO);
+			if (_OwnerGO != null) {
+				Object.Destroy(_OwnerGO);
 			}
 		}
 
-		private void RenderGUI_StatsViewTab(string Name, BTMemoryProfiler.StatsViewTab Mode) {
+		private void RenderGUI_StatsViewTab(string Name, StatsViewTab Mode) {
 			Color backgroundColor = GUI.backgroundColor;
-			if(this.mStatsViewIndex != Mode) {
+			if (mStatsViewIndex != Mode) {
 				GUI.backgroundColor = Color.gray;
 			}
-			if(GUILayout.Button(Name, Array.Empty<GUILayoutOption>())) {
-				this.mStatsViewIndex = Mode;
+
+			if (GUILayout.Button(Name, Array.Empty<GUILayoutOption>())) {
+				mStatsViewIndex = Mode;
 			}
+
 			GUI.backgroundColor = backgroundColor;
 		}
 
 		private void RenderGUI_Stats() {
-			this.GUI_BeginContents();
+			GUI_BeginContents();
 			GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
-			this.RenderGUI_StatsViewTab("Current Stats", BTMemoryProfiler.StatsViewTab.CURRENT_STATS);
-			this.RenderGUI_StatsViewTab("Current Objects", BTMemoryProfiler.StatsViewTab.CURRENT_OBJECTS);
-			this.RenderGUI_StatsViewTab("Dif Stats", BTMemoryProfiler.StatsViewTab.DIF_STATS);
-			this.RenderGUI_StatsViewTab("Dif Objects", BTMemoryProfiler.StatsViewTab.DIF_OBJECTS);
+			RenderGUI_StatsViewTab("Current Stats", StatsViewTab.CURRENT_STATS);
+			RenderGUI_StatsViewTab("Current Objects", StatsViewTab.CURRENT_OBJECTS);
+			RenderGUI_StatsViewTab("Dif Stats", StatsViewTab.DIF_STATS);
+			RenderGUI_StatsViewTab("Dif Objects", StatsViewTab.DIF_OBJECTS);
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
-			GUILayout.Label("Filter:", new GUILayoutOption[]
-			{
-			GUILayout.Width(40f)
-			});
-			this.mFilter_Text = GUILayout.TextField(this.mFilter_Text, new GUILayoutOption[]
-			{
-			GUILayout.ExpandWidth(true)
-			});
-			if(GUILayout.Button("X", new GUILayoutOption[]
-			{
-			GUILayout.Width(20f)
-			})) {
-				this.mFilter_Text = "";
+			GUILayout.Label("Filter:", GUILayout.Width(40f));
+			mFilter_Text = GUILayout.TextField(mFilter_Text, GUILayout.ExpandWidth(true));
+			if (GUILayout.Button("X", GUILayout.Width(20f))) {
+				mFilter_Text = "";
 			}
-			this.mFilter_ShowDependencies = GUILayout.Toggle(this.mFilter_ShowDependencies, "Dependencies", new GUILayoutOption[]
-			{
-			GUILayout.ExpandWidth(false)
-			});
-			BTMemoryProfiler.reflectOnProperties = GUILayout.Toggle(BTMemoryProfiler.reflectOnProperties, "reflectOnProperties", new GUILayoutOption[]{
-			GUILayout.ExpandWidth(false)
-		});
+
+			mFilter_ShowDependencies = GUILayout.Toggle(mFilter_ShowDependencies, "Dependencies", GUILayout.ExpandWidth(false));
+			reflectOnProperties = GUILayout.Toggle(reflectOnProperties, "reflectOnProperties", GUILayout.ExpandWidth(false));
 			GUILayout.EndHorizontal();
-			switch(this.mStatsViewIndex) {
-				case BTMemoryProfiler.StatsViewTab.CURRENT_STATS:
-					this.RenderGUI_Stats(this.mStats_Current1);
+			switch (mStatsViewIndex) {
+				case StatsViewTab.CURRENT_STATS:
+					RenderGUI_Stats(mStats_Current1);
 					break;
-				case BTMemoryProfiler.StatsViewTab.CURRENT_OBJECTS:
-					this.RenderGUI_List(this.mList_Snapshot);
+				case StatsViewTab.CURRENT_OBJECTS:
+					RenderGUI_List(mList_Snapshot);
 					break;
-				case BTMemoryProfiler.StatsViewTab.DIF_STATS:
-					this.RenderGUI_Stats(this.mStats_Dif1);
+				case StatsViewTab.DIF_STATS:
+					RenderGUI_Stats(mStats_Dif1);
 					break;
-				case BTMemoryProfiler.StatsViewTab.DIF_OBJECTS:
-					this.RenderGUI_List(this.mList_Differences);
+				case StatsViewTab.DIF_OBJECTS:
+					RenderGUI_List(mList_Differences);
 					break;
+				default:
+					throw new ArgumentOutOfRangeException();
 			}
-			this.GUI_EndContents();
+
+			GUI_EndContents();
 		}
 
-		private void RenderGUI_Stats(List<KeyValuePair<string, int>> mStats) {
-			this.mScrollViewPos_Stats = GUILayout.BeginScrollView(this.mScrollViewPos_Stats, new GUILayoutOption[]
-			{
-			GUILayout.ExpandHeight(true)
-			});
+		private void RenderGUI_Stats(IReadOnlyList<KeyValuePair<string, int>> mStats) {
+			mScrollViewPos_Stats = GUILayout.BeginScrollView(mScrollViewPos_Stats, GUILayout.ExpandHeight(true));
 			TextAnchor alignment = GUI.skin.label.alignment;
 			GUI.skin.label.alignment = TextAnchor.MiddleRight;
 			int i = 0;
 			int count = mStats.Count;
-			while(i < count) {
+			while (i < count) {
 				KeyValuePair<string, int> keyValuePair = mStats[i];
 				GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
-				GUILayout.Label((keyValuePair.Value < 1048576) ? ((keyValuePair.Value / 1024).ToString() + " Kb") : ((keyValuePair.Value / 1048576).ToString("0.00") + " Mb"), new GUILayoutOption[]
-				{
-				GUILayout.Width(80f)
-				});
-				if(GUILayout.Button(keyValuePair.Key, Array.Empty<GUILayoutOption>())) {
-					this.mFilter_Text = keyValuePair.Key;
-					BTMemoryProfiler.StatsViewTab statsViewTab = this.mStatsViewIndex;
-					if(statsViewTab != BTMemoryProfiler.StatsViewTab.CURRENT_STATS) {
-						if(statsViewTab == BTMemoryProfiler.StatsViewTab.DIF_STATS) {
-							this.mStatsViewIndex = BTMemoryProfiler.StatsViewTab.DIF_OBJECTS;
+				GUILayout.Label(
+						keyValuePair.Value < 1048576
+								? keyValuePair.Value / 1024 + " Kb"
+								: (keyValuePair.Value / 1048576).ToString("0.00") + " Mb"
+						, GUILayout.Width(80f));
+				if (GUILayout.Button(keyValuePair.Key, Array.Empty<GUILayoutOption>())) {
+					mFilter_Text = keyValuePair.Key;
+					StatsViewTab statsViewTab = mStatsViewIndex;
+					if (statsViewTab != StatsViewTab.CURRENT_STATS) {
+						if (statsViewTab == StatsViewTab.DIF_STATS) {
+							mStatsViewIndex = StatsViewTab.DIF_OBJECTS;
 						}
 					} else {
-						this.mStatsViewIndex = BTMemoryProfiler.StatsViewTab.CURRENT_OBJECTS;
+						mStatsViewIndex = StatsViewTab.CURRENT_OBJECTS;
 					}
 				}
+
 				GUILayout.EndHorizontal();
 				i++;
 			}
+
 			GUI.skin.label.alignment = alignment;
 			GUILayout.EndScrollView();
 		}
 
-		public void GUI_BeginContents() {
+		private static void GUI_BeginContents() {
 			GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
 			GUILayout.Space(4f);
-			GUILayout.BeginHorizontal(new GUILayoutOption[]
-			{
-			GUILayout.ExpandHeight(true)
-			});
+			GUILayout.BeginHorizontal(GUILayout.ExpandHeight(true));
 			GUILayout.BeginVertical(Array.Empty<GUILayoutOption>());
 			GUILayout.Space(2f);
 		}
 
-		public void GUI_EndContents() {
+		private static void GUI_EndContents() {
 			GUILayout.Space(3f);
 			GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
@@ -189,208 +152,202 @@ namespace SoD_BaseMod.basemod
 			GUILayout.Space(3f);
 		}
 
-		public void TakeSnapShot() {
-			this.TakeLightSnapShot();
-			this.mList_LastSnapshot.Clear();
-			this.mList_LastSnapshot.Capacity = this.mList_Snapshot.Count;
+		private void TakeSnapShot() {
+			TakeLightSnapShot();
+			mList_LastSnapshot.Clear();
+			mList_LastSnapshot.Capacity = mList_Snapshot.Count;
 			int i = 0;
-			int count = this.mList_Snapshot.Count;
-			while(i < count) {
-				this.mList_LastSnapshot.Add(this.mList_Snapshot[i]);
+			int count = mList_Snapshot.Count;
+			while (i < count) {
+				mList_LastSnapshot.Add(mList_Snapshot[i]);
 				i++;
 			}
 		}
 
-		private int IndexOfObjInArray(ref UnityEngine.Object[] Objs, UnityEngine.Object Obj) {
+		private void TakeLightSnapShot() {
+			Dictionary<string, List<ObjMemDef>> dictionary = new Dictionary<string, List<ObjMemDef>>();
 			int i = 0;
-			int num = Objs.Length;
-			while(i < num) {
-				if(Objs[i] == Obj) {
-					return i;
-				}
+			int count = mList_LastSnapshot.Count;
+			while (i < count) {
+				AddLastSnapShotElement(ref dictionary, mList_LastSnapshot[i]);
 				i++;
 			}
-			return -1;
-		}
 
-		public void TakeLightSnapShot() {
-			Dictionary<string, List<BTMemoryProfiler.ObjMemDef>> dictionary = new Dictionary<string, List<BTMemoryProfiler.ObjMemDef>>();
-			int i = 0;
-			int count = this.mList_LastSnapshot.Count;
-			while(i < count) {
-				this.AddLastSnapShotElement(ref dictionary, this.mList_LastSnapshot[i]);
-				i++;
-			}
-			this.mList_Differences.Clear();
-			this.mList_Snapshot.Clear();
-			int num = 0;
-			this.mStats_Current.Clear();
-			this.mStats_Dif.Clear();
-			UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(UnityEngine.Object));
+			mList_Differences.Clear();
+			mList_Snapshot.Clear();
+			mStats_Current.Clear();
+			mStats_Dif.Clear();
+			Object[] array = Resources.FindObjectsOfTypeAll(typeof(Object));
 			int j = 0;
-			int num2 = array.Length;
-			while(j < num2) {
-				UnityEngine.Object @object = array[j];
-				int num3 = (int)Profiler.GetRuntimeMemorySizeLong(@object);
-				num += num3;
+			while (j < array.Length) {
+				Object @object = array[j];
+				int num3 = (int) Profiler.GetRuntimeMemorySizeLong(@object);
 				string text = @object.GetType().ToString();
-				if(text.StartsWith("UnityEngine.")) {
+				if (text.StartsWith("UnityEngine.")) {
 					text = text.Substring(12);
 				}
-				int num4 = 0;
-				this.mStats_Current.TryGetValue(text, out num4);
-				this.mStats_Current[text] = num4 + num3;
-				BTMemoryProfiler.ObjMemDef objMemDef = new BTMemoryProfiler.ObjMemDef(num3, text, @object.name, this.HasADependantInTheList(@object, ref array), @object);
-				this.mList_Snapshot.Add(objMemDef);
-				if(!this.RemoveLastSnapShotElement(ref dictionary, objMemDef)) {
-					this.mList_Differences.Add(objMemDef);
-					num4 = 0;
-					this.mStats_Dif.TryGetValue(text, out num4);
-					this.mStats_Dif[text] = num4 + num3;
+
+				mStats_Current.TryGetValue(text, out int num4);
+				mStats_Current[text] = num4 + num3;
+				var objMemDef = new ObjMemDef(num3, text, @object.name, HasADependantInTheList(@object), @object);
+				mList_Snapshot.Add(objMemDef);
+				if (!RemoveLastSnapShotElement(ref dictionary, objMemDef)) {
+					mList_Differences.Add(objMemDef);
+					mStats_Dif.TryGetValue(text, out num4);
+					mStats_Dif[text] = num4 + num3;
 				}
+
 				j++;
 			}
-			this.mStats_Dif1.Clear();
-			this.mStats_Current1.Clear();
-			foreach(KeyValuePair<string, int> item in this.mStats_Dif) {
-				this.mStats_Dif1.Add(item);
+
+			mStats_Dif1.Clear();
+			mStats_Current1.Clear();
+			foreach (KeyValuePair<string, int> item in mStats_Dif) {
+				mStats_Dif1.Add(item);
 			}
-			this.mStats_Dif1.Sort((KeyValuePair<string, int> v1, KeyValuePair<string, int> v2) => v2.Value - v1.Value);
-			foreach(KeyValuePair<string, int> item2 in this.mStats_Current) {
-				this.mStats_Current1.Add(item2);
+
+			mStats_Dif1.Sort((v1, v2) => v2.Value - v1.Value);
+			foreach (KeyValuePair<string, int> item2 in mStats_Current) {
+				mStats_Current1.Add(item2);
 			}
-			this.mStats_Current1.Sort((KeyValuePair<string, int> v1, KeyValuePair<string, int> v2) => v2.Value - v1.Value);
-			this.mStats_Dif.Clear();
-			this.mStats_Current.Clear();
-			this.mList_Snapshot.Sort((BTMemoryProfiler.ObjMemDef p1, BTMemoryProfiler.ObjMemDef p2) => p2.CompareTo(ref p1));
-			this.mList_Differences.Sort((BTMemoryProfiler.ObjMemDef p1, BTMemoryProfiler.ObjMemDef p2) => p2.CompareTo(ref p1));
+
+			mStats_Current1.Sort((v1, v2) => v2.Value - v1.Value);
+			mStats_Dif.Clear();
+			mStats_Current.Clear();
+			mList_Snapshot.Sort((p1, p2) => p2.CompareTo(ref p1));
+			mList_Differences.Sort((p1, p2) => p2.CompareTo(ref p1));
 		}
 
-		private bool HasADependantInTheList(UnityEngine.Object Obj, ref UnityEngine.Object[] Objs) {
-			GameObject gameObject = Obj as GameObject;
+		private static bool HasADependantInTheList(Object Obj) {
+			var gameObject = Obj as GameObject;
 			return gameObject == null || gameObject.transform.parent != null;
 		}
 
 		public BTMemoryProfiler() {
-			this.mStats_Dif1 = new List<KeyValuePair<string, int>>();
-			this.mStats_Dif = new Dictionary<string, int>();
-			this.mList_Differences = new List<BTMemoryProfiler.ObjMemDef>();
-			this.mList_LastSnapshot = new List<BTMemoryProfiler.ObjMemDef>();
-			this.mScrollViewPos_Stats = new Vector2(0f, 0f);
-			this.mFilter_Text = "";
-			this.mFilter_ShowDependencies = true;
+			mStats_Dif1 = new List<KeyValuePair<string, int>>();
+			mStats_Dif = new Dictionary<string, int>();
+			mList_Differences = new List<ObjMemDef>();
+			mList_LastSnapshot = new List<ObjMemDef>();
+			mScrollViewPos_Stats = new Vector2(0f, 0f);
+			mFilter_Text = "";
+			mFilter_ShowDependencies = true;
 		}
 
-		private static BTMemoryProfiler.ObjectContentInfo buildContentInfo(object instance) {
-			if(instance == null) {
+		private static ObjectContentInfo buildContentInfo(object instance) {
+			if (instance == null) {
 				return null;
 			}
-			Debug.LogWarning("building contentInfo for object: " + instance.ToString());
+
+			Debug.LogWarning("building contentInfo for object: " + instance);
 			List<object> objectHistory = new List<object>();
-			return new BTMemoryProfiler.ObjectContentInfo(instance.GetType().Name, "", instance.ToString()) {
-				contentInfo = BTMemoryProfiler.buildContentInfoRecursive(instance, 0, objectHistory)
+			return new ObjectContentInfo(instance.GetType().Name, "", instance.ToString()) {
+					contentInfo = buildContentInfoRecursive(instance, 0, objectHistory)
 			};
 		}
 
-		private static List<BTMemoryProfiler.ObjectContentInfo> buildContentInfoRecursive(object value, int depth, List<object> objectHistory) {
-			if(value == null) {
+		private static List<ObjectContentInfo> buildContentInfoRecursive(object value, int depth, ICollection<object> objectHistory) {
+			if (value == null) {
 				return null;
 			}
-			if(depth > 15) {
+
+			if (depth > 15) {
 				return null;
 			}
-			if(objectHistory.Contains(value)) {
+
+			if (objectHistory.Contains(value)) {
 				return null;
 			}
+
 			objectHistory.Add(value);
 			Type type = value.GetType();
-			if(type.IsPrimitive) {
+			if (type.IsPrimitive) {
 				return null;
 			}
-			if(typeof(string).IsInstanceOfType(value)) {
+
+			if (value is string || value is DateTime) {
 				return null;
 			}
-			if(typeof(DateTime).IsInstanceOfType(value)) {
-				return null;
-			}
-			List<BTMemoryProfiler.ObjectContentInfo> result = new List<BTMemoryProfiler.ObjectContentInfo>();
+
+			List<ObjectContentInfo> result = new List<ObjectContentInfo>();
 			try {
-				if(type.IsEnum) {
-					foreach(string enumName in type.GetEnumNames()) {
-						result.Add(new BTMemoryProfiler.ObjectContentInfo("Enum", type.Name, enumName));
-					}
-				} else if(typeof(Array).IsAssignableFrom(type)) {
-					Array array = (Array)value;
+				if (type.IsEnum) {
+					result.AddRange(type.GetEnumNames().Select(enumName => new ObjectContentInfo("Enum", type.Name, enumName)));
+				} else if (typeof(Array).IsAssignableFrom(type)) {
+					var array = (Array) value;
 					int length = array.GetLength(0);
-					for(int index = 0; index < length; index++) {
+					for (int index = 0; index < length; index++) {
 						object arrayValue = array.GetValue(index);
-						BTMemoryProfiler.ObjectContentInfo arrayContentInfo = new BTMemoryProfiler.ObjectContentInfo(arrayValue.GetType().Name, "arr_" + index, arrayValue);
+						var arrayContentInfo = new ObjectContentInfo(arrayValue.GetType().Name, "arr_" + index, arrayValue);
 						result.Add(arrayContentInfo);
-						arrayContentInfo.contentInfo = BTMemoryProfiler.buildContentInfoRecursive(arrayValue, depth + 1, objectHistory);
+						arrayContentInfo.contentInfo = buildContentInfoRecursive(arrayValue, depth + 1, objectHistory);
 					}
-				} else if(type.GetInterfaces().Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDictionary<,>)).Any()) {
-					IDictionary<object, object> dictionary = (IDictionary<object, object>)value;
-					foreach(KeyValuePair<object, object> kvp in dictionary) {
-						BTMemoryProfiler.ObjectContentInfo enumerableContentInfo = new BTMemoryProfiler.ObjectContentInfo(kvp.Key.GetType().Name, "dict[" + kvp.Key.ToString() + "]", kvp.Value);
+				} else if (type.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDictionary<,>))) {
+					IDictionary<object, object> dictionary = (IDictionary<object, object>) value;
+					foreach (KeyValuePair<object, object> kvp in dictionary) {
+						var enumerableContentInfo = new ObjectContentInfo(kvp.Key.GetType().Name, "dict[" + kvp.Key + "]", kvp.Value);
 						result.Add(enumerableContentInfo);
-						enumerableContentInfo.contentInfo = BTMemoryProfiler.buildContentInfoRecursive(kvp.Value, depth + 1, objectHistory);
+						enumerableContentInfo.contentInfo = buildContentInfoRecursive(kvp.Value, depth + 1, objectHistory);
 					}
-				} else if(type.GetInterfaces().Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)).Any()) {
-					IEnumerable<object> enumerable = (IEnumerable<object>)value;
+				} else if (type.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>))) {
+					IEnumerable<object> enumerable = (IEnumerable<object>) value;
 					int quasiIndex = 0;
-					foreach(object item in enumerable) {
-						BTMemoryProfiler.ObjectContentInfo enumerableContentInfo = new BTMemoryProfiler.ObjectContentInfo(item.GetType().Name, "enumerable~" + quasiIndex, item);
+					foreach (object item in enumerable) {
+						var enumerableContentInfo = new ObjectContentInfo(item.GetType().Name, "enumerable~" + quasiIndex, item);
 						result.Add(enumerableContentInfo);
-						enumerableContentInfo.contentInfo = BTMemoryProfiler.buildContentInfoRecursive(item, depth + 1, objectHistory);
+						enumerableContentInfo.contentInfo = buildContentInfoRecursive(item, depth + 1, objectHistory);
 						quasiIndex++;
 					}
 				} else {
-					foreach(FieldInfo fieldInfo in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)) {
+					foreach (FieldInfo fieldInfo in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)) {
 						object fieldValue = fieldInfo.GetValue(value);
-						BTMemoryProfiler.ObjectContentInfo fieldContentInfo = new BTMemoryProfiler.ObjectContentInfo(fieldInfo.FieldType.Name, fieldInfo.Name, fieldValue);
+						var fieldContentInfo = new ObjectContentInfo(fieldInfo.FieldType.Name, fieldInfo.Name, fieldValue);
 						result.Add(fieldContentInfo);
-						fieldContentInfo.contentInfo = BTMemoryProfiler.buildContentInfoRecursive(fieldValue, depth + 1, objectHistory);
+						fieldContentInfo.contentInfo = buildContentInfoRecursive(fieldValue, depth + 1, objectHistory);
 					}
-					if(BTMemoryProfiler.reflectOnProperties) {
-						foreach(PropertyInfo propertyInfo in type.GetProperties()) {
-							if(propertyInfo.CanRead) {
+
+					if (reflectOnProperties) {
+						foreach (PropertyInfo propertyInfo in type.GetProperties()) {
+							if (propertyInfo.CanRead) {
 								ParameterInfo[] parameters = propertyInfo.GetIndexParameters();
-								if(parameters.GetLength(0) != 0) {
-									ObjectContentInfo indexedPropContentInfo = new ObjectContentInfo(propertyInfo.PropertyType.Name, propertyInfo.Name, "[can't reflect on indexed property! listing parameters instead]");
+								if (parameters.GetLength(0) != 0) {
+									var indexedPropContentInfo = new ObjectContentInfo(propertyInfo.PropertyType.Name, propertyInfo.Name,
+											"[can't reflect on indexed property! listing parameters instead]");
 									result.Add(indexedPropContentInfo);
-									List<ObjectContentInfo> parameterInfo = new List<ObjectContentInfo>();
-									foreach(ParameterInfo parameter in parameters) {
-										string defaultParamValue = parameter.HasDefaultValue ? parameter.DefaultValue.ToString() : "none";
-										parameterInfo.Add(new ObjectContentInfo(parameter.ParameterType.Name, parameter.Name, "default: " + defaultParamValue));
-									}
+									List<ObjectContentInfo> parameterInfo = (
+											from parameter in parameters
+											let defaultParamValue = parameter.HasDefaultValue
+													? parameter.DefaultValue?.ToString()
+													: "none"
+											select new ObjectContentInfo(parameter.ParameterType.Name, parameter.Name, "default: " + defaultParamValue)
+									).ToList();
+
 									indexedPropContentInfo.contentInfo = parameterInfo;
 								} else {
 									object propertyValue = propertyInfo.GetValue(value);
-									if(propertyValue != null && !propertyValue.GetType().IsAssignableFrom(type)) {
-										BTMemoryProfiler.ObjectContentInfo propContentInfo = new BTMemoryProfiler.ObjectContentInfo(propertyInfo.PropertyType.Name, propertyInfo.Name, propertyValue);
+									if (propertyValue != null && !propertyValue.GetType().IsAssignableFrom(type)) {
+										var propContentInfo =
+												new ObjectContentInfo(propertyInfo.PropertyType.Name, propertyInfo.Name, propertyValue);
 										result.Add(propContentInfo);
-										propContentInfo.contentInfo = BTMemoryProfiler.buildContentInfoRecursive(propertyValue, depth + 1, objectHistory);
+										propContentInfo.contentInfo = buildContentInfoRecursive(propertyValue, depth + 1, objectHistory);
 									}
 								}
 							}
 						}
 					}
 				}
-			} catch(Exception e) {
-				Debug.LogWarning("reflection usage failed, error: " + e.ToString());
-				return new List<ObjectContentInfo>() { new ObjectContentInfo("error", "encountered error", e) };
+			} catch (Exception e) {
+				Debug.LogWarning("reflection usage failed, error: " + e);
+				return new List<ObjectContentInfo> { new ObjectContentInfo("error", "encountered error", e) };
 			}
+
 			return result;
 		}
 
-		private void RenderGUI_List(List<BTMemoryProfiler.ObjMemDef> mListDef) {
-			this.mScrollViewPos_Stats = GUILayout.BeginScrollView(this.mScrollViewPos_Stats, new GUILayoutOption[]
-			{
-			GUILayout.ExpandHeight(true)
-			});
-			float lineHeight = GUI.skin.button.lineHeight + (float)GUI.skin.button.margin.top + (float)GUI.skin.button.padding.top + (float)GUI.skin.button.padding.bottom;
-			int viewportStartLine = (int)(this.mScrollViewPos_Stats.y / lineHeight);
-			int viewportEndLine = viewportStartLine + (int)((float)Screen.height / lineHeight);
+		private void RenderGUI_List(IReadOnlyList<ObjMemDef> mListDef) {
+			mScrollViewPos_Stats = GUILayout.BeginScrollView(mScrollViewPos_Stats, GUILayout.ExpandHeight(true));
+			float lineHeight = GUI.skin.button.lineHeight + GUI.skin.button.margin.top + GUI.skin.button.padding.top + GUI.skin.button.padding.bottom;
+			int viewportStartLine = (int) (mScrollViewPos_Stats.y / lineHeight);
+			int viewportEndLine = viewportStartLine + (int) (Screen.height / lineHeight);
 			int extraSpacingLines = 0;
 			int renderedLines = 0;
 			TextAnchor alignment = GUI.skin.label.alignment;
@@ -399,143 +356,146 @@ namespace SoD_BaseMod.basemod
 			bool doReflect = false;
 			string filterText = "";
 			string[] reflectPath = null;
-			if(!string.IsNullOrEmpty(this.mFilter_Text)) {
-				doReflect = this.mFilter_Text.EndsWith("@reflect");
-				if(doReflect) {
-					reflectPath = this.mFilter_Text.Replace("@reflect", "").ToLowerInvariant().Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+			if (!string.IsNullOrEmpty(mFilter_Text)) {
+				doReflect = mFilter_Text.EndsWith("@reflect");
+				if (doReflect) {
+					reflectPath = mFilter_Text.Replace("@reflect", "").ToLowerInvariant().Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 				} else {
-					filterText = this.mFilter_Text.ToLowerInvariant();
+					filterText = mFilter_Text.ToLowerInvariant();
 				}
 			}
-			for(int i = 0; i < count; i++) {
-				BTMemoryProfiler.ObjMemDef objMemDef = mListDef[i];
-				if(doReflect) {
-					if(objMemDef._Name.ToLowerInvariant().Equals(reflectPath[0]) || objMemDef._ObjType.ToLowerInvariant().Equals(reflectPath[0])) {
-						this.RenderContentInfoRecursive(objMemDef.GetContentInfo(), 0, 20f, ref renderedLines, viewportStartLine, viewportEndLine, ref extraSpacingLines, lineHeight, reflectPath);
+
+			for (int i = 0; i < count; i++) {
+				ObjMemDef objMemDef = mListDef[i];
+				if (doReflect) {
+					if (objMemDef._Name.ToLowerInvariant().Equals(reflectPath[0]) || objMemDef._ObjType.ToLowerInvariant().Equals(reflectPath[0])) {
+						RenderContentInfoRecursive(objMemDef.GetContentInfo(), 0, 20f, ref renderedLines, viewportStartLine, viewportEndLine,
+								ref extraSpacingLines, lineHeight, reflectPath);
 					}
-				} else if((this.mFilter_ShowDependencies || !objMemDef._IsADependency) && (filterText.Equals("") || objMemDef._Name.ToLowerInvariant().Contains(filterText) || objMemDef._ObjType.ToLowerInvariant().Contains(filterText))) {
-					if(renderedLines > 0 && (renderedLines < viewportStartLine || renderedLines > viewportEndLine)) {
+				} else if ((mFilter_ShowDependencies || !objMemDef._IsADependency) && (filterText.Equals("") ||
+						objMemDef._Name.ToLowerInvariant().Contains(filterText) || objMemDef._ObjType.ToLowerInvariant().Contains(filterText))) {
+					if (renderedLines > 0 && (renderedLines < viewportStartLine || renderedLines > viewportEndLine)) {
 						extraSpacingLines++;
 					} else {
-						if(extraSpacingLines > 0) {
-							GUILayout.Space((float)extraSpacingLines * lineHeight);
+						if (extraSpacingLines > 0) {
+							GUILayout.Space(extraSpacingLines * lineHeight);
 							extraSpacingLines = 0;
 						}
+
 						GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
-						GUILayout.Label((objMemDef._Size < 1048576) ? ((objMemDef._Size / 1024).ToString() + " Kb") : ((objMemDef._Size / 1048576).ToString("0.00") + " Mb"), new GUILayoutOption[]
-						{
-						GUILayout.Width(80f)
-						});
-						if(GUILayout.Button("reflect on type", new GUILayoutOption[] { GUILayout.ExpandWidth(false) })) {
-							this.mFilter_Text = objMemDef._ObjType + "@reflect";
+						GUILayout.Label(
+								objMemDef._Size < 1048576 ? objMemDef._Size / 1024 + " Kb" : (objMemDef._Size / 1048576).ToString("0.00") + " Mb",
+								GUILayout.Width(80f));
+						if (GUILayout.Button("reflect on type", GUILayout.ExpandWidth(false))) {
+							mFilter_Text = objMemDef._ObjType + "@reflect";
 						}
-						if(GUILayout.Button("reflect on name", new GUILayoutOption[] { GUILayout.ExpandWidth(false) })) {
-							this.mFilter_Text = objMemDef._Name + "@reflect";
+
+						if (GUILayout.Button("reflect on name", GUILayout.ExpandWidth(false))) {
+							mFilter_Text = objMemDef._Name + "@reflect";
 						}
-						if(GUILayout.Button(objMemDef._ObjType, new GUILayoutOption[] { GUILayout.Width(200f) })) {
-							this.mFilter_Text = objMemDef._ObjType;
+
+						if (GUILayout.Button(objMemDef._ObjType, GUILayout.Width(200f))) {
+							mFilter_Text = objMemDef._ObjType;
 						}
-						if(GUILayout.Button(objMemDef._Name, Array.Empty<GUILayoutOption>())) {
-							this.mFilter_Text = objMemDef._Name;
+
+						if (GUILayout.Button(objMemDef._Name, Array.Empty<GUILayoutOption>())) {
+							mFilter_Text = objMemDef._Name;
 						}
+
 						GUILayout.EndHorizontal();
 					}
+
 					renderedLines++;
 				}
 			}
+
 			GUI.skin.label.alignment = alignment;
-			if(extraSpacingLines > 0) {
-				GUILayout.Space((float)extraSpacingLines * lineHeight);
+			if (extraSpacingLines > 0) {
+				GUILayout.Space(extraSpacingLines * lineHeight);
 			}
+
 			GUILayout.EndScrollView();
 		}
 
-		private void AddLastSnapShotElement(ref Dictionary<string, List<BTMemoryProfiler.ObjMemDef>> LastSnapshot, BTMemoryProfiler.ObjMemDef ObjDef) {
-			List<BTMemoryProfiler.ObjMemDef> list = null;
-			if(!LastSnapshot.TryGetValue(ObjDef._Name, out list)) {
-				list = new List<BTMemoryProfiler.ObjMemDef>();
+		private static void AddLastSnapShotElement(ref Dictionary<string, List<ObjMemDef>> LastSnapshot, ObjMemDef ObjDef) {
+			if (!LastSnapshot.TryGetValue(ObjDef._Name, out List<ObjMemDef> list)) {
+				list = new List<ObjMemDef>();
 				LastSnapshot[ObjDef._Name] = list;
 			}
+
 			list.Add(ObjDef);
 		}
 
-		private bool RemoveLastSnapShotElement(ref Dictionary<string, List<BTMemoryProfiler.ObjMemDef>> LastSnapshot, BTMemoryProfiler.ObjMemDef ObjDef) {
-			List<BTMemoryProfiler.ObjMemDef> list = null;
-			if(!LastSnapshot.TryGetValue(ObjDef._Name, out list)) {
+		private static bool RemoveLastSnapShotElement(ref Dictionary<string, List<ObjMemDef>> LastSnapshot, ObjMemDef ObjDef) {
+			if (!LastSnapshot.TryGetValue(ObjDef._Name, out List<ObjMemDef> list)) {
 				return false;
 			}
-			int num = list.FindIndex((BTMemoryProfiler.ObjMemDef p) => ObjDef._ObjType == p._ObjType);
-			if(num < 0) {
+
+			int num = list.FindIndex(p => ObjDef._ObjType == p._ObjType);
+			if (num < 0) {
 				return false;
 			}
+
 			list.RemoveAt(num);
 			return true;
 		}
 
-		private void RenderContentInfoRecursive(BTMemoryProfiler.ObjectContentInfo content, int depth, float spaceWidth, ref int renderedLines, int viewPortStartLine, int viewPortEndLine, ref int skippedLines, float lineHeight, string[] reflectPath) {
-			if(content == null) {
+		private void RenderContentInfoRecursive(ObjectContentInfo content, int depth, float spaceWidth, ref int renderedLines, int viewPortStartLine,
+				int viewPortEndLine, ref int skippedLines, float lineHeight, IReadOnlyList<string> reflectPath) {
+			if (content == null) {
 				return;
 			}
-			if(renderedLines == 0 || (renderedLines <= viewPortEndLine && renderedLines >= viewPortStartLine)) {
-				if(skippedLines > 0) {
-					GUILayout.Space(lineHeight * (float)skippedLines);
+
+			if (renderedLines == 0 || renderedLines <= viewPortEndLine && renderedLines >= viewPortStartLine) {
+				if (skippedLines > 0) {
+					GUILayout.Space(lineHeight * skippedLines);
 					skippedLines = 0;
 				}
+
 				GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
-				GUILayout.Space(spaceWidth * (float)depth);
-				if(content.contentInfo != null) {
-					if(GUILayout.Button(content.isFolded ? ">" : "v", new GUILayoutOption[]
-					{
-					GUILayout.Width(20f)
-					})) {
+				GUILayout.Space(spaceWidth * depth);
+				if (content.contentInfo != null) {
+					if (GUILayout.Button(content.isFolded ? ">" : "v", GUILayout.Width(20f))) {
 						content.isFolded = !content.isFolded;
 					}
 				} else {
-					GUILayout.Box("o", new GUILayoutOption[]
-					{
-					GUILayout.Width(20f)
-					});
+					GUILayout.Box("o", GUILayout.Width(20f));
 				}
-				GUILayout.Box(content.typeText, this.boxReflectFontStyle, new GUILayoutOption[]
-				{
-				GUILayout.Width(200f)
-				});
-				GUILayout.Box(content.nameText, this.boxReflectFontStyle, new GUILayoutOption[]
-				{
-				GUILayout.Width(200f)
-				});
-				GUILayout.Box(content.valueText, this.boxReflectFontStyle, Array.Empty<GUILayoutOption>());
+
+				GUILayout.Box(content.typeText, boxReflectFontStyle, GUILayout.Width(200f));
+				GUILayout.Box(content.nameText, boxReflectFontStyle, GUILayout.Width(200f));
+				GUILayout.Box(content.valueText, boxReflectFontStyle, Array.Empty<GUILayoutOption>());
 				GUILayout.EndHorizontal();
 			} else {
 				skippedLines++;
 			}
+
 			renderedLines++;
-			if(content.contentInfo != null && !content.isFolded) {
+			if (content.contentInfo != null && !content.isFolded) {
 				string pathTypeString = null;
 				string pathNameString = null;
-				if(reflectPath.Length > (depth + 1)) {
+				if (reflectPath.Count > depth + 1) {
 					string pathString = reflectPath[depth + 1];
-					if(pathString.EndsWith("@type")) {
+					if (pathString.EndsWith("@type")) {
 						pathTypeString = pathString.Substring(0, pathString.Length - "@type".Length);
 					} else {
 						pathNameString = pathString;
 					}
 
-					if(string.Equals(pathTypeString, "*")) {
+					if (string.Equals(pathTypeString, "*")) {
 						pathTypeString = null;
 					}
-					if(string.Equals(pathNameString, "*")) {
+
+					if (string.Equals(pathNameString, "*")) {
 						pathNameString = null;
 					}
 				}
-				foreach(BTMemoryProfiler.ObjectContentInfo innerContent in content.contentInfo) {
-					if(pathTypeString != null && !InputPartiallyMatches(pathTypeString, innerContent.typeString)) {
-						continue;
-					}
-					if(pathNameString != null && !InputPartiallyMatches(pathNameString, innerContent.nameString)) {
-						continue;
-					}
-					this.RenderContentInfoRecursive(innerContent, depth + 1, spaceWidth, ref renderedLines, viewPortStartLine, viewPortEndLine, ref skippedLines, lineHeight, reflectPath);
+
+				foreach (ObjectContentInfo innerContent in content.contentInfo
+						.Where(innerContent => pathTypeString == null || InputPartiallyMatches(pathTypeString, innerContent.typeString))
+						.Where(innerContent => pathNameString == null || InputPartiallyMatches(pathNameString, innerContent.nameString))) {
+					RenderContentInfoRecursive(innerContent, depth + 1, spaceWidth, ref renderedLines, viewPortStartLine, viewPortEndLine, ref skippedLines,
+							lineHeight, reflectPath);
 				}
 			}
 		}
@@ -546,47 +506,49 @@ namespace SoD_BaseMod.basemod
 		/// <param name="input"></param>
 		/// <param name="target"></param>
 		/// <returns></returns>
-		public static bool InputPartiallyMatches(string input, string target) {
+		private static bool InputPartiallyMatches(string input, string target) {
 			char[] inputChars = input.ToCharArray();
 			int inputCharsLength = inputChars.GetLength(0);
 			char[] targetChars = target.ToCharArray();
 			int targetCharsLength = targetChars.GetLength(0);
 			int targetIndex = 0;
-			for(int inputIndex = 0; inputIndex < inputCharsLength; inputIndex++) {
+			for (int inputIndex = 0; inputIndex < inputCharsLength; inputIndex++) {
 				char inputChar = char.ToUpperInvariant(inputChars[inputIndex]);
-				while(inputChar != char.ToUpperInvariant(targetChars[targetIndex])) {
+				while (inputChar != char.ToUpperInvariant(targetChars[targetIndex])) {
 					targetIndex++;
-					if(targetIndex >= targetCharsLength) {
+					if (targetIndex >= targetCharsLength) {
 						// unable to find matching character in target
 						return false;
 					}
 				}
+
 				targetIndex++;
-				if(targetIndex >= targetCharsLength && (inputIndex + 1) < inputCharsLength) {
+				if (targetIndex >= targetCharsLength && inputIndex + 1 < inputCharsLength) {
 					// reached end of target string, but still have input chars to check
 					return false;
 				}
 			}
+
 			return true;
 		}
 
-		private List<KeyValuePair<string, int>> mStats_Current1 = new List<KeyValuePair<string, int>>();
+		private readonly List<KeyValuePair<string, int>> mStats_Current1 = new List<KeyValuePair<string, int>>();
 
-		private Dictionary<string, int> mStats_Current = new Dictionary<string, int>();
+		private readonly Dictionary<string, int> mStats_Current = new Dictionary<string, int>();
 
-		private List<KeyValuePair<string, int>> mStats_Dif1;
+		private readonly List<KeyValuePair<string, int>> mStats_Dif1;
 
-		private Dictionary<string, int> mStats_Dif;
+		private readonly Dictionary<string, int> mStats_Dif;
 
 		public GameObject _OwnerGO;
 
 		private Vector2 mScrollViewPos_Stats;
 
-		private BTMemoryProfiler.StatsViewTab mStatsViewIndex;
+		private StatsViewTab mStatsViewIndex;
 
 		private string mFilter_Text;
 
-		private static bool reflectOnProperties = false;
+		private static bool reflectOnProperties;
 
 		private bool mFilter_ShowDependencies;
 
@@ -594,89 +556,86 @@ namespace SoD_BaseMod.basemod
 
 		private GUIStyle boxReflectFontStyle;
 
-		private List<BTMemoryProfiler.ObjMemDef> mList_Snapshot = new List<BTMemoryProfiler.ObjMemDef>();
+		private readonly List<ObjMemDef> mList_Snapshot = new List<ObjMemDef>();
 
-		private List<BTMemoryProfiler.ObjMemDef> mList_Differences;
+		private readonly List<ObjMemDef> mList_Differences;
 
-		private List<BTMemoryProfiler.ObjMemDef> mList_LastSnapshot;
+		private readonly List<ObjMemDef> mList_LastSnapshot;
 
-		private class ObjMemDef
-		{
+		private class ObjMemDef {
 			public ObjMemDef(int Size, string ObjType, string Name, bool IsADependency, object instance) {
-				this._Size = Size;
-				this._ObjType = ObjType;
-				this._Name = Name;
-				this._IsADependency = IsADependency;
+				_Size = Size;
+				_ObjType = ObjType;
+				_Name = Name;
+				_IsADependency = IsADependency;
 				this.instance = instance;
-				this.contentLoaded = false;
-				this.contentInfo = null;
+				contentLoaded = false;
+				contentInfo = null;
 			}
 
-			public BTMemoryProfiler.ObjectContentInfo GetContentInfo() {
-				if(!this.contentLoaded) {
-					this.contentInfo = BTMemoryProfiler.buildContentInfo(this.instance);
-					this.contentLoaded = true;
+			public ObjectContentInfo GetContentInfo() {
+				if (!contentLoaded) {
+					contentInfo = buildContentInfo(instance);
+					contentLoaded = true;
 				}
-				return this.contentInfo;
+
+				return contentInfo;
 			}
 
-			public int CompareTo(ref BTMemoryProfiler.ObjMemDef other) {
-				if(this._Size != other._Size) {
-					return this._Size - other._Size;
+			public int CompareTo(ref ObjMemDef other) {
+				if (_Size != other._Size) {
+					return _Size - other._Size;
 				}
-				if(this._IsADependency != other._IsADependency) {
-					return (this._IsADependency ? 1 : 0) - (other._IsADependency ? 1 : 0);
+
+				if (_IsADependency != other._IsADependency) {
+					return (_IsADependency ? 1 : 0) - (other._IsADependency ? 1 : 0);
 				}
-				int num = string.Compare(this._Name, other._Name);
-				if(num != 0) {
-					return num;
-				}
-				return string.Compare(this._ObjType, other._ObjType);
+
+				int num = string.CompareOrdinal(_Name, other._Name);
+				return num != 0 ? num : string.CompareOrdinal(_ObjType, other._ObjType);
 			}
 
-			public int _Size;
+			public readonly int _Size;
 
-			public bool _IsADependency;
+			public readonly bool _IsADependency;
 
-			public string _ObjType;
+			public readonly string _ObjType;
 
-			public string _Name;
+			public readonly string _Name;
 
-			private BTMemoryProfiler.ObjectContentInfo contentInfo;
+			private ObjectContentInfo contentInfo;
 
-			private object instance;
+			private readonly object instance;
 
 			private bool contentLoaded;
 		}
 
-		private enum StatsViewTab
-		{
+		private enum StatsViewTab {
 			CURRENT_STATS,
 			CURRENT_OBJECTS,
 			DIF_STATS,
 			DIF_OBJECTS
 		}
 
-		private class ObjectContentInfo
-		{
+		private class ObjectContentInfo {
 			public ObjectContentInfo(string typeName, string displayName, object value) {
-				this.typeString = typeName;
-				this.nameString = displayName;
-				this.typeText = "type: " + typeName;
-				this.nameText = "name: " + displayName;
-				this.valueText = ((value == null) ? "null" : value.ToString());
-				this.isFolded = false;
+				typeString = typeName;
+				nameString = displayName;
+				typeText = "type: " + typeName;
+				nameText = "name: " + displayName;
+				valueText = value == null ? "null" : value.ToString();
+				isFolded = false;
 			}
 
-			public List<BTMemoryProfiler.ObjectContentInfo> contentInfo;
+			public List<ObjectContentInfo> contentInfo;
 
-			public string typeString;
-			public string typeText;
+			public readonly string typeString;
+			public readonly string typeText;
 
-			public string nameString;
-			public string nameText;
+			public readonly string nameString;
+			public readonly string nameText;
 
-			public string valueText;
+			public readonly string valueText;
 
 			public bool isFolded;
 		}

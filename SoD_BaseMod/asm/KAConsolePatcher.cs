@@ -14,8 +14,8 @@ namespace SoD_BaseMod.asm {
 			MethodInfo getUnlockedOriginal = AccessTools.PropertyGetter(originalType, "pUnlocked");
 			MethodInfo updateOriginal = AccessTools.Method(originalType, "Update");
 
-			HarmonyMethod getUnlockedPrefix = new HarmonyMethod(patcherType, nameof(GetUnlockedPrefix), new[] { typeof(bool).MakeByRefType() });
-			HarmonyMethod updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix), new[] { typeof(KAConsole) });
+			var getUnlockedPrefix = new HarmonyMethod(patcherType, nameof(GetUnlockedPrefix), new[] { typeof(bool).MakeByRefType() });
+			var updatePrefix = new HarmonyMethod(patcherType, nameof(UpdatePrefix), new[] { typeof(KAConsole) });
 
 			harmony.Patch(getUnlockedOriginal, getUnlockedPrefix);
 			harmony.Patch(updateOriginal, updatePrefix);

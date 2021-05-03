@@ -19,7 +19,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 
 		private static void OnExecutePlayerGetXP(BTConsoleCommand.BTCommandInput input) {
 			var cmdInput = (BTPlayerXPGetInput) input;
-			UserAchievementInfo achInfo = (cmdInput.type == 8)
+			UserAchievementInfo achInfo = cmdInput.type == 8
 					? PetRankData.GetUserAchievementInfo(SanctuaryManager.pCurPetData)
 					: UserRankData.GetUserAchievementInfoByType(cmdInput.type);
 			if (achInfo == null) {
@@ -37,7 +37,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.type = (int) type;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"type",
@@ -84,7 +84,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				this.amount = (int) amount;
 			}
 
-			protected override List<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
 				return new List<BTConsoleCommand.BTConsoleArgument> {
 						new BTConsoleCommand.BTConsoleArgument(
 								"type",

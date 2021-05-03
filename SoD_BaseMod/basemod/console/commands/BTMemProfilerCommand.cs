@@ -14,6 +14,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 
 		private static void OnExecute(BTConsoleCommand.BTCommandInput input) {
 			if (Object.FindObjectOfType(typeof(BTMemoryProfilerContainer)) == null) {
+				// ReSharper disable once ObjectCreationAsStatement
 				new GameObject("Memory Profiler", typeof(BTMemoryProfilerContainer));
 				BTConsole.WriteLine("Attached MemProfiler.");
 			} else {
