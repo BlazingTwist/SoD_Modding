@@ -426,7 +426,11 @@ namespace SoD_BaseMod.basemod.console {
 		}
 
 		public static void WriteLine(string line) {
-			consoleText += line + "\n";
+			if (ConfigHolder.config != null && ConfigHolder.config.consoleReverseOutput) {
+				consoleText = line + "\n" + consoleText;
+			} else {
+				consoleText += line + "\n";
+			}
 		}
 
 		public static void ClearConsole() {

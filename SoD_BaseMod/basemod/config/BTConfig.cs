@@ -39,6 +39,7 @@ namespace SoD_BaseMod.basemod.config {
 		public float consoleHeight = 0.3f;
 		public int suggestionCount = 5;
 		public bool consoleOpenByDefault;
+		public bool consoleReverseOutput;
 		public string consoleDefaultCommand = "help";
 		public Dictionary<string, List<string>> commandBinds;
 
