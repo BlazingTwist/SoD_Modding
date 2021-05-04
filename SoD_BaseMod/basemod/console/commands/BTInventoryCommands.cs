@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -411,37 +412,301 @@ namespace SoD_BaseMod.basemod.console.commands {
 				return loadedItemData.Count >= endID - startID + 1;
 			}
 
+			private class ItemDataRow {
+				public int? itemState_ID;
+				public string itemState_Name;
+				public ItemStateCriteriaType? itemState_rule_criteria;
+				public StateTransition? itemState_rule_completionAction;
+				public int? itemState_order;
+
+				public ItemRarity? itemRarity;
+
+				public int? possibleStats_stats_statsID;
+				public int? possibleStats_stats_rangeMap_tierID;
+				public int? possibleStats_stats_rangeMap_startRange;
+				public int? possibleStats_stats_rangeMap_endRange;
+
+				public int? statsMap_itemID;
+				public ItemTier? statsMap_itemTier;
+				public int? statsMap_itemStats_ID;
+				public string statsMap_itemStats_Name;
+				public string statsMap_itemStats_Value;
+
+				public int? itemSale_rewardItemID;
+				public int? itemSale_quantity;
+
+				public DeductibleType? blueprint_deductibles_type;
+				public int? blueprint_deductibles_itemID;
+				public int? blueprint_deductibles_quantity;
+				public int? blueprint_ingredients_specID;
+				public int? blueprint_ingredients_itemID;
+				public int? blueprint_ingredients_categoryID;
+				public ItemRarity? blueprint_ingredients_itemRarity;
+				public ItemTier? blueprint_ingredients_tier;
+				public int? blueprint_ingredients_quantity;
+				public int? blueprint_outputs_specID;
+				public int? blueprint_outputs_itemID;
+				public int? blueprint_outputs_categoryID;
+				public ItemRarity? blueprint_outputs_itemRarity;
+				public ItemTier? blueprint_outputs_tier;
+				public int? blueprint_outputs_quantity;
+
+				public string assetName;
+
+				public string attributes_key;
+				public string attributes_value;
+
+				public int? categories_catID;
+				public string categories_name;
+
+				public int? cost;
+				public int? cashCost;
+				public int? creativePoints;
+				public string description;
+				public string iconName;
+				public int? inventoryMax;
+				public int? itemID;
+				public string itemName;
+				public string itemNamePlural;
+				public bool? locked;
+				public string geometry2;
+
+				public string rollover_dialogName;
+				public string rollover_bundle;
+
+				public int? rankID;
+
+				public string relationship_type;
+				public int? relationship_itemID;
+				public int? relationship_weight;
+				public int? relationship_quantity;
+
+				public int? saleFactor;
+
+				public string textures_name;
+				public string textures_typeName;
+
+				public int? uses;
+
+				public DateTime? availabilities_startDate;
+				public DateTime? availabilities_endDate;
+
+				public int? rewardTypeID;
+				public int? points;
+
+				public static IEnumerable<string> GetRowHeader() {
+					return new List<string> {
+							"itemState.ID",
+							"itemState.Name",
+							"itemState.rule.criteria",
+							"itemState.rule.completionAction",
+							"itemState.order",
+							"itemRarity",
+							"possibleStats.stats.statsID",
+							"possibleStats.stats.rangeMap.tierID",
+							"possibleStats.stats.rangeMap.startRange",
+							"possibleStats.stats.rangeMap.endRange",
+							"statsMap.itemID",
+							"statsMap.itemTier",
+							"statsMap.itemStats.ID",
+							"statsMap.itemStats.Name",
+							"statsMap.itemStats.Value",
+							"itemSale.rewardItemID",
+							"itemSale.quantity",
+							"blueprint.deductibles.type",
+							"blueprint.deductibles.itemID",
+							"blueprint.deductibles.quantity",
+							"blueprint.ingredients.specID",
+							"blueprint.ingredients.itemID",
+							"blueprint.ingredients.categoryID",
+							"blueprint.ingredients.itemRarity",
+							"blueprint.ingredients.tier",
+							"blueprint.ingredients.quantity",
+							"blueprint.outputs.specID",
+							"blueprint.outputs.itemID",
+							"blueprint.outputs.categoryID",
+							"blueprint.outputs.itemRarity",
+							"blueprint.outputs.tier",
+							"blueprint.outputs.quantity",
+							"assetName",
+							"attributes.key",
+							"attributes.value",
+							"categories.catID",
+							"categories.name",
+							"cost",
+							"cashCost",
+							"creativePoints",
+							"description",
+							"iconName",
+							"inventoryMax",
+							"itemID",
+							"itemName",
+							"itemNamePlural",
+							"locked",
+							"geometry2",
+							"rollover.dialogName",
+							"rollover.bundle",
+							"rankID",
+							"relationship.type",
+							"relationship.itemID",
+							"relationship.weight",
+							"relationship.quantity",
+							"saleFactor",
+							"textures.name",
+							"textures.typeName",
+							"uses",
+							"availabilities.startDate",
+							"availabilities.endDate",
+							"rewardTypeID",
+							"points"
+					};
+				}
+
+				public string GetRowString() {
+					var resultBuilder = new StringBuilder();
+					resultBuilder.Append(itemState_ID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemState_Name).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemState_rule_criteria).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemState_rule_completionAction).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemState_order).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemRarity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(possibleStats_stats_statsID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(possibleStats_stats_rangeMap_tierID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(possibleStats_stats_rangeMap_startRange).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(possibleStats_stats_rangeMap_endRange).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(statsMap_itemID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(statsMap_itemTier).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(statsMap_itemStats_ID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(statsMap_itemStats_Name).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(statsMap_itemStats_Value).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemSale_rewardItemID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemSale_quantity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_deductibles_type).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_deductibles_itemID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_deductibles_quantity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_ingredients_specID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_ingredients_itemID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_ingredients_categoryID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_ingredients_itemRarity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_ingredients_tier).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_ingredients_quantity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_outputs_specID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_outputs_itemID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_outputs_categoryID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_outputs_itemRarity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_outputs_tier).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(blueprint_outputs_quantity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(assetName).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(attributes_key).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(attributes_value).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(categories_catID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(categories_name).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(cost).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(cashCost).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(creativePoints).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(description).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(iconName).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(inventoryMax).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemName).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(itemNamePlural).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(locked).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(geometry2).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(rollover_dialogName).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(rollover_bundle).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(rankID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(relationship_type).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(relationship_itemID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(relationship_weight).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(relationship_quantity).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(saleFactor).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(textures_name).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(textures_typeName).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(uses).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(availabilities_startDate).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(availabilities_endDate).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(rewardTypeID).Append("<COL_SEPARATOR>");
+					resultBuilder.Append(points);
+					return resultBuilder
+							.ToString()
+							.Replace("\t", "\\t")
+							.Replace("\n", "\\n")
+							.Replace("\r", "\\r")
+							.Replace("<COL_SEPARATOR>", "\t");
+				}
+
+				public void Merge(ItemDataRow other) {
+					itemState_ID = itemState_ID ?? other.itemState_ID;
+					itemState_Name = itemState_Name ?? other.itemState_Name;
+					itemState_rule_criteria = itemState_rule_criteria ?? other.itemState_rule_criteria;
+					itemState_rule_completionAction = itemState_rule_completionAction ?? other.itemState_rule_completionAction;
+					itemState_order = itemState_order ?? other.itemState_order;
+					itemRarity = itemRarity ?? other.itemRarity;
+					possibleStats_stats_statsID = possibleStats_stats_statsID ?? other.possibleStats_stats_statsID;
+					possibleStats_stats_rangeMap_tierID = possibleStats_stats_rangeMap_tierID ?? other.possibleStats_stats_rangeMap_tierID;
+					possibleStats_stats_rangeMap_startRange = possibleStats_stats_rangeMap_startRange ?? other.possibleStats_stats_rangeMap_startRange;
+					possibleStats_stats_rangeMap_endRange = possibleStats_stats_rangeMap_endRange ?? other.possibleStats_stats_rangeMap_endRange;
+					statsMap_itemID = statsMap_itemID ?? other.statsMap_itemID;
+					statsMap_itemTier = statsMap_itemTier ?? other.statsMap_itemTier;
+					statsMap_itemStats_ID = statsMap_itemStats_ID ?? other.statsMap_itemStats_ID;
+					statsMap_itemStats_Name = statsMap_itemStats_Name ?? other.statsMap_itemStats_Name;
+					statsMap_itemStats_Value = statsMap_itemStats_Value ?? other.statsMap_itemStats_Value;
+					itemSale_rewardItemID = itemSale_rewardItemID ?? other.itemSale_rewardItemID;
+					itemSale_quantity = itemSale_quantity ?? other.itemSale_quantity;
+					blueprint_deductibles_type = blueprint_deductibles_type ?? other.blueprint_deductibles_type;
+					blueprint_deductibles_itemID = blueprint_deductibles_itemID ?? other.blueprint_deductibles_itemID;
+					blueprint_deductibles_quantity = blueprint_deductibles_quantity ?? other.blueprint_deductibles_quantity;
+					blueprint_ingredients_specID = blueprint_ingredients_specID ?? other.blueprint_ingredients_specID;
+					blueprint_ingredients_itemID = blueprint_ingredients_itemID ?? other.blueprint_ingredients_itemID;
+					blueprint_ingredients_categoryID = blueprint_ingredients_categoryID ?? other.blueprint_ingredients_categoryID;
+					blueprint_ingredients_itemRarity = blueprint_ingredients_itemRarity ?? other.blueprint_ingredients_itemRarity;
+					blueprint_ingredients_tier = blueprint_ingredients_tier ?? other.blueprint_ingredients_tier;
+					blueprint_ingredients_quantity = blueprint_ingredients_quantity ?? other.blueprint_ingredients_quantity;
+					blueprint_outputs_specID = blueprint_outputs_specID ?? other.blueprint_outputs_specID;
+					blueprint_outputs_itemID = blueprint_outputs_itemID ?? other.blueprint_outputs_itemID;
+					blueprint_outputs_categoryID = blueprint_outputs_categoryID ?? other.blueprint_outputs_categoryID;
+					blueprint_outputs_itemRarity = blueprint_outputs_itemRarity ?? other.blueprint_outputs_itemRarity;
+					blueprint_outputs_tier = blueprint_outputs_tier ?? other.blueprint_outputs_tier;
+					blueprint_outputs_quantity = blueprint_outputs_quantity ?? other.blueprint_outputs_quantity;
+					assetName = assetName ?? other.assetName;
+					attributes_key = attributes_key ?? other.attributes_key;
+					attributes_value = attributes_value ?? other.attributes_value;
+					categories_catID = categories_catID ?? other.categories_catID;
+					categories_name = categories_name ?? other.categories_name;
+					cost = cost ?? other.cost;
+					cashCost = cashCost ?? other.cashCost;
+					creativePoints = creativePoints ?? other.creativePoints;
+					description = description ?? other.description;
+					iconName = iconName ?? other.iconName;
+					inventoryMax = inventoryMax ?? other.inventoryMax;
+					itemID = itemID ?? other.itemID;
+					itemName = itemName ?? other.itemName;
+					itemNamePlural = itemNamePlural ?? other.itemNamePlural;
+					locked = locked ?? other.locked;
+					geometry2 = geometry2 ?? other.geometry2;
+					rollover_dialogName = rollover_dialogName ?? other.rollover_dialogName;
+					rollover_bundle = rollover_bundle ?? other.rollover_bundle;
+					rankID = rankID ?? other.rankID;
+					relationship_type = relationship_type ?? other.relationship_type;
+					relationship_itemID = relationship_itemID ?? other.relationship_itemID;
+					relationship_weight = relationship_weight ?? other.relationship_weight;
+					relationship_quantity = relationship_quantity ?? other.relationship_quantity;
+					saleFactor = saleFactor ?? other.saleFactor;
+					textures_name = textures_name ?? other.textures_name;
+					textures_typeName = textures_typeName ?? other.textures_typeName;
+					uses = uses ?? other.uses;
+					availabilities_startDate = availabilities_startDate ?? other.availabilities_startDate;
+					availabilities_endDate = availabilities_endDate ?? other.availabilities_endDate;
+					rewardTypeID = rewardTypeID ?? other.rewardTypeID;
+					points = points ?? other.points;
+				}
+			}
+
 			private void OnAllItemsLoaded() {
 				BTConsole.WriteLine("All requested items loaded!");
+
 				var resultBuilder = new StringBuilder();
-				resultBuilder.Append("ItemID")
-						.Append("\t").Append("ItemName")
-						.Append("\t").Append("AssetName")
-						.Append("\t").Append("IconName")
-						.Append("\t").Append("Rollover.DialogName")
-						.Append("\t").Append("Rollover.Bundle")
-						.Append("\t").Append("Description")
-						.Append("\t").Append("Geometry2")
-						.Append("\t").Append("TextureCount")
-						.Append("\t").Append("Texture.TextureName")
-						.Append("\t").Append("Texture.TextureTypeName")
-						.Append("\t").Append("Texture.OffsetX")
-						.Append("\t").Append("Texture.OffsetY")
-						.Append("\t").Append("CategoryCount")
-						.Append("\t").Append("Category.CategoryID")
-						.Append("\t").Append("Category.CategoryName")
-						.Append("\t").Append("Category.IconName")
-						.Append("\t").Append("RelationshipCount")
-						.Append("\t").Append("Relationship.Type")
-						.Append("\t").Append("Relationship.ItemID")
-						.Append("\t").Append("Relationship.Weight")
-						.Append("\t").Append("Relationship.Quantity")
-						.Append("\t").Append("RankID")
-						.Append("\t").Append("Locked")
-						.Append("\t").Append("Cost")
-						.Append("\t").Append("Uses")
-						.Append("\t").Append("InventoryMax")
-						.Append("\t").Append("CreativePoints");
+				resultBuilder.Append(ItemDataRow.GetRowHeader()).Append("\n");
 				for (int i = startID; i <= endID; i++) {
 					if (!loadedItemData.ContainsKey(i)) {
 						BTConsole.WriteLine("ERROR - itemData for ID: " + i + " was never loaded!");
@@ -453,122 +718,194 @@ namespace SoD_BaseMod.basemod.console.commands {
 						continue;
 					}
 
-					resultBuilder.Append("\n");
-					resultBuilder.Append(itemData.ItemID);
-					resultBuilder.Append("\t").Append(ReplaceNewline(itemData.ItemName));
-					resultBuilder.Append("\t").Append(ReplaceNewline(itemData.AssetName));
-					resultBuilder.Append("\t").Append(ReplaceNewline(itemData.IconName));
-					ItemDataRollover rollover = itemData.Rollover;
-					if (rollover == null) {
-						resultBuilder.Append("\t\t");
-					} else {
-						resultBuilder.Append("\t").Append(ReplaceNewline(rollover.DialogName));
-						resultBuilder.Append("\t").Append(ReplaceNewline(rollover.Bundle));
+					var mainItemRow = new ItemDataRow {
+							itemRarity = itemData.ItemRarity,
+							assetName = itemData.AssetName,
+							cost = itemData.Cost,
+							cashCost = itemData.CashCost,
+							creativePoints = itemData.CreativePoints,
+							description = itemData.Description,
+							iconName = itemData.IconName,
+							inventoryMax = itemData.InventoryMax,
+							itemID = itemData.ItemID,
+							itemName = itemData.ItemName,
+							itemNamePlural = itemData.ItemNamePlural,
+							locked = itemData.Locked,
+							geometry2 = itemData.Geometry2,
+							rankID = itemData.RankId,
+							saleFactor = itemData.SaleFactor,
+							uses = itemData.Uses,
+							rewardTypeID = itemData.RewardTypeID,
+							points = itemData.Points,
+							rollover_dialogName = itemData.Rollover.DialogName,
+							rollover_bundle = itemData.Rollover.Bundle
+					};
+
+
+					List<List<ItemDataRow>> segmentedItemDataRows = new List<List<ItemDataRow>>();
+					List<ItemDataRow> activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					foreach (ItemState itemState in itemData.ItemStates) {
+						var firstStateRow = new ItemDataRow();
+						activeRows.Add(firstStateRow);
+						firstStateRow.itemState_ID = itemState.ItemStateID;
+						firstStateRow.itemState_Name = itemState.Name;
+						firstStateRow.itemState_order = itemState.Order;
+						firstStateRow.itemState_rule_completionAction = itemState.Rule.CompletionAction.Transition;
+
+						List<ItemDataRow> ruleCriteria = itemState.Rule.Criterias
+								.Select(criterion => new ItemDataRow {
+										itemState_rule_criteria = criterion.Type
+								}).ToList();
+
+						if (ruleCriteria.Count > 0) {
+							firstStateRow.Merge(ruleCriteria[0]);
+							ruleCriteria.RemoveAt(0);
+							activeRows.AddRange(ruleCriteria);
+						}
 					}
 
-					resultBuilder.Append("\t").Append(ReplaceNewline(itemData.Description));
-					resultBuilder.Append("\t").Append(ReplaceNewline(itemData.Geometry2));
-					if (itemData.Texture == null) {
-						resultBuilder.Append("\t").Append("0");
-						resultBuilder.Append("\t\t\t\t");
-					} else {
-						resultBuilder.Append("\t").Append(itemData.Texture.Length);
-						string textureNames = "";
-						string textureTypeNames = "";
-						string offsetX = "";
-						string offsetY = "";
-						for (int index = 0; index < itemData.Texture.Length; index++) {
-							ItemDataTexture texture = itemData.Texture[index];
-							if (index == 0) {
-								textureNames += texture.TextureName;
-								textureTypeNames += texture.TextureTypeName;
-								offsetX += texture.OffsetX == null ? "null" : texture.OffsetX.Value.ToString(CultureInfo.InvariantCulture);
-								offsetY += texture.OffsetY == null ? "null" : texture.OffsetY.Value.ToString(CultureInfo.InvariantCulture);
-							} else {
-								textureNames += ", " + texture.TextureName;
-								textureTypeNames += ", " + texture.TextureTypeName;
-								offsetX += ", " + (texture.OffsetX == null ? "null" : texture.OffsetX.Value.ToString(CultureInfo.InvariantCulture));
-								offsetY += ", " + (texture.OffsetY == null ? "null" : texture.OffsetY.Value.ToString(CultureInfo.InvariantCulture));
-							}
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					foreach (Stat stat in itemData.PossibleStatsMap.Stats) {
+						var firstStatRow = new ItemDataRow();
+						activeRows.Add(firstStatRow);
+						firstStatRow.possibleStats_stats_statsID = stat.ItemStatsID;
+
+						List<ItemDataRow> rangeMaps = stat.ItemStatsRangeMaps
+								.Select(rangeMap => new ItemDataRow {
+										possibleStats_stats_rangeMap_tierID = rangeMap.ItemTierID,
+										possibleStats_stats_rangeMap_startRange = rangeMap.StartRange,
+										possibleStats_stats_rangeMap_endRange = rangeMap.EndRange
+								}).ToList();
+
+						if (rangeMaps.Count > 0) {
+							firstStatRow.Merge(rangeMaps[0]);
+							rangeMaps.RemoveAt(0);
+							activeRows.AddRange(rangeMaps);
+						}
+					}
+
+					mainItemRow.statsMap_itemID = itemData.ItemStatsMap.ItemID;
+					mainItemRow.statsMap_itemTier = itemData.ItemStatsMap.ItemTier;
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.ItemStatsMap.ItemStats
+							.Select(stat => new ItemDataRow {
+									statsMap_itemStats_ID = stat.ItemStatID,
+									statsMap_itemStats_Name = stat.Name,
+									statsMap_itemStats_Value = stat.Value
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.ItemSaleConfigs
+							.Select(saleConfig => new ItemDataRow {
+									itemSale_rewardItemID = saleConfig.RewardItemID,
+									itemSale_quantity = saleConfig.Quantity
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.BluePrint.Deductibles
+							.Select(deductible => new ItemDataRow {
+									blueprint_deductibles_type = deductible.DeductibleType,
+									blueprint_deductibles_itemID = deductible.ItemID,
+									blueprint_deductibles_quantity = deductible.Quantity
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.BluePrint.Ingredients
+							.Select(ingredient => new ItemDataRow {
+									blueprint_ingredients_specID = ingredient.BluePrintSpecID,
+									blueprint_ingredients_itemID = ingredient.ItemID,
+									blueprint_ingredients_categoryID = ingredient.CategoryID,
+									blueprint_ingredients_itemRarity = ingredient.ItemRarity,
+									blueprint_ingredients_tier = ingredient.Tier,
+									blueprint_ingredients_quantity = ingredient.Quantity
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.BluePrint.Outputs
+							.Select(output => new ItemDataRow {
+									blueprint_outputs_specID = output.BluePrintSpecID,
+									blueprint_outputs_itemID = output.ItemID,
+									blueprint_outputs_categoryID = output.CategoryID,
+									blueprint_outputs_itemRarity = output.ItemRarity,
+									blueprint_outputs_tier = output.Tier,
+									blueprint_outputs_quantity = output.Quantity
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.Attribute
+							.Select(attribute => new ItemDataRow {
+									attributes_key = attribute.Key,
+									attributes_value = attribute.Value
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.Category
+							.Select(category => new ItemDataRow {
+									categories_catID = category.CategoryId,
+									categories_name = category.CategoryName
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.Relationship
+							.Select(relationship => new ItemDataRow {
+									relationship_type = relationship.Type,
+									relationship_itemID = relationship.ItemId,
+									relationship_weight = relationship.Weight,
+									relationship_quantity = relationship.Quantity
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.Texture
+							.Select(texture => new ItemDataRow {
+									textures_name = texture.TextureName,
+									textures_typeName = texture.TextureTypeName
+							}));
+
+					activeRows = new List<ItemDataRow>();
+					segmentedItemDataRows.Add(activeRows);
+					activeRows.AddRange(itemData.Availability
+							.Select(availability => new ItemDataRow {
+									availabilities_startDate = availability.StartDate,
+									availabilities_endDate = availability.EndDate
+							}));
+
+					int mergedRowCount = 1;
+					List<ItemDataRow> mergedDataRows = new List<ItemDataRow> { mainItemRow };
+					foreach (List<ItemDataRow> dataRowSegment in segmentedItemDataRows) {
+						int count = dataRowSegment.Count;
+						if (count == 0) {
+							continue;
 						}
 
-						resultBuilder.Append("\t").Append(ReplaceNewline(textureNames));
-						resultBuilder.Append("\t").Append(ReplaceNewline(textureTypeNames));
-						resultBuilder.Append("\t").Append(ReplaceNewline(offsetX));
-						resultBuilder.Append("\t").Append(ReplaceNewline(offsetY));
-					}
-
-					if (itemData.Category == null) {
-						resultBuilder.Append("\t").Append("0");
-						resultBuilder.Append("\t\t\t");
-					} else {
-						resultBuilder.Append("\t").Append(itemData.Category.Length);
-						string categoryIDs = "";
-						string categoryNames = "";
-						string iconNames = "";
-						for (int index = 0; index < itemData.Category.Length; index++) {
-							ItemDataCategory category = itemData.Category[index];
-							if (index == 0) {
-								categoryIDs += category.CategoryId;
-								categoryNames += category.CategoryName;
-								iconNames += category.IconName;
-							} else {
-								categoryIDs += ", " + category.CategoryId;
-								categoryNames += ", " + category.CategoryName;
-								iconNames += ", " + category.IconName;
-							}
+						for (; mergedRowCount < count; mergedRowCount++) {
+							mergedDataRows.Add(new ItemDataRow());
 						}
 
-						resultBuilder.Append("\t").Append(ReplaceNewline(categoryIDs));
-						resultBuilder.Append("\t").Append(ReplaceNewline(categoryNames));
-						resultBuilder.Append("\t").Append(ReplaceNewline(iconNames));
-					}
-
-					if (itemData.Relationship == null) {
-						resultBuilder.Append("\t").Append("0");
-						resultBuilder.Append("\t\t");
-					} else {
-						resultBuilder.Append("\t").Append(itemData.Relationship.Length);
-						string relationshipTypes = "";
-						string relationshipItemIDs = "";
-						string relationshipWeights = "";
-						string relationshipQuantities = "";
-						for (int index = 0; index < itemData.Relationship.Length; index++) {
-							ItemDataRelationship relationship = itemData.Relationship[index];
-							if (index == 0) {
-								relationshipTypes += relationship.Type;
-								relationshipItemIDs += relationship.ItemId;
-								relationshipWeights += relationship.Weight;
-								relationshipQuantities += relationship.Quantity;
-							} else {
-								relationshipTypes += ", " + relationship.Type;
-								relationshipItemIDs += ", " + relationship.ItemId;
-								relationshipWeights += ", " + relationship.Weight;
-								relationshipQuantities += ", " + relationship.Quantity;
-							}
+						for (int rowIndex = 0; rowIndex < count; rowIndex++) {
+							mergedDataRows[rowIndex].Merge(dataRowSegment[rowIndex]);
 						}
-
-						resultBuilder.Append("\t").Append(ReplaceNewline(relationshipTypes));
-						resultBuilder.Append("\t").Append(ReplaceNewline(relationshipItemIDs));
-						resultBuilder.Append("\t").Append(ReplaceNewline(relationshipWeights));
-						resultBuilder.Append("\t").Append(ReplaceNewline(relationshipQuantities));
 					}
 
-					resultBuilder.Append("\t").Append(itemData.RankId);
-					resultBuilder.Append("\t").Append(itemData.Locked);
-					resultBuilder.Append("\t").Append(itemData.Cost);
-					resultBuilder.Append("\t").Append(itemData.Uses);
-					resultBuilder.Append("\t").Append(itemData.InventoryMax);
-					resultBuilder.Append("\t").Append(itemData.CreativePoints);
+					foreach (ItemDataRow dataRow in mergedDataRows) {
+						resultBuilder.Append(dataRow.GetRowString()).Append("\n");
+					}
 				}
 
-				BTConsole.WriteLine(resultBuilder.ToString());
-				Debug.LogError(resultBuilder.ToString());
+				string resultString = resultBuilder.ToString();
+				BTConsole.WriteLine("Finished building itemData, check log file");
+				Debug.LogError(resultString);
 			}
-		}
-
-		private static string ReplaceNewline(string input) {
-			return input == null ? "" : input.Replace("\n", "\\n");
 		}
 
 		private class BTInventoryDumpItemDataInput : BTConsoleCommand.BTCommandInput {
