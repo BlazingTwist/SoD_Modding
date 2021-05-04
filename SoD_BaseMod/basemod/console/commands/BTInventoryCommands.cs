@@ -737,148 +737,173 @@ namespace SoD_BaseMod.basemod.console.commands {
 							uses = itemData.Uses,
 							rewardTypeID = itemData.RewardTypeID,
 							points = itemData.Points,
-							rollover_dialogName = itemData.Rollover.DialogName,
-							rollover_bundle = itemData.Rollover.Bundle
+							rollover_dialogName = itemData.Rollover?.DialogName,
+							rollover_bundle = itemData.Rollover?.Bundle
 					};
 
 
 					List<List<ItemDataRow>> segmentedItemDataRows = new List<List<ItemDataRow>>();
-					List<ItemDataRow> activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					foreach (ItemState itemState in itemData.ItemStates) {
-						var firstStateRow = new ItemDataRow();
-						activeRows.Add(firstStateRow);
-						firstStateRow.itemState_ID = itemState.ItemStateID;
-						firstStateRow.itemState_Name = itemState.Name;
-						firstStateRow.itemState_order = itemState.Order;
-						firstStateRow.itemState_rule_completionAction = itemState.Rule.CompletionAction.Transition;
+					List<ItemDataRow> activeRows;
+					if (itemData.ItemStates != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						foreach (ItemState itemState in itemData.ItemStates) {
+							var firstStateRow = new ItemDataRow();
+							activeRows.Add(firstStateRow);
+							firstStateRow.itemState_ID = itemState?.ItemStateID;
+							firstStateRow.itemState_Name = itemState?.Name;
+							firstStateRow.itemState_order = itemState?.Order;
+							firstStateRow.itemState_rule_completionAction = itemState?.Rule?.CompletionAction?.Transition;
 
-						List<ItemDataRow> ruleCriteria = itemState.Rule.Criterias
-								.Select(criterion => new ItemDataRow {
-										itemState_rule_criteria = criterion.Type
-								}).ToList();
+							List<ItemDataRow> ruleCriteria = itemState?.Rule?.Criterias
+									?.Select(criterion => new ItemDataRow {
+											itemState_rule_criteria = criterion?.Type
+									}).ToList();
 
-						if (ruleCriteria.Count > 0) {
-							firstStateRow.Merge(ruleCriteria[0]);
-							ruleCriteria.RemoveAt(0);
-							activeRows.AddRange(ruleCriteria);
-						}
+							if (ruleCriteria != null && ruleCriteria.Count > 0) {
+								firstStateRow.Merge(ruleCriteria[0]);
+								ruleCriteria.RemoveAt(0);
+								activeRows.AddRange(ruleCriteria);
+							}
+						}						
 					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					foreach (Stat stat in itemData.PossibleStatsMap.Stats) {
-						var firstStatRow = new ItemDataRow();
-						activeRows.Add(firstStatRow);
-						firstStatRow.possibleStats_stats_statsID = stat.ItemStatsID;
+					if (itemData.PossibleStatsMap?.Stats != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						foreach (Stat stat in itemData.PossibleStatsMap.Stats) {
+							var firstStatRow = new ItemDataRow();
+							activeRows.Add(firstStatRow);
+							firstStatRow.possibleStats_stats_statsID = stat?.ItemStatsID;
 
-						List<ItemDataRow> rangeMaps = stat.ItemStatsRangeMaps
-								.Select(rangeMap => new ItemDataRow {
-										possibleStats_stats_rangeMap_tierID = rangeMap.ItemTierID,
-										possibleStats_stats_rangeMap_startRange = rangeMap.StartRange,
-										possibleStats_stats_rangeMap_endRange = rangeMap.EndRange
-								}).ToList();
+							List<ItemDataRow> rangeMaps = stat?.ItemStatsRangeMaps
+									?.Select(rangeMap => new ItemDataRow {
+											possibleStats_stats_rangeMap_tierID = rangeMap?.ItemTierID,
+											possibleStats_stats_rangeMap_startRange = rangeMap?.StartRange,
+											possibleStats_stats_rangeMap_endRange = rangeMap?.EndRange
+									}).ToList();
 
-						if (rangeMaps.Count > 0) {
-							firstStatRow.Merge(rangeMaps[0]);
-							rangeMaps.RemoveAt(0);
-							activeRows.AddRange(rangeMaps);
-						}
+							if (rangeMaps != null && rangeMaps.Count > 0) {
+								firstStatRow.Merge(rangeMaps[0]);
+								rangeMaps.RemoveAt(0);
+								activeRows.AddRange(rangeMaps);
+							}
+						}						
 					}
 
-					mainItemRow.statsMap_itemID = itemData.ItemStatsMap.ItemID;
-					mainItemRow.statsMap_itemTier = itemData.ItemStatsMap.ItemTier;
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.ItemStatsMap.ItemStats
-							.Select(stat => new ItemDataRow {
-									statsMap_itemStats_ID = stat.ItemStatID,
-									statsMap_itemStats_Name = stat.Name,
-									statsMap_itemStats_Value = stat.Value
-							}));
+					if (itemData.ItemStatsMap != null) {
+						mainItemRow.statsMap_itemID = itemData.ItemStatsMap.ItemID;
+						mainItemRow.statsMap_itemTier = itemData.ItemStatsMap.ItemTier;
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.ItemStatsMap.ItemStats
+								?.Select(stat => new ItemDataRow {
+										statsMap_itemStats_ID = stat?.ItemStatID,
+										statsMap_itemStats_Name = stat?.Name,
+										statsMap_itemStats_Value = stat?.Value
+								}));
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.ItemSaleConfigs
-							.Select(saleConfig => new ItemDataRow {
-									itemSale_rewardItemID = saleConfig.RewardItemID,
-									itemSale_quantity = saleConfig.Quantity
-							}));
+					if (itemData.ItemSaleConfigs != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.ItemSaleConfigs
+								.Select(saleConfig => new ItemDataRow {
+										itemSale_rewardItemID = saleConfig?.RewardItemID,
+										itemSale_quantity = saleConfig?.Quantity
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.BluePrint.Deductibles
-							.Select(deductible => new ItemDataRow {
-									blueprint_deductibles_type = deductible.DeductibleType,
-									blueprint_deductibles_itemID = deductible.ItemID,
-									blueprint_deductibles_quantity = deductible.Quantity
-							}));
+					if (itemData.BluePrint?.Deductibles != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.BluePrint.Deductibles
+								.Select(deductible => new ItemDataRow {
+										blueprint_deductibles_type = deductible?.DeductibleType,
+										blueprint_deductibles_itemID = deductible?.ItemID,
+										blueprint_deductibles_quantity = deductible?.Quantity
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.BluePrint.Ingredients
-							.Select(ingredient => new ItemDataRow {
-									blueprint_ingredients_specID = ingredient.BluePrintSpecID,
-									blueprint_ingredients_itemID = ingredient.ItemID,
-									blueprint_ingredients_categoryID = ingredient.CategoryID,
-									blueprint_ingredients_itemRarity = ingredient.ItemRarity,
-									blueprint_ingredients_tier = ingredient.Tier,
-									blueprint_ingredients_quantity = ingredient.Quantity
-							}));
+					if (itemData.BluePrint?.Ingredients != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.BluePrint.Ingredients
+								.Select(ingredient => new ItemDataRow {
+										blueprint_ingredients_specID = ingredient?.BluePrintSpecID,
+										blueprint_ingredients_itemID = ingredient?.ItemID,
+										blueprint_ingredients_categoryID = ingredient?.CategoryID,
+										blueprint_ingredients_itemRarity = ingredient?.ItemRarity,
+										blueprint_ingredients_tier = ingredient?.Tier,
+										blueprint_ingredients_quantity = ingredient?.Quantity
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.BluePrint.Outputs
-							.Select(output => new ItemDataRow {
-									blueprint_outputs_specID = output.BluePrintSpecID,
-									blueprint_outputs_itemID = output.ItemID,
-									blueprint_outputs_categoryID = output.CategoryID,
-									blueprint_outputs_itemRarity = output.ItemRarity,
-									blueprint_outputs_tier = output.Tier,
-									blueprint_outputs_quantity = output.Quantity
-							}));
+					if (itemData.BluePrint?.Outputs != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.BluePrint.Outputs
+								.Select(output => new ItemDataRow {
+										blueprint_outputs_specID = output?.BluePrintSpecID,
+										blueprint_outputs_itemID = output?.ItemID,
+										blueprint_outputs_categoryID = output?.CategoryID,
+										blueprint_outputs_itemRarity = output?.ItemRarity,
+										blueprint_outputs_tier = output?.Tier,
+										blueprint_outputs_quantity = output?.Quantity
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.Attribute
-							.Select(attribute => new ItemDataRow {
-									attributes_key = attribute.Key,
-									attributes_value = attribute.Value
-							}));
+					if (itemData.Attribute != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.Attribute
+								.Select(attribute => new ItemDataRow {
+										attributes_key = attribute?.Key,
+										attributes_value = attribute?.Value
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.Category
-							.Select(category => new ItemDataRow {
-									categories_catID = category.CategoryId,
-									categories_name = category.CategoryName
-							}));
+					if (itemData.Category != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.Category
+								.Select(category => new ItemDataRow {
+										categories_catID = category?.CategoryId,
+										categories_name = category?.CategoryName
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.Relationship
-							.Select(relationship => new ItemDataRow {
-									relationship_type = relationship.Type,
-									relationship_itemID = relationship.ItemId,
-									relationship_weight = relationship.Weight,
-									relationship_quantity = relationship.Quantity
-							}));
+					if (itemData.Relationship != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.Relationship
+								.Select(relationship => new ItemDataRow {
+										relationship_type = relationship?.Type,
+										relationship_itemID = relationship?.ItemId,
+										relationship_weight = relationship?.Weight,
+										relationship_quantity = relationship?.Quantity
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.Texture
-							.Select(texture => new ItemDataRow {
-									textures_name = texture.TextureName,
-									textures_typeName = texture.TextureTypeName
-							}));
+					if (itemData.Texture != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.Texture
+								.Select(texture => new ItemDataRow {
+										textures_name = texture?.TextureName,
+										textures_typeName = texture?.TextureTypeName
+								}));						
+					}
 
-					activeRows = new List<ItemDataRow>();
-					segmentedItemDataRows.Add(activeRows);
-					activeRows.AddRange(itemData.Availability
-							.Select(availability => new ItemDataRow {
-									availabilities_startDate = availability.StartDate,
-									availabilities_endDate = availability.EndDate
-							}));
+					if (itemData.Availability != null) {
+						activeRows = new List<ItemDataRow>();
+						segmentedItemDataRows.Add(activeRows);
+						activeRows.AddRange(itemData.Availability
+								.Select(availability => new ItemDataRow {
+										availabilities_startDate = availability?.StartDate,
+										availabilities_endDate = availability?.EndDate
+								}));						
+					}
 
 					int mergedRowCount = 1;
 					List<ItemDataRow> mergedDataRows = new List<ItemDataRow> { mainItemRow };
