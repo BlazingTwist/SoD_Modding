@@ -706,7 +706,7 @@ namespace SoD_BaseMod.basemod.console.commands {
 				BTConsole.WriteLine("All requested items loaded!");
 
 				var resultBuilder = new StringBuilder();
-				resultBuilder.Append(ItemDataRow.GetRowHeader()).Append("\n");
+				resultBuilder.Append(string.Join("\t", ItemDataRow.GetRowHeader())).Append("\n");
 				for (int i = startID; i <= endID; i++) {
 					if (!loadedItemData.ContainsKey(i)) {
 						BTConsole.WriteLine("ERROR - itemData for ID: " + i + " was never loaded!");
