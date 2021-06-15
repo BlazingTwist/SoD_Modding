@@ -15,6 +15,11 @@ namespace SoD_BaseMod.basemod.console.commands {
 					"adds rank points of specified type",
 					OnExecute
 			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "Player", "setDisplayName" },
+					new BTPlayerSetDisplayNameInput(),
+					"sets the viking's DisplayName",
+					OnExecuteSetDisplayName));
 		}
 
 		private static void OnExecutePlayerGetXP(BTConsoleCommand.BTCommandInput input) {
@@ -99,6 +104,72 @@ namespace SoD_BaseMod.basemod.console.commands {
 								"amount of points to add",
 								SetAmount,
 								typeof(int)
+						)
+				};
+			}
+		}
+
+		private static void OnExecuteSetDisplayName(BTConsoleCommand.BTCommandInput input) {
+			var cmdInput = (BTPlayerSetDisplayNameInput) input;
+			var request = new SetDisplayNameRequest() {
+					DisplayName = cmdInput.name,
+					ItemID = 13030,
+					StoreID = 93
+			};
+			WsWebService.SetDisplayName(request, OnCallbackSetDisplayName, cmdInput);
+		}
+
+		private static void OnCallbackSetDisplayName(WsServiceType inType, WsServiceEvent inEvent, float inProgress, object inObject, object inUserData) {
+			// ReSharper disable once ConvertIfStatementToSwitchStatement
+			if (inEvent == WsServiceEvent.ERROR) {
+				BTConsole.WriteLine("ERROR: SetDisplayName responded with error!");
+				return;
+			}
+
+			if (inEvent == WsServiceEvent.COMPLETE) {
+				if (inObject == null) {
+					BTConsole.WriteLine("ERROR: WebService returned no data!");
+					return;
+				}
+
+				var result = (SetAvatarResult) inObject;
+				if (result.Success) {
+					BTConsole.WriteLine("Successfully changed name to: " + result.DisplayName);
+					if (AvAvatar.pToolbar != null) {
+						var component = AvAvatar.pToolbar.GetComponent<UiToolbar>();
+						if (component != null) {
+							component.DisplayName();
+						}
+					}
+
+					AvatarData.SetDisplayName(result.DisplayName);
+					UserInfo.pInstance.Username = result.DisplayName;
+				} else {
+					BTConsole.WriteLine("ERROR: SetDisplayName failed. Status: " + result.StatusCode);
+					if (result.Suggestions?.Suggestion != null) {
+						foreach (string suggestion in result.Suggestions.Suggestion) {
+							BTConsole.WriteLine("\tgot Suggestion: " + suggestion);
+						}
+					}
+				}
+			}
+		}
+
+		private class BTPlayerSetDisplayNameInput : BTConsoleCommand.BTCommandInput {
+			public string name;
+
+			private void SetName(object name, bool isPresent) {
+				this.name = (string) name;
+			}
+
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+				return new List<BTConsoleCommand.BTConsoleArgument> {
+						new BTConsoleCommand.BTConsoleArgument(
+								"name",
+								false,
+								"name to use as DisplayName",
+								SetName,
+								typeof(string)
 						)
 				};
 			}

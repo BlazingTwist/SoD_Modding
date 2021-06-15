@@ -15,10 +15,12 @@ namespace SoD_Enable_Logging
 		public const string pluginName = "BlazingTwist SoD EnableLogging";
 		public const string pluginVersion = "1.0.0";
 
-		public static readonly string basePath = Application.dataPath + "/BlazingTwist/";
+		public static string basePath;
 
 		public void Awake() {
-			Harmony harmony = new Harmony(pluginGuid);
+			basePath = Application.dataPath + "/BlazingTwist/";
+		
+			var harmony = new Harmony(pluginGuid);
 			harmony.PatchAll();
 			RuntimePatcherUtils.RunPatchers(Logger, harmony, RuntimePatcherUtils.GetTypesInNamespace(Assembly.GetExecutingAssembly(), "SoD_Enable_Logging.AsmFirstpass"));
 		}

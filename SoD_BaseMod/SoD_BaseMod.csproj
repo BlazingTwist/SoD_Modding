@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -188,6 +189,8 @@
     <Compile Include="basemod\console\commands\BTTaskCommands.cs" />
     <Compile Include="basemod\console\commands\BTTutorialCommands.cs" />
     <Compile Include="basemod\console\commands\BTTweakDataCommand.cs" />
+    <Compile Include="basemod\console\commands\itemdumphandlers\FullItemDumpHandler.cs" />
+    <Compile Include="basemod\console\commands\itemdumphandlers\ItemStateDumpHandler.cs" />
     <Compile Include="SodBaseMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

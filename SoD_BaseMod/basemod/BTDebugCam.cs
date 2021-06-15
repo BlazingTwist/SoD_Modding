@@ -187,8 +187,8 @@ namespace SoD_BaseMod.basemod {
 					Vector3 forward = Math.Abs(camRotationY - 90f) < float.Epsilon
 							? cameraUp
 							: Math.Abs(camRotationY + 90f) < float.Epsilon
-									? cameraTransform.forward
-									: -cameraUp;
+									? -cameraUp
+									: cameraTransform.forward;
 					forward.y = 0f;
 					movementInput += Vector3.Normalize(forward) * forwardInput;
 				}

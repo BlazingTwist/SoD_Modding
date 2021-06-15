@@ -86,6 +86,11 @@ namespace SoD_BaseMod.basemod.console.commands {
 					"invokes the avatar's 'OnUpdateAvatar' function",
 					OnExecuteUpdateFlyingData
 			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string>{"avatar", "part", "info"}, 
+					new BTNoArgsInput(), 
+					"prints info on all equipped avatar parts",
+					OnExecuteAvatarPartInfo));
 		}
 
 		private static void OnExecuteGetPosition(BTConsoleCommand.BTCommandInput input) {
@@ -434,6 +439,12 @@ namespace SoD_BaseMod.basemod.console.commands {
 		private static void OnExecuteUpdateFlyingData(BTConsoleCommand.BTCommandInput input) {
 			AvAvatar.pObject.GetComponent<AvAvatarController>().OnUpdateAvatar();
 			BTConsole.WriteLine("FlyingData updated.");
+		}
+
+		private static void OnExecuteAvatarPartInfo(BTConsoleCommand.BTCommandInput input) {
+			foreach (AvatarDataPart avatarPart in AvatarData.pInstanceInfo.mInstance.Part) {
+				BTConsole.WriteLine($"partType: '{avatarPart.PartType}', itemID: '{avatarPart.ItemId}', inventoryID: '{avatarPart.UserInventoryId}'");
+			}
 		}
 	}
 }

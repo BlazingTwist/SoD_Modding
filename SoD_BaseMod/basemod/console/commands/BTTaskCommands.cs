@@ -15,6 +15,12 @@ namespace SoD_BaseMod.basemod.console.commands {
 					"shows / hides the Task Console",
 					OnExecuteConsoleShow
 			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "Task", "Details" },
+					new TaskDetailsInput(),
+					"prints details of the given task",
+					OnExecuteTaskDetails
+			));
 		}
 
 		private static void OnExecuteComplete(BTConsoleCommand.BTCommandInput input) {
@@ -86,6 +92,37 @@ namespace SoD_BaseMod.basemod.console.commands {
 								"show/hide the Task Console",
 								SetShow,
 								typeof(bool)
+						)
+				};
+			}
+		}
+
+		private static void OnExecuteTaskDetails(BTConsoleCommand.BTCommandInput input) {
+			var cmdInput = (TaskDetailsInput) input;
+			Task task = MissionManager.pInstance.GetTask(cmdInput.taskID);
+			if (task == null) {
+				BTConsole.WriteLine("Task for ID " + cmdInput.taskID + " is null!");
+				return;
+			}
+
+			BTConsole.WriteLine(UtUtilities.SerializeToXml(task, true));
+		}
+
+		private class TaskDetailsInput : BTConsoleCommand.BTCommandInput {
+			public int taskID;
+
+			private void SetTaskID(object taskID, bool isPresent) {
+				this.taskID = (int) taskID;
+			}
+
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+				return new List<BTConsoleCommand.BTConsoleArgument> {
+						new BTConsoleCommand.BTConsoleArgument(
+								"taskID",
+								false,
+								"taskID to look up",
+								SetTaskID,
+								typeof(int)
 						)
 				};
 			}
