@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\AsmFirstpass\KAUICursorManagerPatcher.cs" />
+    <Compile Include="src\asm\AbilityPatcher.cs" />
     <Compile Include="src\asm\AvAvatarControllerPatcher.cs" />
     <Compile Include="src\asm\CaAvatarCamPatcher.cs" />
     <Compile Include="src\asm\CameraMovementPatcher.cs" />

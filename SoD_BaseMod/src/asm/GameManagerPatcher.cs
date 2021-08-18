@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System.Linq;
+using HarmonyLib;
 using SoD_BaseMod.config;
 using SquadTactics;
 
@@ -16,16 +17,19 @@ namespace SoD_BaseMod {
 				selectedNode._CharacterOnNode.TakeStatChange(SquadTactics.Stat.HEALTH, -10_000f);
 				return false;
 			}
-
-			if (hackConfig.squadTactics_infiniteRange) {
-				__instance.ShowCharacterMovementRange(true);
-				__instance.StartCoroutine(selectedNode._CharacterOnNode == null
-						? __instance._SelectedCharacter.DoMovement(selectedNode)
-						: __instance._SelectedCharacter.DoMovePlusAbility(selectedNode._CharacterOnNode));
-				return false;
-			}
-
+			
 			return true;
+		}
+
+		[HarmonyPrefix, HarmonyPatch(methodName: nameof(GameManager.SelectCharacter), argumentTypes: new[] { typeof(Character) })]
+		private static void SelectCharacter_Prefix(GameManager __instance, Character character) {
+			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
+			if (hackConfig != null && hackConfig.squadTactics_infiniteRange) {
+				foreach (StStat movementStat in __instance.pAllPlayerUnits.Select(playerUnit => playerUnit.pCharacterData._Stats._Movement)) {
+					movementStat._Limits.Max = 100;
+					movementStat.pCurrentValue = movementStat._Limits.Max;
+				}
+			}
 		}
 	}
 }
