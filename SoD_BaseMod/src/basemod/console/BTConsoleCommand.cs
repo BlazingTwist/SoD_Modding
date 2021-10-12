@@ -116,6 +116,25 @@ namespace SoD_BaseMod.console {
 			return resultBuilder.ToString();
 		}
 
+		public bool IsCommandMatchingExact(List<string> input) {
+			int inputCount = input.Count;
+			int namespaceCount = commandNamespace.Count;
+			int totalArgumentCount = commandInput.TotalArgumentCount();
+			int requiredArgumentCount = commandInput.RequiredArgumentCount();
+			if (inputCount < namespaceCount + requiredArgumentCount || inputCount > namespaceCount + totalArgumentCount) {
+				return false;
+			}
+
+			for (int index = 0; index < namespaceCount; index++) {
+				string inputString = input[index];
+				string namespaceString = commandNamespace[index];
+				if (inputString != namespaceString) {
+					return false;
+				}
+			}
+			return true;
+		}
+
 		public bool IsFullNamespaceMatching(List<string> input) {
 			int inputCount = input.Count;
 			int namespaceCount = commandNamespace.Count;
@@ -279,8 +298,18 @@ namespace SoD_BaseMod.console {
 			public void Consume(string value) {
 				object argument = valueType.IsEnum
 						? Enum.Parse(valueType, value, true)
-						: Convert.ChangeType(value, valueType, CultureInfo.InvariantCulture);
+						: valueType == typeof(int)
+								? ConvertIntegerLiteral(value)
+								: Convert.ChangeType(value, valueType, CultureInfo.InvariantCulture);
 				valueConsumer.Invoke(argument, true);
+			}
+
+			private static int ConvertIntegerLiteral(string value) {
+				return value.StartsWith("0x")
+						? Convert.ToInt32(value.Substring(2), 16)
+						: value.StartsWith("0b")
+								? Convert.ToInt32(value.Substring(2), 2)
+								: Convert.ToInt32(value, 10);
 			}
 
 			public string GetFormattedDisplayName() {

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using SoD_BaseMod.extensions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -47,6 +50,18 @@ namespace SoD_BaseMod.console {
 					new BTPetAgeSetInput(),
 					"sets the age of the active pet",
 					OnExecutePetAgeSet
+			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "pet", "color", "set" },
+					new BTPetColorInput(),
+					"sets the color of the pet",
+					OnExecutePetColorSet
+			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "pet", "color", "setf" },
+					new BTPetColorFloatInput(),
+					"sets the color of the pet",
+					OnExecutePetColorSet
 			));
 		}
 
@@ -316,6 +331,143 @@ namespace SoD_BaseMod.console {
 								true,
 								"default is 'true', I'd recommend leaving it unchanged",
 								SetResetSkills,
+								typeof(bool)
+						)
+				};
+			}
+		}
+
+		private static void OnExecutePetColorSet(BTConsoleCommand.BTCommandInput input) {
+			var cmdInput = (BTPetColorInputBase) input;
+			SanctuaryPet activePet = SanctuaryManager.pCurPetInstance;
+			Color primary = cmdInput.primary ?? activePet.pData.GetColor(0);
+			Color secondary = cmdInput.secondary ?? activePet.pData.GetColor(1);
+			Color tertiary = cmdInput.tertiary ?? activePet.pData.GetColor(2);
+			activePet.SetColors(primary, secondary, tertiary, cmdInput.saveData);
+			BTConsole.WriteLine($"New Pet Colors are: {primary.ToString()} | {secondary.ToString()} | {tertiary.ToString()}");
+		}
+
+		private abstract class BTPetColorInputBase : BTConsoleCommand.BTCommandInput {
+			public Color? primary;
+			public Color? secondary;
+			public Color? tertiary;
+			public bool saveData;
+		}
+		
+		private class BTPetColorInput : BTPetColorInputBase {
+			private static Color? GetColorFromInt(int color) {
+				if (color < 0) {
+					return null;
+				}
+				return ColorExtensions.GetColorFromInt(color);
+			}
+
+			private void SetPrimary(object color, bool isPresent) {
+				primary = isPresent ? GetColorFromInt((int) color) : null;
+			}
+
+			private void SetSecondary(object color, bool isPresent) {
+				secondary = isPresent ? GetColorFromInt((int) color) : null;
+			}
+
+			private void SetTertiary(object color, bool isPresent) {
+				tertiary = isPresent ? GetColorFromInt((int) color) : null;
+			}
+
+			private void SetSaveData(object value, bool isPresent) {
+				saveData = isPresent && (bool) value;
+			}
+
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+				return new List<BTConsoleCommand.BTConsoleArgument> {
+						new BTConsoleCommand.BTConsoleArgument(
+								"primary",
+								false,
+								"primary color to set or -1 to keep current color, example: 0xFF0000 is red",
+								SetPrimary,
+								typeof(int)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"secondary",
+								false,
+								"secondary color to set or -1 to keep current color, example: 0x00FF00 is green",
+								SetSecondary,
+								typeof(int)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"tertiary",
+								false,
+								"tertiary color to set or -1 to keep current color, example: 0x0000FF is blue",
+								SetTertiary,
+								typeof(int)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"saveData",
+								true,
+								"store colors on the server, default is false",
+								SetSaveData,
+								typeof(bool)
+						)
+				};
+			}
+		}
+
+		private class BTPetColorFloatInput : BTPetColorInputBase {
+			private static Color? GetColorFromString(string color) {
+				float[] colorData = color.Split(',')
+						.Where(str => !string.IsNullOrWhiteSpace(str))
+						.Select(str => float.Parse(str, CultureInfo.InvariantCulture))
+						.ToArray();
+				if (colorData.Length != 3) {
+					return null;
+				}
+				return new Color(colorData[0], colorData[1], colorData[2]);
+			}
+			
+			private void SetPrimary(object color, bool isPresent) {
+				primary = isPresent ? GetColorFromString((string) color) : null;
+			}
+
+			private void SetSecondary(object color, bool isPresent) {
+				secondary = isPresent ? GetColorFromString((string) color) : null;
+			}
+
+			private void SetTertiary(object color, bool isPresent) {
+				tertiary = isPresent ? GetColorFromString((string) color) : null;
+			}
+
+			private void SetSaveData(object value, bool isPresent) {
+				saveData = isPresent && (bool) value;
+			}
+			
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+				return new List<BTConsoleCommand.BTConsoleArgument> {
+						new BTConsoleCommand.BTConsoleArgument(
+								"primary",
+								false,
+								"comma separated RGB primary color OR '-1' to keep current color, example: '1.0,0.5,0' is 0xFF7F00",
+								SetPrimary,
+								typeof(string)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"secondary",
+								false,
+								"comma separated RGB secondary color OR '-1' to keep current color",
+								SetSecondary,
+								typeof(string)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"tertiary",
+								false,
+								"comma separated RGB tertiary color OR '-1' to keep current color",
+								SetTertiary,
+								typeof(string)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"saveData",
+								true,
+								"store colors on the server, default is false",
+								SetSaveData,
 								typeof(bool)
 						)
 				};

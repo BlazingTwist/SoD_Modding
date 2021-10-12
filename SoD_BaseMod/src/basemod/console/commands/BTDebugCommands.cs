@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Text;
+using KA.Framework;
 using KnowledgeAdventure.Multiplayer.Utility;
+using SoD_BaseMod.Extensions;
 using UnityEngine;
 
 namespace SoD_BaseMod.console {
@@ -58,6 +61,12 @@ namespace SoD_BaseMod.console {
 					new BTDebugMaskInput(),
 					"adds or clears a UtDebug._Mask",
 					OnExecuteDebugMask
+			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "DebugCommand" },
+					new BTDebugCommandInput(),
+					"debug command used for executing test code on command",
+					OnExecuteDebugCommand
 			));
 		}
 
@@ -234,6 +243,42 @@ namespace SoD_BaseMod.console {
 								typeof(bool)
 						)
 				};
+			}
+		}
+
+		private static void OnExecuteDebugCommand(BTConsoleCommand.BTCommandInput input) {
+			var cmdInput = (BTDebugCommandInput) input;
+			StringBuilder outputBuilder = new StringBuilder();
+			Dictionary<string, SkinnedMeshRenderer> rendererMap = SanctuaryManager.pCurPetInstance.GetRendererMap();
+			foreach (KeyValuePair<string, SkinnedMeshRenderer> skinnedMeshRenderer in rendererMap) {
+				outputBuilder.AppendLine($"Renderer key: '{skinnedMeshRenderer.Key}'");
+				if (skinnedMeshRenderer.Value == null) {
+					outputBuilder.AppendLine("\tValue is null.");
+					continue;
+				}
+				foreach (Material material in skinnedMeshRenderer.Value.materials) {
+					if (material == null) {
+						continue;
+					}
+					outputBuilder.AppendLine($"\tmaterial name: '{material.name}'");
+					outputBuilder.AppendLine(
+							$"\t\tshader keywords: '{(material.shaderKeywords != null ? string.Join("','", material.shaderKeywords) : "null")}'");
+					outputBuilder.AppendLine($"\t\tshader name: '{(material.shader != null ? material.shader.name : null)}'");
+					outputBuilder.AppendLine($"\t\tmain texture: '{(material.mainTexture != null ? material.mainTexture.name : "null")}'");
+					string[] texturePropertyNames = material.GetTexturePropertyNames();
+					if (texturePropertyNames != null) {
+						outputBuilder.AppendLine($"\t\tmaterial property names: '{string.Join("','", texturePropertyNames)}'");
+					}
+				}
+			}
+			outputBuilder.Append("==========\n");
+			outputBuilder.AppendLine($"Also, ProductSettings.pInstance._Resource: {ProductSettings.pInstance._Resource}");
+			BTConsole.WriteLine(outputBuilder.ToString());
+		}
+
+		private class BTDebugCommandInput : BTConsoleCommand.BTCommandInput {
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+				return new List<BTConsoleCommand.BTConsoleArgument>();
 			}
 		}
 	}

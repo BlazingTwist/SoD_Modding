@@ -81,26 +81,20 @@ namespace SoD_BaseMod.console {
 			public static IEnumerable<string> GetRowHeader() {
 				return new List<string> {
 						"itemState.ID",
-						"itemState.Name",
 						"itemState.rule.criteria",
 						"itemState.rule.criteriaData",
 						"itemState.rule.completionAction",
 						"itemState.order",
 						"itemRarity",
 						"possibleStats.stats.statsID",
-						"possibleStats.stats.rangeMap.tierID",
 						"possibleStats.stats.rangeMap.startRange",
 						"possibleStats.stats.rangeMap.endRange",
-						"statsMap.itemID",
 						"statsMap.itemTier",
 						"statsMap.itemStats.ID",
 						"statsMap.itemStats.Name",
 						"statsMap.itemStats.Value",
 						"itemSale.rewardItemID",
 						"itemSale.quantity",
-						"blueprint.deductibles.type",
-						"blueprint.deductibles.itemID",
-						"blueprint.deductibles.quantity",
 						"blueprint.ingredients.specID",
 						"blueprint.ingredients.itemID",
 						"blueprint.ingredients.categoryID",
@@ -126,10 +120,7 @@ namespace SoD_BaseMod.console {
 						"itemID",
 						"itemName",
 						"itemNamePlural",
-						"locked",
 						"geometry2",
-						"rollover.dialogName",
-						"rollover.bundle",
 						"rankID",
 						"relationship.type",
 						"relationship.itemID",
@@ -160,6 +151,10 @@ namespace SoD_BaseMod.console {
 					case ItemStateCriteriaType.ConsumableItem: {
 						var item = (ItemStateCriteriaConsumable) itemState_rule_criteriaObject;
 						resultBuilder.Append("Amount: " + item.Amount + " | itemID: " + item.ItemID);
+						break;
+					}
+					case ItemStateCriteriaType.ReplenishableItem: {
+						resultBuilder.Append("--unused--");
 						break;
 					}
 					case ItemStateCriteriaType.SpeedUpItem: {
@@ -348,9 +343,14 @@ namespace SoD_BaseMod.console {
 						firstStateRow.itemState_rule_completionAction = itemState?.Rule?.CompletionAction?.Transition;
 
 						List<ItemDataRow> ruleCriteria = itemState?.Rule?.Criterias
-								?.Select(criterion => new ItemDataRow {
-										itemState_rule_criteria = criterion?.Type,
-										itemState_rule_criteriaObject = criterion
+								?.Select(criterion => {
+									if (criterion?.Type == ItemStateCriteriaType.ReplenishableItem) {
+										BTConsole.WriteLine("Found 'ReplenishableItem' at id: " + i);
+									}
+									return new ItemDataRow {
+											itemState_rule_criteria = criterion?.Type,
+											itemState_rule_criteriaObject = criterion
+									};
 								}).ToList();
 
 						if (ruleCriteria != null && ruleCriteria.Count > 0) {

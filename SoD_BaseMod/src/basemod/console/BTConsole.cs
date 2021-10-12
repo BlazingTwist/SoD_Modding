@@ -281,6 +281,91 @@ namespace SoD_BaseMod.console {
 			return result;
 		}
 
+		private static BTConsoleCommand GetBestMatchingCommand(string inputString, List<string> input, bool isHelpRequest, bool isMultilineCommand) {
+			BTConsoleCommand exactMatchCommand = commandList.FirstOrDefault(cmd => cmd.IsCommandMatchingExact(input));
+			if (exactMatchCommand != null) {
+				return exactMatchCommand;
+			}
+
+			Dictionary<int, List<BTConsoleCommand>> suggestionDict = new Dictionary<int, List<BTConsoleCommand>>();
+			int maxSuggestionStrength = 0;
+			foreach (BTConsoleCommand cmd in commandList) {
+				int suggestionStrength = cmd.ShowAsSuggestion(input);
+				if (suggestionStrength == 0) {
+					continue;
+				}
+
+				if (suggestionStrength > maxSuggestionStrength) {
+					maxSuggestionStrength = suggestionStrength;
+				}
+
+				if (!suggestionDict.ContainsKey(suggestionStrength)) {
+					suggestionDict.Add(suggestionStrength, new List<BTConsoleCommand>());
+				}
+
+				suggestionDict[suggestionStrength].Add(cmd);
+			}
+			
+			if (maxSuggestionStrength == 0) {
+				WriteLine("unable to find command: '" + inputString + "'");
+				return null;
+			}
+			
+			List<BTConsoleCommand> matchingCommands;
+			if (isHelpRequest) {
+				matchingCommands = commandList
+						.Where(cmd => cmd.IsFullNamespaceMatching(input))
+						.ToList();
+			} else {
+				matchingCommands = commandList
+						.Where(cmd => cmd.IsCommandMatching(input))
+						.ToList();
+			}
+			
+			if (matchingCommands.Count == 0) {
+				if (isHelpRequest) {
+					WriteLine("unable to print help for command: '" + inputString + "' - no such command found");
+					return null;
+				}
+
+				if (isMultilineCommand) {
+					WriteLine("unable to find command: '" + inputString + "' - autocomplete is not supported for multiline-commands");
+					return null;
+				}
+
+				// no full matches -> autocomplete best suggestion
+				List<BTConsoleCommand> bestSuggestions = suggestionDict[maxSuggestionStrength];
+				if (bestSuggestions.Count > 1) {
+					WriteLine("Found multiple equally strong suggestions - can't autocomplete");
+					return null;
+				}
+
+				inputText = bestSuggestions[0].Autocomplete(input);
+				return null;
+			}
+			
+			if (matchingCommands.Count == 1) {
+				return matchingCommands[0];
+			}
+			{ //count > 1
+				List<BTConsoleCommand> bestSuggestions = suggestionDict[maxSuggestionStrength];
+				List<BTConsoleCommand> bestMatchingCommands = matchingCommands
+						.Where(cmd => bestSuggestions.Contains(cmd))
+						.ToList();
+				int bestMatchingCommandsCount = bestMatchingCommands.Count;
+				switch (bestMatchingCommandsCount) {
+					case 0:
+						WriteLine("Can't identify command: '" + inputString + "'! BestSuggestions and MatchingCommands are disjointed (somehow)");
+						return null;
+					case 1:
+						return bestMatchingCommands.First();
+					default:
+						WriteLine("Can't identify command: '" + inputString + "'! Found multiple full matches of equal suggestionStrength!");
+						return null;
+				}
+			}
+		}
+		
 		private static void OnCommandSubmitted(string multiCommand, bool addToHistory) {
 			if (addToHistory) {
 				AddCommandToHistory(multiCommand);
@@ -298,84 +383,7 @@ namespace SoD_BaseMod.console {
 				}
 
 				List<string> input = SplitInputCommand(command);
-				Dictionary<int, List<BTConsoleCommand>> suggestionDict = new Dictionary<int, List<BTConsoleCommand>>();
-				int maxSuggestionStrength = 0;
-				foreach (BTConsoleCommand cmd in commandList) {
-					int suggestionStrength = cmd.ShowAsSuggestion(input);
-					if (suggestionStrength == 0) {
-						continue;
-					}
-
-					if (suggestionStrength > maxSuggestionStrength) {
-						maxSuggestionStrength = suggestionStrength;
-					}
-
-					if (!suggestionDict.ContainsKey(suggestionStrength)) {
-						suggestionDict.Add(suggestionStrength, new List<BTConsoleCommand>());
-					}
-
-					suggestionDict[suggestionStrength].Add(cmd);
-				}
-
-				if (maxSuggestionStrength == 0) {
-					WriteLine("unable to find command: '" + command + "'");
-					continue;
-				}
-
-				List<BTConsoleCommand> matchingCommands;
-				if (isHelpRequest) {
-					matchingCommands = commandList
-							.Where(cmd => cmd.IsFullNamespaceMatching(input))
-							.ToList();
-				} else {
-					matchingCommands = commandList
-							.Where(cmd => cmd.IsCommandMatching(input))
-							.ToList();
-				}
-
-				if (matchingCommands.Count == 0) {
-					if (isHelpRequest) {
-						WriteLine("unable to print help for command: '" + command + "' - no such command found");
-						continue;
-					}
-
-					if (inputCommandCount > 1) {
-						WriteLine("unable to find command: '" + command + "' - autocomplete is not supported for multiline-commands");
-						continue;
-					}
-
-					// no full matches -> autocomplete best suggestion
-					List<BTConsoleCommand> bestSuggestions = suggestionDict[maxSuggestionStrength];
-					if (bestSuggestions.Count > 1) {
-						WriteLine("Found multiple equally strong suggestions - can't autocomplete");
-						continue;
-					}
-
-					inputText = bestSuggestions[0].Autocomplete(input);
-					continue;
-				}
-
-				BTConsoleCommand bestMatchingCommand;
-				if (matchingCommands.Count == 1) {
-					bestMatchingCommand = matchingCommands[0];
-				} else { //count > 1
-					List<BTConsoleCommand> bestSuggestions = suggestionDict[maxSuggestionStrength];
-					List<BTConsoleCommand> bestMatchingCommands = matchingCommands
-							.Where(cmd => bestSuggestions.Contains(cmd))
-							.ToList();
-					int bestMatchingCommandsCount = bestMatchingCommands.Count;
-					switch (bestMatchingCommandsCount) {
-						case 0:
-							WriteLine("Can't identify command: '" + command + "'! BestSuggestions and MatchingCommands are disjointed (somehow)");
-							continue;
-						case 1:
-							bestMatchingCommand = bestMatchingCommands.First();
-							break;
-						default:
-							WriteLine("Can't identify command: '" + command + "'! Found multiple full matches of equal suggestionStrength!");
-							continue;
-					}
-				}
+				BTConsoleCommand bestMatchingCommand = GetBestMatchingCommand(command, input, isHelpRequest, inputCommandCount > 1);
 
 				inputText = "";
 				if (isHelpRequest) {

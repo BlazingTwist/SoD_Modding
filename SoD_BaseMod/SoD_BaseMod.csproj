@@ -122,6 +122,7 @@
     <Compile Include="src\asm\EREelPatcher.cs" />
     <Compile Include="src\asm\Extensions\EelRoastManagerExtensions.cs" />
     <Compile Include="src\asm\Extensions\KAConsoleExtensions.cs" />
+    <Compile Include="src\asm\Extensions\SanctuaryPet_Extensions.cs" />
     <Compile Include="src\asm\Extensions\UiAvatarControlsExtensions.cs" />
     <Compile Include="src\asm\Extensions\UiBackpackExtensions.cs" />
     <Compile Include="src\asm\Extensions\UiChestExtensions.cs" />
@@ -199,6 +200,8 @@
     <Compile Include="src\basemod\console\commands\BTTweakDataCommand.cs" />
     <Compile Include="src\basemod\console\commands\itemdumphandlers\FullItemDumpHandler.cs" />
     <Compile Include="src\basemod\console\commands\itemdumphandlers\ItemStateDumpHandler.cs" />
+    <Compile Include="src\basemod\extensions\ColorExtensions.cs" />
+    <Compile Include="src\basemod\extensions\StringBuilderExtensions.cs" />
     <Compile Include="src\SodBaseMod.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
