@@ -15,5 +15,11 @@ namespace SoD_BaseMod.Extensions {
 			/* dummy content */
 			throw new NotImplementedException("Stub called, reverse patch has not been applied!");
 		}
+
+		[HarmonyReversePatch, HarmonyPatch(methodName: "EnableAvatarShowButton", argumentTypes: new[] { typeof(bool) })]
+		public static void EnableAvatarShowButton(this UiAvatarControls __instance, bool hide) {
+			/* dummy content */
+			throw new NotImplementedException("Stub called, reverse patch has not been applied!");
+		}
 	}
 }

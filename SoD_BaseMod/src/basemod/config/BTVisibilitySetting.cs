@@ -1,5 +1,5 @@
 ﻿namespace SoD_BaseMod.config {
-	public enum BTCursorVisibility {
+	public enum BTVisibilitySetting {
 		Default,
 		Force,
 		Hide

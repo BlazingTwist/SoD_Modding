@@ -25,11 +25,11 @@ namespace SoD_BaseMod {
 			}
 
 			switch (config.cursorVisibility) {
-				case BTCursorVisibility.Force:
+				case BTVisibilitySetting.Force:
 					return true;
-				case BTCursorVisibility.Hide:
+				case BTVisibilitySetting.Hide:
 					return false;
-				case BTCursorVisibility.Default:
+				case BTVisibilitySetting.Default:
 				default:
 					return currentValue;
 			}

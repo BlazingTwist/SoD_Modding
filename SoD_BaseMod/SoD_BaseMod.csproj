@@ -155,7 +155,7 @@
     <Compile Include="src\basemod\BTUIDragHandler.cs" />
     <Compile Include="src\basemod\BTUIUtils.cs" />
     <Compile Include="src\basemod\config\BTConfig.cs" />
-    <Compile Include="src\basemod\config\BTCursorVisibility.cs" />
+    <Compile Include="src\basemod\config\BTVisibilitySetting.cs" />
     <Compile Include="src\basemod\config\BTCutsceneConfigEntry.cs" />
     <Compile Include="src\basemod\config\BTHackConfig.cs" />
     <Compile Include="src\basemod\config\BTLevelConfigEntry.cs" />

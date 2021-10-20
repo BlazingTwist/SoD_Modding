@@ -44,6 +44,9 @@ namespace SoD_BaseMod.config {
 		public Dictionary<string, List<string>> commandBinds;
 
 		// Cursor
-		public BTCursorVisibility cursorVisibility = BTCursorVisibility.Default;
+		public BTVisibilitySetting cursorVisibility = BTVisibilitySetting.Default;
+		
+		// Hide AvatarButton
+		public BTVisibilitySetting avatarButtonVisibility = BTVisibilitySetting.Default;
 	}
 }
