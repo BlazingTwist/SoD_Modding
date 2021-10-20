@@ -2,6 +2,7 @@
 using System.Globalization;
 using UnityEngine;
 using System.Runtime.Serialization;
+using SoD_BaseMod.console;
 
 namespace SoD_BaseMod.config.toggleScript {
 	/**
@@ -47,25 +48,37 @@ namespace SoD_BaseMod.config.toggleScript {
 			return result;
 		}
 
-		public bool ObjectMatches(GameObject gameObject) {
+		public bool ObjectMatches(GameObject gameObject, bool verbose) {
 			if (!gameObject.name.Equals(name, StringComparison.InvariantCulture)) {
 				return false;
 			}
 			Vector3 objectPosition = gameObject.transform.position;
 			if (x != null) {
 				if (Math.Abs(x.Value - objectPosition.x) > epsilon) {
+					if (verbose) {
+						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed x check: expected={x.Value} != actual={objectPosition.x}");
+					}
 					return false;
 				}
 			}
 			if (y != null) {
 				if (Math.Abs(y.Value - objectPosition.y) > epsilon) {
+					if (verbose) {
+						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed y check: expected={y.Value} != actual={objectPosition.y}");
+					}
 					return false;
 				}
 			}
 			if (z != null) {
 				if (Math.Abs(z.Value - objectPosition.z) > epsilon) {
+					if (verbose) {
+						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed z check: expected={z.Value} != actual={objectPosition.z}");
+					}
 					return false;
 				}
+			}
+			if (verbose) {
+				BTConsole.WriteLine($"object passed all checks: {gameObject.name} | {objectPosition}");
 			}
 			return true;
 		}

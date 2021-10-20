@@ -210,7 +210,7 @@ namespace SoD_BaseMod.console {
 			Dictionary<BTToggleScriptEntry, int> matches = toggleScript.ToDictionary(script => script, script => 0);
 			int total = 0;
 			foreach (GameObject gameObject in Resources.FindObjectsOfTypeAll<GameObject>()) {
-				BTToggleScriptEntry matchingEntry = toggleScript.FirstOrDefault(entry => entry.ObjectMatches(gameObject));
+				BTToggleScriptEntry matchingEntry = toggleScript.FirstOrDefault(entry => entry.ObjectMatches(gameObject, cmdInput.verbose));
 				if (matchingEntry != null) {
 					switch (cmdInput.mode) {
 						case BTLevelRunToggleScriptInput.ToggleScriptMode.ENABLE:
@@ -229,14 +229,14 @@ namespace SoD_BaseMod.console {
 					total++;
 				}
 			}
-			
+
 			foreach (BTToggleScriptEntry script in matches.Where(kvp => kvp.Value == 0).Select(kvp => kvp.Key)) {
 				outputBuilder.AppendLine($"\tWarning: script-target '{script.Serialize()}' found 0 matches!");
 			}
 			outputBuilder.Append($"{cmdInput.mode}D {total} objects.");
 			BTConsole.WriteLine(outputBuilder.ToString());
 		}
-		
+
 		private class BTLevelRunToggleScriptInput : BTConsoleCommand.BTCommandInput {
 			public enum ToggleScriptMode {
 				ENABLE,
@@ -246,6 +246,7 @@ namespace SoD_BaseMod.console {
 
 			public string scriptName;
 			public ToggleScriptMode mode;
+			public bool verbose;
 
 			private void SetScriptName(object scriptName, bool isPresent) {
 				this.scriptName = (string) scriptName;
@@ -253,6 +254,10 @@ namespace SoD_BaseMod.console {
 
 			private void SetMode(object mode, bool isPresent) {
 				this.mode = isPresent ? (ToggleScriptMode) mode : ToggleScriptMode.TOGGLE;
+			}
+
+			private void SetVerbose(object verbose, bool isPresent) {
+				this.verbose = isPresent && (bool) verbose;
 			}
 
 			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
@@ -270,6 +275,13 @@ namespace SoD_BaseMod.console {
 								"mode of script execution, 'ENABLE's, 'DISABLE's or 'TOGGLE's all script objects - defaults to TOGGLE",
 								SetMode,
 								typeof(ToggleScriptMode)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"verbose",
+								true,
+								"if true, provides debug information to the console - defaults to 'false'",
+								SetVerbose,
+								typeof(bool)
 						)
 				};
 			}
