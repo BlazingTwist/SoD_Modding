@@ -343,14 +343,9 @@ namespace SoD_BaseMod.console {
 						firstStateRow.itemState_rule_completionAction = itemState?.Rule?.CompletionAction?.Transition;
 
 						List<ItemDataRow> ruleCriteria = itemState?.Rule?.Criterias
-								?.Select(criterion => {
-									if (criterion?.Type == ItemStateCriteriaType.ReplenishableItem) {
-										BTConsole.WriteLine("Found 'ReplenishableItem' at id: " + i);
-									}
-									return new ItemDataRow {
-											itemState_rule_criteria = criterion?.Type,
-											itemState_rule_criteriaObject = criterion
-									};
+								?.Select(criterion => new ItemDataRow {
+										itemState_rule_criteria = criterion?.Type,
+										itemState_rule_criteriaObject = criterion
 								}).ToList();
 
 						if (ruleCriteria != null && ruleCriteria.Count > 0) {
