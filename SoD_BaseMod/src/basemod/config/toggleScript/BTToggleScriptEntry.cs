@@ -48,31 +48,32 @@ namespace SoD_BaseMod.config.toggleScript {
 			return result;
 		}
 
-		public bool ObjectMatches(GameObject gameObject, bool verbose) {
+		public bool ObjectMatches(GameObject gameObject, bool verbose, float? accuracy) {
 			if (!gameObject.name.Equals(name, StringComparison.InvariantCulture)) {
 				return false;
 			}
+			float maxDelta = accuracy ?? epsilon;
 			Vector3 objectPosition = gameObject.transform.position;
 			if (x != null) {
-				if (Math.Abs(x.Value - objectPosition.x) > epsilon) {
+				if (Math.Abs(x.Value - objectPosition.x) > maxDelta) {
 					if (verbose) {
-						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed x check: expected={x.Value} != actual={objectPosition.x}");
+						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed x check: expected={x.Value} != actual={objectPosition.x} | maxDelta={maxDelta}");
 					}
 					return false;
 				}
 			}
 			if (y != null) {
-				if (Math.Abs(y.Value - objectPosition.y) > epsilon) {
+				if (Math.Abs(y.Value - objectPosition.y) > maxDelta) {
 					if (verbose) {
-						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed y check: expected={y.Value} != actual={objectPosition.y}");
+						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed y check: expected={y.Value} != actual={objectPosition.y} | maxDelta={maxDelta}");
 					}
 					return false;
 				}
 			}
 			if (z != null) {
-				if (Math.Abs(z.Value - objectPosition.z) > epsilon) {
+				if (Math.Abs(z.Value - objectPosition.z) > maxDelta) {
 					if (verbose) {
-						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed z check: expected={z.Value} != actual={objectPosition.z}");
+						BTConsole.WriteLine($"object passed name check: {gameObject.name} | {objectPosition} - but failed z check: expected={z.Value} != actual={objectPosition.z} | maxDelta={maxDelta}");
 					}
 					return false;
 				}

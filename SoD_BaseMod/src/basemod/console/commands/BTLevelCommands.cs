@@ -210,7 +210,7 @@ namespace SoD_BaseMod.console {
 			Dictionary<BTToggleScriptEntry, int> matches = toggleScript.ToDictionary(script => script, script => 0);
 			int total = 0;
 			foreach (GameObject gameObject in Resources.FindObjectsOfTypeAll<GameObject>()) {
-				BTToggleScriptEntry matchingEntry = toggleScript.FirstOrDefault(entry => entry.ObjectMatches(gameObject, cmdInput.verbose));
+				BTToggleScriptEntry matchingEntry = toggleScript.FirstOrDefault(entry => entry.ObjectMatches(gameObject, cmdInput.verbose, cmdInput.accuracy));
 				if (matchingEntry != null) {
 					switch (cmdInput.mode) {
 						case BTLevelRunToggleScriptInput.ToggleScriptMode.ENABLE:
@@ -247,6 +247,7 @@ namespace SoD_BaseMod.console {
 			public string scriptName;
 			public ToggleScriptMode mode;
 			public bool verbose;
+			public float? accuracy;
 
 			private void SetScriptName(object scriptName, bool isPresent) {
 				this.scriptName = (string) scriptName;
@@ -258,6 +259,10 @@ namespace SoD_BaseMod.console {
 
 			private void SetVerbose(object verbose, bool isPresent) {
 				this.verbose = isPresent && (bool) verbose;
+			}
+
+			private void SetAccuracy(object accuracy, bool isPresent) {
+				this.accuracy = isPresent ? new float?((float) accuracy) : null;
 			}
 
 			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
@@ -282,6 +287,13 @@ namespace SoD_BaseMod.console {
 								"if true, provides debug information to the console - defaults to 'false'",
 								SetVerbose,
 								typeof(bool)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"accuracy",
+								true,
+								"provide a custom accuracy for float comparisons, this is the maximum difference between two equal floats - e.g. '2' means that '1.0' and '3.0' are considered equal",
+								SetAccuracy,
+								typeof(float)
 						)
 				};
 			}
