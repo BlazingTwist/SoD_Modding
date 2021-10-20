@@ -10,7 +10,7 @@ namespace SoD_BaseMod.config.toggleScript {
 	[DataContract(Namespace = "", Name = xmlContractName)]
 	public class BTToggleScriptEntry {
 		private const string xmlContractName = "TargetObject";
-		private const float epsilon = 0.00001f;
+		private const float epsilon = 0.01f;
 		
 		[DataMember(IsRequired = true, EmitDefaultValue = false)] private string name;
 		[DataMember(IsRequired = false, EmitDefaultValue = false)] private float? x;
