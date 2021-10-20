@@ -61,6 +61,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>..\SoD_BepInEx_Libraries\System.Runtime.Serialization.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -157,6 +160,7 @@
     <Compile Include="src\basemod\config\BTHackConfig.cs" />
     <Compile Include="src\basemod\config\BTLevelConfigEntry.cs" />
     <Compile Include="src\basemod\config\BTLoggerConfigEntry.cs" />
+    <Compile Include="src\basemod\config\toggleScript\BTToggleScriptEntry.cs" />
     <Compile Include="src\basemod\console\BTCommandUtils.cs" />
     <Compile Include="src\basemod\console\BTConsole.cs" />
     <Compile Include="src\basemod\console\BTConsoleCommand.cs" />

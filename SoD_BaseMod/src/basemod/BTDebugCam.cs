@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using SoD_BaseMod.config.toggleScript;
+using SoD_BaseMod.console;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -128,7 +130,12 @@ namespace SoD_BaseMod {
 
 		private static void DeleteLookedAtObject(Component camera) {
 			if (Physics.Raycast(camera.transform.position, camera.transform.forward, out RaycastHit raycastHit)) {
-				raycastHit.transform.gameObject.SetActive(false);
+				GameObject deleteObject = raycastHit.transform.gameObject;
+				deleteObject.SetActive(false);
+				string xmlString = new BTToggleScriptEntry(deleteObject).Serialize();
+				string logString = $"Disabled object: {xmlString}";
+				BTConsole.WriteLine(logString);
+				Debug.Log(logString);
 			}
 		}
 

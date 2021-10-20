@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using SoD_BaseMod.config.toggleScript;
 using SoD_BaseMod.extensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace SoD_BaseMod.console {
 	public static class BTLevelCommands {
@@ -25,6 +29,12 @@ namespace SoD_BaseMod.console {
 					new BTLevelSetLightingInput(),
 					"set the lighting in the current scene",
 					OnExecuteLevelSetLighting
+			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "level", "runToggleScript" },
+					new BTLevelRunToggleScriptInput(),
+					"execute a toggleScript (enables/disables objects in the scene)",
+					OnExecuteRunToggleScript
 			));
 		}
 
@@ -180,6 +190,86 @@ namespace SoD_BaseMod.console {
 								"comma separated xyz direction of the sunlight, default is '0,-1,0' (straight down), example: '1.5,-1,2.7'",
 								SetLightDirection,
 								typeof(string)
+						)
+				};
+			}
+		}
+
+		private static void OnExecuteRunToggleScript(BTConsoleCommand.BTCommandInput input) {
+			var cmdInput = (BTLevelRunToggleScriptInput) input;
+			List<BTToggleScriptEntry> toggleScript;
+			try {
+				toggleScript = BTConfigHolder.LoadToggleScript(cmdInput.scriptName);
+			} catch (Exception e) {
+				BTConsole.WriteLine("RunToggleScript failed due to an error while loading the toggleScript.\n"
+						+ $"Error: {e.Message}");
+				return;
+			}
+			StringBuilder outputBuilder = new StringBuilder();
+			outputBuilder.AppendLine($"Executing toggleScript: {cmdInput.scriptName} in mode: {cmdInput.mode}");
+			Dictionary<BTToggleScriptEntry, int> matches = toggleScript.ToDictionary(script => script, script => 0);
+			int total = 0;
+			foreach (GameObject gameObject in Resources.FindObjectsOfTypeAll<GameObject>()) {
+				BTToggleScriptEntry matchingEntry = toggleScript.FirstOrDefault(entry => entry.ObjectMatches(gameObject));
+				if (matchingEntry != null) {
+					switch (cmdInput.mode) {
+						case BTLevelRunToggleScriptInput.ToggleScriptMode.ENABLE:
+							gameObject.SetActive(true);
+							break;
+						case BTLevelRunToggleScriptInput.ToggleScriptMode.DISABLE:
+							gameObject.SetActive(false);
+							break;
+						case BTLevelRunToggleScriptInput.ToggleScriptMode.TOGGLE:
+							gameObject.SetActive(!gameObject.activeSelf);
+							break;
+						default:
+							throw new InvalidDataException($"Unknown toggleScript-mode: '{cmdInput.mode}'");
+					}
+					matches[matchingEntry]++;
+					total++;
+				}
+			}
+			
+			foreach (BTToggleScriptEntry script in matches.Where(kvp => kvp.Value == 0).Select(kvp => kvp.Key)) {
+				outputBuilder.AppendLine($"\tWarning: script-target '{script.Serialize()}' found 0 matches!");
+			}
+			outputBuilder.Append($"{cmdInput.mode}D {total} objects.");
+			BTConsole.WriteLine(outputBuilder.ToString());
+		}
+		
+		private class BTLevelRunToggleScriptInput : BTConsoleCommand.BTCommandInput {
+			public enum ToggleScriptMode {
+				ENABLE,
+				DISABLE,
+				TOGGLE
+			}
+
+			public string scriptName;
+			public ToggleScriptMode mode;
+
+			private void SetScriptName(object scriptName, bool isPresent) {
+				this.scriptName = (string) scriptName;
+			}
+
+			private void SetMode(object mode, bool isPresent) {
+				this.mode = isPresent ? (ToggleScriptMode) mode : ToggleScriptMode.TOGGLE;
+			}
+
+			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
+				return new List<BTConsoleCommand.BTConsoleArgument> {
+						new BTConsoleCommand.BTConsoleArgument(
+								"scriptName",
+								false,
+								"name of the script to execute, toggleScripts are stored in '...\\DOMain_Data\\BlazingTwist\\toggleScripts\\'",
+								SetScriptName,
+								typeof(string)
+						),
+						new BTConsoleCommand.BTConsoleArgument(
+								"mode",
+								true,
+								"mode of script execution, 'ENABLE's, 'DISABLE's or 'TOGGLE's all script objects - defaults to TOGGLE",
+								SetMode,
+								typeof(ToggleScriptMode)
 						)
 				};
 			}
