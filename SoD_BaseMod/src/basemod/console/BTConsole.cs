@@ -434,10 +434,23 @@ namespace SoD_BaseMod.console {
 		}
 
 		public static void WriteLine(string line) {
-			if (ConfigHolder.config != null && ConfigHolder.config.consoleReverseOutput) {
+			bool reverseOutput = ConfigHolder.config?.consoleReverseOutput ?? false;
+			int maxLines = ConfigHolder.config?.consoleMaxOutputLines ?? 256;
+			if (reverseOutput) {
+				// newest lines are on top
 				consoleText = line + "\n" + consoleText;
+				string[] lines = consoleText.Split('\n');
+				if (lines.Length > maxLines) {
+					consoleText = string.Join("\n", lines, 0, maxLines);
+				}
 			} else {
+				// newest lines are at bottom
 				consoleText += line + "\n";
+				string[] lines = consoleText.Split('\n');
+				int lineCount = lines.Length;
+				if (lineCount > maxLines) {
+					consoleText = string.Join("\n", lines, lineCount - maxLines, maxLines);
+				}
 			}
 		}
 

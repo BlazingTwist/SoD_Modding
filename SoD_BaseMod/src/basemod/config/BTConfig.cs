@@ -40,6 +40,7 @@ namespace SoD_BaseMod.config {
 		public int suggestionCount = 5;
 		public bool consoleOpenByDefault;
 		public bool consoleReverseOutput;
+		public int consoleMaxOutputLines = 256;
 		public string consoleDefaultCommand = "help";
 		public Dictionary<string, List<string>> commandBinds;
 
