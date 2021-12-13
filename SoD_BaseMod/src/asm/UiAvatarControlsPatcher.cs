@@ -2,15 +2,12 @@
 using HarmonyLib;
 using SoD_BaseMod.config;
 using SoD_BaseMod.Extensions;
+using UnityEngine;
 
 namespace SoD_BaseMod {
 	[HarmonyPatch(declaringType: typeof(UiAvatarControls))]
 	public static class UiAvatarControlsPatcher {
-		[HarmonyPrefix, HarmonyPatch(methodName: nameof(UiAvatarControls.ShowAvatarToggleButton), argumentTypes: new[] { typeof(bool) })]
-		private static void ShowAvatarToggleButtonPrefix(out bool show) {
-			show = true;
-		}
-
+		
 		[HarmonyPostfix, HarmonyPatch(methodName: nameof(UiAvatarControls.GetWeaponCooldown), argumentTypes: new Type[] { })]
 		private static void GetWeaponCooldownPostfix(ref float __result) {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
@@ -69,6 +66,22 @@ namespace SoD_BaseMod {
 				if (FUEManager.IsInputEnabled("ToggleAvatar")) {
 					__instance.EnableAvatarHideButton(!hide);
 				}
+			}
+		}
+		
+		[HarmonyPrefix, HarmonyPatch(methodName: nameof(UiAvatarControls.ShowAvatarToggleButton), argumentTypes: new[] { typeof(bool) })]
+		private static bool ShowAvatarToggleButtonPrefix(UiAvatarControls __instance, bool show) {
+			BTVisibilitySetting visibility = BTDebugCamInputManager.GetConfigHolder().config.avatarButtonVisibility;
+			switch (visibility) {
+				case BTVisibilitySetting.Default:
+					return true;
+				case BTVisibilitySetting.Force:
+					return false;
+				case BTVisibilitySetting.Hide:
+					return false;
+				default:
+					BTConfigHolder.LogMessage(LogType.Error, $"ShowAvatarToggleButtonPrefix: Unknown ButtonVisibility '{visibility}'");
+					throw new ArgumentOutOfRangeException();
 			}
 		}
 	}

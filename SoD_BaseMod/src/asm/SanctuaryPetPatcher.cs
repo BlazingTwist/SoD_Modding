@@ -68,7 +68,7 @@ namespace SoD_BaseMod {
 			}
 		}
 
-		[HarmonyPrefix, HarmonyPatch(methodName: "set_" + nameof(SanctuaryPet.pWeaponShotsAvailable), argumentTypes: new[] { typeof(int) })]
+		[HarmonyPrefix, HarmonyPatch(methodName: nameof(SanctuaryPet.pWeaponShotsAvailable), methodType: MethodType.Setter)]
 		private static bool SetPWeaponShotsAvailablePrefix() {
 			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
 			return hackConfig == null || !hackConfig.fireball_infiniteShots;
