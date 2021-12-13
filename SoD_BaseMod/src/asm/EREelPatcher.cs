@@ -13,14 +13,14 @@ namespace SoD_BaseMod {
 				return true;
 			}
 
+			// TODO find a way to bypass eel deletion without duplicating the remaining code
 			SanctuaryManager.pCurPetInstance.UpdateMeter(SanctuaryPetMeterType.HAPPINESS, __instance._PetHappiness);
 			if (__instance._EelBlastColors == null || __instance._EelBlastColors.Length == 0 || __instance._EelBlastEffectObj == null) {
 				return false;
 			}
 
 			int num = UnityEngine.Random.Range(0, __instance._EelBlastColors.Length);
-			GameObject gameObject = UnityEngine.Object.Instantiate(__instance._EelBlastEffectObj, __instance._RenderPath.transform.position,
-					__instance._EelBlastEffectObj.transform.rotation);
+			GameObject gameObject = UnityEngine.Object.Instantiate(__instance._EelBlastEffectObj, __instance._RenderPath.transform.position, __instance._EelBlastEffectObj.transform.rotation);
 			gameObject.transform.parent = __instance._PrtParent.transform;
 
 			ParticleSystem.MainModule main = gameObject.GetComponent<ParticleSystem>().main;
@@ -31,8 +31,7 @@ namespace SoD_BaseMod {
 			}
 
 			Vector3 position = SanctuaryManager.pCurPetInstance.GetHeadPosition() + __instance._HappinessTextDragonOffset;
-			GameObject gameObject2 = UnityEngine.Object.Instantiate(__instance._EelHit3DScore.gameObject, position,
-					__instance._EelHit3DScore.transform.rotation);
+			GameObject gameObject2 = UnityEngine.Object.Instantiate(__instance._EelHit3DScore.gameObject, position, __instance._EelHit3DScore.transform.rotation);
 			var component = gameObject2.GetComponent<TargetHit3DScore>();
 			component.mDisplayScore = (int) __instance._PetHappiness;
 			component.mDisplayText = __instance._PetHappinessText._Text;

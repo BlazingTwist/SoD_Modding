@@ -15,8 +15,6 @@ namespace SoD_BaseMod {
 
 			var harmony = new Harmony(pluginGuid);
 			harmony.PatchAll(GetType().Assembly);
-			CharacterPatcher.ApplyPatches(harmony);
-			AbilityPatcher.ApplyPatches(harmony);
 		}
 	}
 }

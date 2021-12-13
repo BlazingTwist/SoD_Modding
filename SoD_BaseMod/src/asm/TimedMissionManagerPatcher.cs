@@ -7,13 +7,12 @@ using BepInEx.Logging;
 using BTHarmonyUtils.TranspilerUtils;
 using HarmonyLib;
 using SoD_BaseMod.config;
+using SoD_BaseMod.utils;
 
 namespace SoD_BaseMod {
 	[HarmonyPatch(declaringType: typeof(TimedMissionManager))]
 	public static class TimedMissionManagerPatcher {
-		private static readonly string loggerName = $"BT_{MethodBase.GetCurrentMethod().DeclaringType?.Name}";
-		private static ManualLogSource Logger => _logger ?? (_logger = BepInEx.Logging.Logger.CreateLogSource(loggerName));
-		private static ManualLogSource _logger;
+		private static readonly ManualLogSource logger = LoggerUtils.GetLogger();
 
 		[HarmonyPostfix, HarmonyPatch(methodName: "UpdateSlotStates", argumentTypes: new Type[] { })]
 		private static void UpdateSlotStatesPostfix(List<TimedMissionSlotData> ___mTimedMissionSlotList) {
@@ -89,7 +88,7 @@ namespace SoD_BaseMod {
 							new CodeInstruction(OpCodes.Call, patcherMethod_SetAchievementByEntityIDsHook)
 					}
 			);
-			patch.ApplySafe(instructionList, Logger);
+			patch.ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 

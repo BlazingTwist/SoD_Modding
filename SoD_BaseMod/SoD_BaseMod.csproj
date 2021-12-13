@@ -206,6 +206,8 @@
     <Compile Include="src\basemod\console\commands\itemdumphandlers\ItemStateDumpHandler.cs" />
     <Compile Include="src\basemod\extensions\ColorExtensions.cs" />
     <Compile Include="src\basemod\extensions\StringBuilderExtensions.cs" />
+    <Compile Include="src\basemod\HackLogic.cs" />
+    <Compile Include="src\basemod\utils\LoggerUtils.cs" />
     <Compile Include="src\SodBaseMod.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

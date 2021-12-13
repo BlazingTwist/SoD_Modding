@@ -7,14 +7,13 @@ using BTHarmonyUtils.TranspilerUtils;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SoD_BaseMod.config;
+using SoD_BaseMod.utils;
 using SquadTactics;
 
 namespace SoD_BaseMod {
 	[HarmonyPatch(declaringType: typeof(UiEndDB))]
 	public static class UiEndDBPatcher {
-		private static readonly string loggerName = $"BT_{MethodBase.GetCurrentMethod().DeclaringType?.Name}";
-		private static ManualLogSource Logger => _logger ?? (_logger = BepInEx.Logging.Logger.CreateLogSource(loggerName));
-		private static ManualLogSource _logger;
+		private static readonly ManualLogSource logger = LoggerUtils.GetLogger();
 
 		[UsedImplicitly]
 		public static int GetChestCount(int normalCount) {
@@ -50,7 +49,7 @@ namespace SoD_BaseMod {
 							new CodeInstruction(OpCodes.Call, patcherMethod_GetChestCount)
 					}
 			);
-			patch.ApplySafe(instructionList, Logger);
+			patch.ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 	}

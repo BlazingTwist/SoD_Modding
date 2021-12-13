@@ -7,38 +7,25 @@ using BTHarmonyUtils;
 using BTHarmonyUtils.TranspilerUtils;
 using HarmonyLib;
 using JetBrains.Annotations;
-using SoD_BaseMod.config;
+using SoD_BaseMod.utils;
 using SquadTactics;
 
 namespace SoD_BaseMod {
+	[HarmonyPatch]
 	public static class AbilityPatcher {
-		private static readonly string loggerName = $"BT_{MethodBase.GetCurrentMethod().DeclaringType?.Name}";
-		private static ManualLogSource Logger => _logger ?? (_logger = BepInEx.Logging.Logger.CreateLogSource(loggerName));
-		private static ManualLogSource _logger;
+		private static readonly ManualLogSource logger = LoggerUtils.GetLogger();
 
-		public static void ApplyPatches(Harmony harmony) {
-			harmony.Patch(
-					original: PatcherUtils.FindIEnumeratorMoveNext(AccessTools.Method(typeof(Ability), nameof(Ability.Activate),
-							new[] { typeof(Character), typeof(Character) })),
-					transpiler: new HarmonyMethod(SymbolExtensions.GetMethodInfo(() => Activate_Transpiler(null)))
-			);
+		[HarmonyTargetMethod, UsedImplicitly]
+		private static MethodInfo Find_Activate_MoveNext() {
+			return PatcherUtils.FindIEnumeratorMoveNext(AccessTools.Method(typeof(Ability), nameof(Ability.Activate), new[] { typeof(Character), typeof(Character) }));
 		}
 
-		[UsedImplicitly]
-		private static int GetCooldown(int fallback) {
-			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-			if (hackConfig != null && hackConfig.squadTactics_infiniteActions) {
-				return 0;
-			}
-			return fallback;
-		}
-		
-		[UsedImplicitly]
+		[HarmonyTranspiler, UsedImplicitly]
 		private static IEnumerable<CodeInstruction> Activate_Transpiler(IEnumerable<CodeInstruction> instructions) {
 			List<CodeInstruction> instructionList = instructions.ToList();
 
 			FieldInfo field_mCurrentCooldown = AccessTools.Field(typeof(Ability), "mCurrentCooldown");
-			MethodInfo patcherMethod_GetCooldown = SymbolExtensions.GetMethodInfo(() => GetCooldown(0));
+			MethodInfo patcherMethod_GetCooldown = SymbolExtensions.GetMethodInfo(() => HackLogic.GetAbilityCooldown(0));
 
 			CodeReplacementPatch patch = new CodeReplacementPatch(
 					expectedMatches: 1,
@@ -49,7 +36,7 @@ namespace SoD_BaseMod {
 							new CodeInstruction(OpCodes.Stfld, field_mCurrentCooldown)
 					}
 			);
-			patch.ApplySafe(instructionList, Logger);
+			patch.ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 	}

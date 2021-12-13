@@ -6,14 +6,13 @@ using BepInEx.Logging;
 using BTHarmonyUtils.TranspilerUtils;
 using HarmonyLib;
 using SoD_BaseMod.config;
+using SoD_BaseMod.utils;
 using UnityEngine;
 
 namespace SoD_BaseMod {
 	[HarmonyPatch(declaringType: typeof(AvAvatarController))]
 	public static class AvAvatarControllerPatcher {
-		private static readonly string loggerName = $"BT_{MethodBase.GetCurrentMethod().DeclaringType?.Name}";
-		private static ManualLogSource Logger => _logger ?? (_logger = BepInEx.Logging.Logger.CreateLogSource(loggerName));
-		private static ManualLogSource _logger;
+		private static readonly ManualLogSource logger = LoggerUtils.GetLogger();
 
 		[HarmonyPrefix, HarmonyPatch(methodName: "set_" + nameof(AvAvatarController.pFlyingData), argumentTypes: new[] { typeof(AvAvatarFlyingData) })]
 		private static void SetPFlyingDataPrefix(ref AvAvatarFlyingData value) {
@@ -36,7 +35,7 @@ namespace SoD_BaseMod {
 
 			FieldInfo field_mIsBouncing = AccessTools.Field(typeof(AvAvatarController), "mIsBouncing");
 
-			MethodInfo patchMethod_GetFastMovementFactor = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(GetFastMovementFactor));
+			MethodInfo patchMethod_GetFastMovementFactor = SymbolExtensions.GetMethodInfo(() => HackLogic.GetFastMovementFactor());
 
 			CodeReplacementPatch patch = new CodeReplacementPatch(
 					expectedMatches: 1,
@@ -51,16 +50,13 @@ namespace SoD_BaseMod {
 							new CodeInstruction(OpCodes.Ldfld, field_mIsBouncing)
 					}
 			);
-			patch.ApplySafe(instructionList, Logger);
+			patch.ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 
 		[HarmonyPostfix, HarmonyPatch(methodName: "GetHorizontalFromInput", argumentTypes: new Type[] { })]
 		private static void GetHorizontalFromInputPostfix(ref float __result) {
-			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {
-				__result *= 2f;
-			}
+			HackLogic.ModifyHorizontalInput(ref __result);
 		}
 
 		[HarmonyTranspiler, HarmonyPatch(methodName: nameof(AvAvatarController.DoUpdate), argumentTypes: new Type[] { })]
@@ -70,7 +66,7 @@ namespace SoD_BaseMod {
 			FieldInfo field_mVi = AccessTools.Field(typeof(AvAvatarController), "mVi");
 			MethodInfo method_GetJumpVelocity = AccessTools.Method(typeof(AvAvatarController), nameof(AvAvatarController.GetJumpVelocity));
 
-			MethodInfo patchMethod_GetFastMovementFactor = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(GetFastMovementFactor));
+			MethodInfo patchMethod_GetFastMovementFactor = SymbolExtensions.GetMethodInfo(() => HackLogic.GetFastMovementFactor());
 
 			CodeReplacementPatch patch = new CodeReplacementPatch(
 					expectedMatches: 1,
@@ -85,7 +81,7 @@ namespace SoD_BaseMod {
 							new CodeInstruction(OpCodes.Stfld, field_mVi)
 					}
 			);
-			patch.ApplySafe(instructionList, Logger);
+			patch.ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 
@@ -95,7 +91,7 @@ namespace SoD_BaseMod {
 
 			FieldInfo field_mTurnFactor = AccessTools.Field(typeof(AvAvatarController), "mTurnFactor");
 
-			MethodInfo patchMethod_GetTurnFactor = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(GetTurnFactor), new[] { typeof(float) });
+			MethodInfo patchMethod_GetTurnFactor = SymbolExtensions.GetMethodInfo(() => HackLogic.GetTurnFactor(0));
 
 			CodeReplacementPatch patch = new CodeReplacementPatch(
 					expectedMatches: 1,
@@ -106,7 +102,7 @@ namespace SoD_BaseMod {
 							new CodeInstruction(OpCodes.Stfld, field_mTurnFactor)
 					}
 			);
-			patch.ApplySafe(instructionList, Logger);
+			patch.ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 
@@ -117,10 +113,9 @@ namespace SoD_BaseMod {
 			FieldInfo field_mFlightSpeed = AccessTools.Field(typeof(AvAvatarController), "mFlightSpeed");
 			MethodInfo method_Max = AccessTools.Method(typeof(Mathf), nameof(Mathf.Max), new[] { typeof(float), typeof(float) });
 
-			MethodInfo patchMethod_ApplySpeedModifiers = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(ApplySpeedModifiers),
-					new[] { typeof(float).MakeByRefType(), typeof(float).MakeByRefType() });
-			MethodInfo patchMethod_ApplyWingsuitSpeedModifier = AccessTools.Method(typeof(AvAvatarControllerPatcher), nameof(ApplyWingsuitSpeedModifier),
-					new[] { typeof(float) });
+			float ref_val = 0;
+			MethodInfo patchMethod_ApplySpeedModifiers = SymbolExtensions.GetMethodInfo(() => HackLogic.ApplySpeedModifiers(ref ref_val, ref ref_val));
+			MethodInfo patchMethod_ApplyWingsuitSpeedModifier = SymbolExtensions.GetMethodInfo(() => HackLogic.ApplyWingsuitSpeedModifier(0));
 
 			// replace
 			//  if (this.mFlightSpeed < num5)
@@ -160,44 +155,9 @@ namespace SoD_BaseMod {
 							new CodeInstruction(OpCodes.Stloc_S, 4)
 					}
 			);
-			speedModifierPatch.ApplySafe(instructionList, Logger);
-			wingsuitSpeedModifierPatch.ApplySafe(instructionList, Logger);
+			speedModifierPatch.ApplySafe(instructionList, logger);
+			wingsuitSpeedModifierPatch.ApplySafe(instructionList, logger);
 			return instructionList;
-		}
-
-		public static float GetFastMovementFactor() {
-			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-			if (hackConfig != null && hackConfig.controls_fastMovementFactor > 0 && BTDebugCamInputManager.IsKeyDown("DebugCamFastMovement")) {
-				return hackConfig.controls_fastMovementFactor;
-			}
-
-			return 1f;
-		}
-
-		public static float GetTurnFactor(float fallback) {
-			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {
-				return 1f;
-			}
-
-			return fallback;
-		}
-
-		public static void ApplySpeedModifiers(ref float maxSpeed, ref float acceleration) {
-			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {
-				maxSpeed *= 10f;
-				acceleration *= 3f;
-			}
-		}
-
-		public static float ApplyWingsuitSpeedModifier(float speed) {
-			BTHackConfig hackConfig = BTDebugCamInputManager.GetConfigHolder().hackConfig;
-			if (hackConfig != null && hackConfig.controls_useSpeedHacks) {
-				return speed * 5f;
-			}
-
-			return speed;
 		}
 	}
 }

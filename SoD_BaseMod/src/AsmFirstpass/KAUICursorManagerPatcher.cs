@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using BepInEx.Logging;
 using BTHarmonyUtils.TranspilerUtils;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SoD_BaseMod.config;
+using SoD_BaseMod.utils;
 using UnityEngine;
 
 namespace SoD_BaseMod {
 	[HarmonyPatch(declaringType: typeof(KAUICursorManager))]
 	public class KAUICursorManagerPatcher {
-		private static readonly string loggerName = $"BT_{MethodBase.GetCurrentMethod().DeclaringType?.Name}";
-		private static ManualLogSource Logger => _logger ?? (_logger = BepInEx.Logging.Logger.CreateLogSource(loggerName));
-		private static ManualLogSource _logger;
+		private static readonly ManualLogSource logger = LoggerUtils.GetLogger();
 
 		[UsedImplicitly]
 		public static bool ApplyCursorVisibility(bool currentValue) {
@@ -38,14 +36,14 @@ namespace SoD_BaseMod {
 		[HarmonyTranspiler, HarmonyPatch(methodName: "Start", argumentTypes: new Type[] { })]
 		private static IEnumerable<CodeInstruction> StartTranspiler(IEnumerable<CodeInstruction> instructions) {
 			List<CodeInstruction> instructionList = instructions.ToList();
-			GetCursorVisibilityPatch().ApplySafe(instructionList, Logger);
+			GetCursorVisibilityPatch().ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 
 		[HarmonyTranspiler, HarmonyPatch(methodName: nameof(KAUICursorManager.SetCursor), argumentTypes: new[] { typeof(string), typeof(bool) })]
 		private static IEnumerable<CodeInstruction> SetCursorTranspiler(IEnumerable<CodeInstruction> instructions) {
 			List<CodeInstruction> instructionList = instructions.ToList();
-			GetCursorVisibilityPatch().ApplySafe(instructionList, Logger);
+			GetCursorVisibilityPatch().ApplySafe(instructionList, logger);
 			return instructionList;
 		}
 
