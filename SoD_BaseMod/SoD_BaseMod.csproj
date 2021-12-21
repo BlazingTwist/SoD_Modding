@@ -125,6 +125,7 @@
     <Compile Include="src\asm\EREelPatcher.cs" />
     <Compile Include="src\asm\Extensions\EelRoastManagerExtensions.cs" />
     <Compile Include="src\asm\Extensions\KAConsoleExtensions.cs" />
+    <Compile Include="src\asm\Extensions\MissionManager_Extensions.cs" />
     <Compile Include="src\asm\Extensions\SanctuaryPet_Extensions.cs" />
     <Compile Include="src\asm\Extensions\UiAvatarControlsExtensions.cs" />
     <Compile Include="src\asm\Extensions\UiBackpackExtensions.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="src\asm\UiEndDBPatcher.cs" />
     <Compile Include="src\asm\UiSelectProfilePatcher.cs" />
     <Compile Include="src\asm\WeaponManagerPatcher.cs" />
+    <Compile Include="src\asm\WorldEventScoutAttackPatches.cs" />
     <Compile Include="src\basemod\BTAnimationPlayerManager.cs" />
     <Compile Include="src\basemod\BTConfigHolder.cs" />
     <Compile Include="src\basemod\BTCutsceneManager.cs" />
@@ -208,6 +210,7 @@
     <Compile Include="src\basemod\extensions\StringBuilderExtensions.cs" />
     <Compile Include="src\basemod\HackLogic.cs" />
     <Compile Include="src\basemod\utils\LoggerUtils.cs" />
+    <Compile Include="src\basemod\utils\TableUtils.cs" />
     <Compile Include="src\SodBaseMod.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

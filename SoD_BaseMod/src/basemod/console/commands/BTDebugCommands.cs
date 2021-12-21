@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using HarmonyLib;
 using KA.Framework;
 using KnowledgeAdventure.Multiplayer.Utility;
 using SoD_BaseMod.Extensions;
@@ -64,9 +65,27 @@ namespace SoD_BaseMod.console {
 			));
 			BTConsole.AddCommand(new BTConsoleCommand(
 					new List<string> { "DebugCommand" },
-					new BTDebugCommandInput(),
-					"debug command used for executing test code on command",
+					new BTNoArgsInput(),
+					"debug command used for executing test code on command (currently logging pet shader details)",
 					OnExecuteDebugCommand
+			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "DebugCommand2" },
+					new BTNoArgsInput(),
+					"debug command used for executing test code on command (currently mission data logging)",
+					OnExecuteDebugCommand2
+			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "DebugCommand3" },
+					new BTNoArgsInput(),
+					"debug command used for executing test code on command",
+					OnExecuteDebugCommand3
+			));
+			BTConsole.AddCommand(new BTConsoleCommand(
+					new List<string> { "DebugCommand4" },
+					new BTNoArgsInput(),
+					"debug command used for executing test code on command",
+					OnExecuteDebugCommand4
 			));
 		}
 
@@ -86,7 +105,7 @@ namespace SoD_BaseMod.console {
 		}
 
 		private static void OnExecuteDebugInfo(BTConsoleCommand.BTCommandInput input) {
-			var cmdInput = (BTDebugInfoInput) input;
+			var cmdInput = (BTDebugInfoInput)input;
 			GameObject debugUI = GameObject.Find("PfUiDebugInfo");
 			if (debugUI == null) {
 				BTConsole.WriteLine("error - Can't find debug UI");
@@ -101,7 +120,7 @@ namespace SoD_BaseMod.console {
 			public bool show;
 
 			private void SetShow(object show, bool isPresent) {
-				this.show = (bool) show;
+				this.show = (bool)show;
 			}
 
 			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
@@ -123,7 +142,7 @@ namespace SoD_BaseMod.console {
 		}
 
 		private static void OnExecuteDebugMemDump(BTConsoleCommand.BTCommandInput input) {
-			var cmdInput = (BTDebugMemDumpInput) input;
+			var cmdInput = (BTDebugMemDumpInput)input;
 			string outputFileName = MemDump.WriteToFile(cmdInput.fileName);
 			BTConsole.WriteLine("Dumping Memory to file " + outputFileName);
 		}
@@ -132,7 +151,7 @@ namespace SoD_BaseMod.console {
 			public string fileName;
 
 			private void SetFileName(object fileName, bool isPresent) {
-				this.fileName = isPresent ? "_" + (string) fileName : "";
+				this.fileName = isPresent ? "_" + (string)fileName : "";
 			}
 
 			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
@@ -165,7 +184,7 @@ namespace SoD_BaseMod.console {
 		}
 
 		private static void OnExecuteDebugParticles(BTConsoleCommand.BTCommandInput input) {
-			var cmdInput = (BTDebugParticlesInput) input;
+			var cmdInput = (BTDebugParticlesInput)input;
 			if (!(Resources.FindObjectsOfTypeAll(typeof(ParticleSystem)) is ParticleSystem[] allParticleSystems)) {
 				BTConsole.WriteLine("Did not find any particle systems!");
 				return;
@@ -184,7 +203,7 @@ namespace SoD_BaseMod.console {
 			public bool enable;
 
 			private void SetEnable(object enable, bool isPresent) {
-				this.enable = (bool) enable;
+				this.enable = (bool)enable;
 			}
 
 			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
@@ -201,7 +220,7 @@ namespace SoD_BaseMod.console {
 		}
 
 		private static void OnExecuteDebugMask(BTConsoleCommand.BTCommandInput input) {
-			var cmdInput = (BTDebugMaskInput) input;
+			var cmdInput = (BTDebugMaskInput)input;
 			if (cmdInput.add) {
 				UtDebug._Mask |= cmdInput.mask;
 				BTConsole.WriteLine("DebugMask " + cmdInput.mask + " added.");
@@ -219,11 +238,11 @@ namespace SoD_BaseMod.console {
 			public bool add;
 
 			private void SetMask(object mask, bool isPresent) {
-				this.mask = (uint) mask;
+				this.mask = (uint)mask;
 			}
 
 			private void SetAdd(object add, bool isPresent) {
-				this.add = (bool) add;
+				this.add = (bool)add;
 			}
 
 			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
@@ -247,7 +266,6 @@ namespace SoD_BaseMod.console {
 		}
 
 		private static void OnExecuteDebugCommand(BTConsoleCommand.BTCommandInput input) {
-			var cmdInput = (BTDebugCommandInput) input;
 			StringBuilder outputBuilder = new StringBuilder();
 			Dictionary<string, SkinnedMeshRenderer> rendererMap = SanctuaryManager.pCurPetInstance.GetRendererMap();
 			foreach (KeyValuePair<string, SkinnedMeshRenderer> skinnedMeshRenderer in rendererMap) {
@@ -276,9 +294,75 @@ namespace SoD_BaseMod.console {
 			BTConsole.WriteLine(outputBuilder.ToString());
 		}
 
-		private class BTDebugCommandInput : BTConsoleCommand.BTCommandInput {
-			protected override IEnumerable<BTConsoleCommand.BTConsoleArgument> BuildConsoleArguments() {
-				return new List<BTConsoleCommand.BTConsoleArgument>();
+		private static void OnExecuteDebugCommand2(BTConsoleCommand.BTCommandInput input) {
+			List<int> achievementIDs = new List<int> { /*206051, 206052, 206053, 206054, 206055, 206056,*/ 206057 };
+
+			foreach (int achievementID in achievementIDs) {
+				WsWebService.SetAchievementAndGetReward(achievementID, "", (inType, inEvent, progress, inObject, data) => {
+					if (inEvent == WsServiceEvent.ERROR) {
+						BTConsole.WriteLine($"AchievementID: '{(int)data}' returned Error!");
+						return;
+					}
+					if (inEvent == WsServiceEvent.COMPLETE) {
+						if (inObject == null) {
+							BTConsole.WriteLine($"AchievementID: '{(int)data}' received no data!");
+							return;
+						}
+
+						BTConsole.WriteLine($"AchievementID: '{(int)data}' returned data:");
+						BTConsole.WriteLine(UtUtilities.SerializeToXml(inObject));
+					}
+				}, achievementID);
+			}
+		}
+
+		private static void OnExecuteDebugCommand3(BTConsoleCommand.BTCommandInput input) {
+			WsWebService.GetUserAchievements((inType, inEvent, progress, inObject, data) => {
+				if (inEvent != WsServiceEvent.COMPLETE) {
+					return;
+				}
+				ArrayOfUserAchievementInfo info = (ArrayOfUserAchievementInfo)inObject;
+				if (info == null) {
+					BTConsole.WriteLine("info was null!");
+					return;
+				}
+
+				BTConsole.WriteLine(UtUtilities.SerializeToXml(info));
+			}, null);
+		}
+
+		private static void OnExecuteDebugCommand4(BTConsoleCommand.BTCommandInput input) {
+			WorldEventScoutAttack[] eventManagers = Object.FindObjectsOfType<WorldEventScoutAttack>();
+			BTConsole.WriteLine($"Found {eventManagers.Length} instances.");
+			foreach (WorldEventScoutAttack worldEventScoutAttack in eventManagers) {
+				if (worldEventScoutAttack == null) {
+					BTConsole.WriteLine("instance was null!");
+					continue;
+				}
+
+				WorldEventManager.WorldEventAchievementRewardInfo[] rewardInfo = new Traverse(worldEventScoutAttack)
+						.Field("mCurrentRewardInfo")
+						.GetValue<WorldEventManager.WorldEventAchievementRewardInfo[]>();
+				if (rewardInfo == null) {
+					BTConsole.WriteLine("rewardInfo was null!");
+					continue;
+				}
+
+				BTConsole.WriteLine($"  Found {rewardInfo.Length} rewardInfos");
+				foreach (WorldEventManager.WorldEventAchievementRewardInfo info in rewardInfo) {
+					if (info == null) {
+						BTConsole.WriteLine("info was null!");
+						continue;
+					}
+					BTConsole.WriteLine(
+							"    "
+							+ "_RewardNameText = " + info._RewardNameText + " | "
+							+ "_RewardTier = " + info._RewardTier + " | "
+							+ "_AchievementID = " + info._AchievementID + " | "
+							+ "_AdRewardAchievementID = " + info._AdRewardAchievementID
+					);
+				}
+				BTConsole.WriteLine("-----");
 			}
 		}
 	}
